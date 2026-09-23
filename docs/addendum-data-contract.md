@@ -1,0 +1,400 @@
+# Phụ Lục Kỹ Thuật: Giao Ước Dữ Liệu & Dữ Liệu Mẫu (Data Contract & Mock Dataset)
+**Dự án:** AIVES (AI-powered Viva Exam System)  
+**Tài liệu kèm theo PRD:** `prd-aives-2026-09-22/addendum-data-contract.md`  
+**Mục tiêu:** Cung cấp bộ khung dữ liệu chuẩn để đội ngũ phát triển có thể lập trình độc lập **Chức năng số 6 (Phản hồi & Báo cáo)** ngay lập tức mà không phải chờ Lõi AI (Nhóm 3 & 4).
+
+---
+
+## 1. Kiến Trúc Dữ Liệu Phục Vụ Chức Năng 6 (Data Schema Definition)
+
+Mọi báo cáo trong Chức năng 6 đều xoay quanh một thực thể trung tâm là `VivaAttemptRecord` (Bản ghi phiên thi của thí sinh):
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "VivaAttemptRecord",
+  "type": "object",
+  "required": [
+    "attempt_id",
+    "exam_session_id",
+    "student",
+    "status",
+    "total_score",
+    "dialogue_history"
+  ],
+  "properties": {
+    "attempt_id": { "type": "string", "format": "uuid" },
+    "exam_session_id": { "type": "string", "format": "uuid" },
+    "student": {
+      "type": "object",
+      "properties": {
+        "student_id": { "type": "string" },
+        "student_code": { "type": "string" },
+        "full_name": { "type": "string" },
+        "class_name": { "type": "string" }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["IN_PROGRESS", "COMPLETED", "AI_SUGGESTED", "FINALIZED", "PUBLISHED"]
+    },
+    "total_score": { "type": "number", "minimum": 0, "maximum": 10 },
+    "letter_grade": { "type": "string", "enum": ["A+", "A", "B+", "B", "C+", "C", "D+", "D", "F"] },
+    "duration_seconds": { "type": "integer" },
+    "published_at": { "type": "string", "format": "date-time" },
+    "lecturer_note": { "type": "string" },
+    "overall_feedback": {
+      "type": "object",
+      "properties": {
+        "summary": { "type": "string" },
+        "key_strengths": { "type": "array", "items": { "type": "string" } },
+        "areas_for_improvement": { "type": "array", "items": { "type": "string" } },
+        "recommended_review_topics": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "dialogue_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "question_id": { "type": "string" },
+          "question_order": { "type": "integer" },
+          "main_question": { "type": "string" },
+          "bloom_level": { "type": "string", "enum": ["UNDERSTAND", "APPLY", "ANALYZE"] },
+          "max_score": { "type": "number" },
+          "final_question_score": { "type": "number" },
+          "ai_suggested_score": { "type": "number" },
+          "audio_url": { "type": "string" },
+          "turns": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "turn_index": { "type": "integer" },
+                "turn_type": { "type": "string", "enum": ["MAIN_QUESTION", "ADAPTIVE_FOLLOW_UP"] },
+                "ai_prompt": { "type": "string" },
+                "student_transcript": { "type": "string" },
+                "fluency_signals": {
+                  "type": "object",
+                  "properties": {
+                    "pause_duration_seconds": { "type": "number" },
+                    "speaking_rate_wpm": { "type": "number" }
+                  }
+                }
+              }
+            }
+          },
+          "rubric_evaluations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "criterion_name": { "type": "string" },
+                "weight_percent": { "type": "number" },
+                "max_points": { "type": "number" },
+                "awarded_points": { "type": "number" },
+                "ai_reasoning": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+## 2. Dữ Liệu Mẫu Thực Tế (Mock Dataset Cho Sinh Viên & Lớp Học)
+
+Nhóm phát triển Frontend / Backend có thể import trực tiếp JSON này để dựng giao diện:
+
+```json
+[
+  {
+    "attempt_id": "att-001",
+    "exam_session_id": "exam-viva-oop-2026",
+    "student": {
+      "student_id": "sv-101",
+      "student_code": "21120001",
+      "full_name": "Nguyễn Văn An",
+      "class_name": "21KTPM1"
+    },
+    "status": "PUBLISHED",
+    "total_score": 8.5,
+    "letter_grade": "A",
+    "duration_seconds": 720,
+    "published_at": "2026-09-22T15:30:00Z",
+    "lecturer_note": "Nắm vững bản chất OOP, trả lời câu hỏi xoáy sắc bén.",
+    "overall_feedback": {
+      "summary": "Thí sinh có nền tảng tư duy hướng đối tượng tốt, hiểu rõ sự khác biệt giữa Abstract Class và Interface.",
+      "key_strengths": [
+        "Lập luận logic, nêu được ví dụ thực tế trong thiết kế phần mềm",
+        "Hiểu sâu về nguyên lý Dependency Inversion trong SOLID"
+      ],
+      "areas_for_improvement": [
+        "Cần chuẩn xác hơn về chi phí bộ nhớ khi sử dụng Virtual Table (vtable)"
+      ],
+      "recommended_review_topics": [
+        "Cơ chế Dynamic Dispatch trong C++/Java",
+        "Design Pattern: Factory Method"
+      ]
+    },
+    "dialogue_history": [
+      {
+        "question_id": "q-oop-01",
+        "question_order": 1,
+        "main_question": "Em hãy phân biệt sự khác nhau giữa Abstract Class và Interface. Khi nào nên dùng loại nào?",
+        "bloom_level": "ANALYZE",
+        "max_score": 5.0,
+        "ai_suggested_score": 4.5,
+        "final_question_score": 4.5,
+        "audio_url": "https://storage.aives.edu.vn/audio/att-001-q1.mp3",
+        "turns": [
+          {
+            "turn_index": 1,
+            "turn_type": "MAIN_QUESTION",
+            "ai_prompt": "Em hãy phân biệt sự khác nhau giữa Abstract Class và Interface. Khi nào nên dùng loại nào?",
+            "student_transcript": "Dạ thưa thầy, Abstract Class là một lớp trừu tượng có thể chứa cả phương thức trừu tượng và phương thức có phần thân, còn Interface thì từ Java 8 trở về trước chỉ chứa khai báo phương thức trừu tượng. Abstract class dùng khi các lớp có quan hệ kế thừa IS-A, còn Interface dùng khi có quan hệ CAN-DO.",
+            "fluency_signals": {
+              "pause_duration_seconds": 1.2,
+              "speaking_rate_wpm": 135
+            }
+          },
+          {
+            "turn_index": 2,
+            "turn_type": "ADAPTIVE_FOLLOW_UP",
+            "ai_prompt": "Em vừa nói Abstract Class biểu thị quan hệ IS-A. Vậy nếu một class cần kế thừa hành vi từ nhiều nguồn thì Java giải quyết như thế nào khi không hỗ trợ đa kế thừa class?",
+            "student_transcript": "Dạ, Java giải quyết bằng cách cho phép một class implements nhiều Interface cùng lúc. Ngoài ra từ Java 8, Interface có thêm Default Method giúp chia sẻ code dùng chung mà không vi phạm nguyên tắc đơn kế thừa.",
+            "fluency_signals": {
+              "pause_duration_seconds": 2.0,
+              "speaking_rate_wpm": 140
+            }
+          }
+        ],
+        "rubric_evaluations": [
+          {
+            "criterion_name": "Độ chính xác khái niệm (Khác biệt cú pháp & ngữ nghĩa)",
+            "weight_percent": 40,
+            "max_points": 2.0,
+            "awarded_points": 2.0,
+            "ai_reasoning": "Nêu đúng và đủ bản chất IS-A vs CAN-DO và cú pháp."
+          },
+          {
+            "criterion_name": "Khả năng phản biện khi bị hỏi xoáy (Multiple inheritance & Default method)",
+            "weight_percent": 40,
+            "max_points": 2.0,
+            "awarded_points": 1.8,
+            "ai_reasoning": "Trả lời chính xác cơ chế implements nhiều interface và default method."
+          },
+          {
+            "criterion_name": "Độ lưu loát và thuật ngữ chuyên ngành",
+            "weight_percent": 20,
+            "max_points": 1.0,
+            "awarded_points": 0.7,
+            "ai_reasoning": "Nói rõ ràng, thuật ngữ chuẩn xác, thời gian ngập ngừng ngắn."
+          }
+        ]
+      },
+      {
+        "question_id": "q-oop-02",
+        "question_order": 2,
+        "main_question": "Nguyên lý Open/Closed Principle (OCP) trong SOLID được hiểu như thế nào? Cho một ví dụ vi phạm và cách khắc phục.",
+        "bloom_level": "APPLY",
+        "max_score": 5.0,
+        "ai_suggested_score": 3.8,
+        "final_question_score": 4.0,
+        "audio_url": "https://storage.aives.edu.vn/audio/att-001-q2.mp3",
+        "turns": [
+          {
+            "turn_index": 1,
+            "turn_type": "MAIN_QUESTION",
+            "ai_prompt": "Nguyên lý Open/Closed Principle (OCP) trong SOLID được hiểu như thế nào? Cho một ví dụ vi phạm và cách khắc phục.",
+            "student_transcript": "Dạ, OCP nghĩa là mở cho mở rộng nhưng đóng cho sửa đổi. Nghĩa là khi có chức năng mới, ta nên viết thêm code mới thay vì sửa code cũ đang chạy ổn định. Ví dụ hàm tính lương nhân viên dùng if-else kiểm tra từng loại nhân viên Fulltime, Parttime. Nếu thêm nhân viên Intern thì phải sửa code cũ, đó là vi phạm.",
+            "fluency_signals": {
+              "pause_duration_seconds": 1.5,
+              "speaking_rate_wpm": 128
+            }
+          },
+          {
+            "turn_index": 2,
+            "turn_type": "ADAPTIVE_FOLLOW_UP",
+            "ai_prompt": "Vậy để khắc phục đoạn code if-else tính lương đó tuân thủ OCP, em sẽ áp dụng kỹ thuật hướng đối tượng nào?",
+            "student_transcript": "Dạ em sẽ tạo Interface hoặc Abstract Class Employee có phương thức abstract calculateSalary(). Sau đó mỗi loại nhân viên sẽ kế thừa và tự định nghĩa cách tính lương. Khi thêm Intern chỉ cần tạo class mới kế thừa mà không đụng đến code cũ.",
+            "fluency_signals": {
+              "pause_duration_seconds": 1.8,
+              "speaking_rate_wpm": 130
+            }
+          }
+        ],
+        "rubric_evaluations": [
+          {
+            "criterion_name": "Định nghĩa nguyên lý OCP",
+            "weight_percent": 30,
+            "max_points": 1.5,
+            "awarded_points": 1.5,
+            "ai_reasoning": "Định nghĩa chính xác, súc tích."
+          },
+          {
+            "criterion_name": "Phân tích ví dụ vi phạm và giải pháp",
+            "weight_percent": 50,
+            "max_points": 2.5,
+            "awarded_points": 2.0,
+            "ai_reasoning": "Ví dụ if-else tính lương rất điển hình, cách giải quyết bằng tính đa hình (Polymorphism) chuẩn xác."
+          },
+          {
+            "criterion_name": "Độ mạch lạc và trình bày",
+            "weight_percent": 20,
+            "max_points": 1.0,
+            "awarded_points": 0.5,
+            "ai_reasoning": "Có đôi chỗ ấp úng nhưng tự điều chỉnh được."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "attempt_id": "att-002",
+    "exam_session_id": "exam-viva-oop-2026",
+    "student": {
+      "student_id": "sv-102",
+      "student_code": "21120002",
+      "full_name": "Trần Thị Bích",
+      "class_name": "21KTPM1"
+    },
+    "status": "PUBLISHED",
+    "total_score": 5.5,
+    "letter_grade": "C",
+    "duration_seconds": 600,
+    "published_at": "2026-09-22T15:30:00Z",
+    "lecturer_note": "Nắm được định nghĩa cơ bản nhưng lúng túng khi bị hỏi sâu về tình huống thực tế.",
+    "overall_feedback": {
+      "summary": "Thí sinh nhớ được các định nghĩa trong sách giáo khoa nhưng gặp khó khăn trong việc áp dụng giải quyết bài toán cụ thể.",
+      "key_strengths": [
+        "Học thuộc đúng định nghĩa tính đóng gói và kế thừa"
+      ],
+      "areas_for_improvement": [
+        "Cần luyện tập thêm kỹ năng tư duy trừu tượng",
+        "Khi bị hỏi xoáy còn ngập ngừng và trả lời lạc đề"
+      ],
+      "recommended_review_topics": [
+        "Bài tập áp dụng 4 tính chất OOP",
+        "Refactoring mã nguồn hướng đối tượng"
+      ]
+    },
+    "dialogue_history": [
+      {
+        "question_id": "q-oop-01",
+        "question_order": 1,
+        "main_question": "Em hãy phân biệt sự khác nhau giữa Abstract Class và Interface. Khi nào nên dùng loại nào?",
+        "bloom_level": "ANALYZE",
+        "max_score": 5.0,
+        "ai_suggested_score": 2.8,
+        "final_question_score": 3.0,
+        "audio_url": "https://storage.aives.edu.vn/audio/att-002-q1.mp3",
+        "turns": [
+          {
+            "turn_index": 1,
+            "turn_type": "MAIN_QUESTION",
+            "ai_prompt": "Em hãy phân biệt sự khác nhau giữa Abstract Class và Interface. Khi nào nên dùng loại nào?",
+            "student_transcript": "Dạ, Abstract Class là lớp cha, còn Interface là một giao diện. Lớp có thể extends Abstract class nhưng chỉ được một lần, còn Interface thì implements được nhiều cái.",
+            "fluency_signals": {
+              "pause_duration_seconds": 3.5,
+              "speaking_rate_wpm": 95
+            }
+          },
+          {
+            "turn_index": 2,
+            "turn_type": "ADAPTIVE_FOLLOW_UP",
+            "ai_prompt": "Vậy về mặt thiết kế, tại sao người ta lại tạo ra Interface thay vì chỉ dùng Abstract Class? Mục đích cốt lõi là gì?",
+            "student_transcript": "Dạ... để... để cho linh hoạt hơn ạ. Dạ em nhớ là vậy thôi ạ.",
+            "fluency_signals": {
+              "pause_duration_seconds": 5.0,
+              "speaking_rate_wpm": 60
+            }
+          }
+        ],
+        "rubric_evaluations": [
+          {
+            "criterion_name": "Độ chính xác khái niệm",
+            "weight_percent": 40,
+            "max_points": 2.0,
+            "awarded_points": 1.2,
+            "ai_reasoning": "Chỉ nhớ cú pháp extends/implements, chưa nêu được bản chất ngữ nghĩa."
+          },
+          {
+            "criterion_name": "Khả năng phản biện khi bị hỏi xoáy",
+            "weight_percent": 40,
+            "max_points": 2.0,
+            "awarded_points": 0.8,
+            "ai_reasoning": "Không giải thích được mục đích thiết kế của Interface, câu trả lời mơ hồ."
+          },
+          {
+            "criterion_name": "Độ lưu loát và thuật ngữ chuyên ngành",
+            "weight_percent": 20,
+            "max_points": 1.0,
+            "awarded_points": 0.5,
+            "ai_reasoning": "Ngập ngừng nhiều, thiếu tự tin."
+          }
+        ]
+      },
+      {
+        "question_id": "q-oop-02",
+        "question_order": 2,
+        "main_question": "Nguyên lý Open/Closed Principle (OCP) trong SOLID được hiểu như thế nào? Cho một ví dụ vi phạm và cách khắc phục.",
+        "bloom_level": "APPLY",
+        "max_score": 5.0,
+        "ai_suggested_score": 2.5,
+        "final_question_score": 2.5,
+        "audio_url": "https://storage.aives.edu.vn/audio/att-002-q2.mp3",
+        "turns": [
+          {
+            "turn_index": 1,
+            "turn_type": "MAIN_QUESTION",
+            "ai_prompt": "Nguyên lý Open/Closed Principle (OCP) trong SOLID được hiểu như thế nào? Cho một ví dụ vi phạm và cách khắc phục.",
+            "student_transcript": "Dạ OCP là chữ O trong SOLID. Nghĩa là không được sửa code đã viết, chỉ được thêm thôi ạ. Ví dụ như khi làm web thì không sửa trang cũ mà tạo trang mới ạ.",
+            "fluency_signals": {
+              "pause_duration_seconds": 2.5,
+              "speaking_rate_wpm": 105
+            }
+          },
+          {
+            "turn_index": 2,
+            "turn_type": "ADAPTIVE_FOLLOW_UP",
+            "ai_prompt": "Ví dụ của em về 'tạo trang mới' chưa thể hiện rõ thiết kế hướng đối tượng (OOP). Em có thể lấy ví dụ cụ thể về một Class cụ thể được mở rộng bằng Kế thừa hoặc Đa hình không?",
+            "student_transcript": "Dạ phần này em chưa chuẩn bị kỹ ví dụ ạ.",
+            "fluency_signals": {
+              "pause_duration_seconds": 4.0,
+              "speaking_rate_wpm": 80
+            }
+          }
+        ],
+        "rubric_evaluations": [
+          {
+            "criterion_name": "Định nghĩa nguyên lý OCP",
+            "weight_percent": 30,
+            "max_points": 1.5,
+            "awarded_points": 1.0,
+            "ai_reasoning": "Nêu được ý chính nhưng diễn đạt chưa mang tính kỹ thuật."
+          },
+          {
+            "criterion_name": "Phân tích ví dụ vi phạm và giải pháp",
+            "weight_percent": 50,
+            "max_points": 2.5,
+            "awarded_points": 0.5,
+            "ai_reasoning": "Ví dụ sai ngữ cảnh OOP, từ chối trả lời câu hỏi xoáy."
+          },
+          {
+            "criterion_name": "Độ mạch lạc và trình bày",
+            "weight_percent": 20,
+            "max_points": 1.0,
+            "awarded_points": 0.5,
+            "ai_reasoning": "Dừng trả lời sớm."
+          }
+        ]
+      }
+    ]
+  }
+]
+```
