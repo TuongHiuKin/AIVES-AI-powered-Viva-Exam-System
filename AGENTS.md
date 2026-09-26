@@ -1,34 +1,50 @@
-<!-- bmad:context -->
-<!-- Verified 2026-09-22 against initial repository state. Managed by bmad-project-context; edits inside this block are replaced on refresh. Keep anything you want preserved outside the markers. -->
+# PRN222 Assignment 01 — Agent & Team Instructions: FU News Management System
 
-## AIVES (AI-powered Viva Exam System)
+This document directs agents to the project's architecture and Git skills. Read `.agents/skills/funews-architecture/SKILL.md` before architecture or feature work and `.agents/skills/team-git-workflow/SKILL.md` before explicitly requested Git operations. Do not search outside this workspace; preserve teammate changes; build and run relevant safe tests; never push or merge without explicit instruction.
 
-Hệ thống thi vấn đáp thông minh ứng dụng AI (giám khảo ảo phỏng vấn bằng giọng nói, hỏi xoáy thích ứng, hỗ trợ chấm điểm theo Rubric, và báo cáo phân tích học tập).
-Planning artifacts lưu tại `_bmad-output/planning-artifacts/`, specifications và contracts lưu tại `_bmad-output/specs/`.
+## 1. Project Overview & Target
+- **Course:** PRN222 (Application Development with .NET Core)
+- **Project:** FU News Management System (`FUNewsManagementSystem`)
+- **Technology Stack:** ASP.NET Core MVC (Web App), Entity Framework Core, LINQ, Microsoft SQL Server
+- **Main Demonstration Flow:** **News Article Management** (Staff)
 
-## Policy
+## 2. Hard Architectural Rules (Violations may result in 0 marks)
+1. **Strict 3-Layer Architecture:**
+   - Presentation: `StudentNameMVC` (Controllers, Views, ViewModels)
+   - Business Logic: `FUNewsManagement.BLL` (Service interfaces & implementations)
+   - Data Access: `FUNewsManagement.DAL` (Entities, Repository interfaces & classes, DAOs & DbContext)
+2. **Controller Database Access Rule:**
+   - **ABSOLUTE BAN:** Controllers MUST NOT inject or directly access `FUNewsManagementDbContext`, `DbSet`, or execute SQL queries.
+   - Controllers depend EXCLUSIVELY on Service interfaces (`INewsArticleService`, `ICategoryService`, `ISystemAccountService`, etc.).
+3. **Repository & DAO Pattern:**
+   - Services call Repositories.
+   - Repositories call Data Access Objects (DAOs).
+   - DAOs query the `FUNewsManagementDbContext` via LINQ.
+4. **Singleton Pattern:**
+   - All DAOs (`NewsArticleDAO`, `CategoryDAO`, `SystemAccountDAO`, `TagDAO`) MUST implement a thread-safe **Singleton Pattern** (via `Instance` property).
+5. **Configuration Sources:**
+   - Database connection string MUST come from `appsettings.json` (`ConnectionStrings:DefaultConnection`).
+   - Default Administrator account credentials MUST come from `appsettings.json` (`DefaultAdmin:Email` and `DefaultAdmin:Password`). Never hard-code passwords in C# files.
+6. **Default Route:**
+   - The default URL route MUST land on `Account/Login`.
+7. **UI Requirements:**
+   - Create and Update operations for News, Categories, and Accounts MUST use **Popup Modals / Dialogs**.
+   - Delete operations MUST display an explicit **Confirmation Modal / Dialog** with Cancel and Confirm buttons.
+8. **Business Rules:**
+   - A Category CANNOT be deleted if it is currently referenced by any News Article. This rule MUST be enforced in `CategoryService.DeleteCategory()`.
 
-- **NGUYÊN TẮC BẮT BUỘC**: Tuyệt đối KHÔNG viết mã nguồn (code implementation) khi giai đoạn Planning và Architecture chưa được định nghĩa đầy đủ và được người dùng phê duyệt.
-- Tuân thủ nghiêm ngặt vòng đời của BMAD Method: Phân tích (Analysis) -> Lập kế hoạch (Planning) -> Kiến trúc hệ thống (Architecture) -> Bóc tách Epics & Stories -> Triển khai (Implementation / Build).
-- Toàn bộ quyết định kiến trúc, Data Model, API Contract và Mock Data phải được tài liệu hóa trong `_bmad-output/` trước khi lập trình bất kỳ tính năng nào.
-- Mọi quyết định thiết kế quan trọng phải được ghi vết vào `.memlog.md` qua `memlog.py append`.
-- Ngôn ngữ giao tiếp và tài liệu kỹ thuật là Tiếng Việt (`Vietnamese`).
+## 3. Pull Request & Quality Gate
+- Before any PR is merged to `main`, automated unit tests MUST pass in GitHub Actions.
+- Never commit broken builds, hardcoded database credentials, or empty exception catches.
 
-## Where things are
-
-- Tài liệu PRD/BRD: `_bmad-output/planning-artifacts/prds/`
-- Data Contract & Mock Dataset: `_bmad-output/planning-artifacts/prds/prd-aives-2026-09-22/addendum-data-contract.md`
-- BMAD Core & Config: `_bmad/` và `.agent/skills/`
-- Bộ tiêu chuẩn BA Blueprint: `BA-Blueprint-Agent/`
-
-## Running and verifying
-
-- Mọi script Python của BMAD chạy thông qua `uv` (`uv run <script>`).
-- Kiểm tra trạng thái BMAD: `npx bmad-method status`.
-
-## Known pitfalls
-
-- Nhảy vào code giao diện hoặc backend trước khi chốt Data Contract sẽ dẫn đến mâu thuẫn dữ liệu giữa Lõi AI (Nhóm 3), Chấm điểm (Nhóm 4) và Báo cáo (Nhóm 6).
-- Tự động hóa hoàn toàn việc chấm điểm mà bỏ qua vai trò duyệt của Giảng viên (Human-in-the-loop) sẽ vi phạm nguyên tắc bảo đảm liêm chính học thuật.
-
-<!-- /bmad:context -->
+## 4. Team workflow: architecture review before implementation
+- The owner has authorized the structural refactor on `kien/restructure-mvc-bll-dal`. This does not authorize implementing unrelated features, changing database state, or claiming empty named files constitute completed MVC/layers.
+- The current zero-byte `.cs` and feature `.cshtml` files are placeholders. A project/folder/reference diagram is only an architectural plan; a working three-layer flow must later be verified through real methods and a successful build.
+- Every implementation change must belong to one assigned GitHub issue with function IDs, explicit file ownership, dependencies, acceptance criteria, and a named reviewer. Read the issue and the function plan when available before editing. Do not expand into another member's files without agreement on the issue/PR.
+- One member owns each shared file at a time, especially `Program.cs`, project files, entity/DbContext mapping, `_Layout.cshtml`, and shared JavaScript. Agree on interfaces and model contracts in an issue before parallel implementation. Use separate branches/PRs; do not merge a scaffold-only branch into `main` while the solution is broken.
+- Target a framework explicitly allowed by Assignment 1 (.NET 5/6/7/8) and make the CI SDK match; the solution now targets .NET 8.
+- Do not infer table columns, key types, or News–Tag cardinality from filenames or generated planning text. The exact instructor/database schema must be provided or identified within the approved project scope before EF mapping or tag behavior is implemented. Mark schema-dependent issues blocked until then.
+- For completed implementation issues, show the real `View → Controller → Service → Repository → DAO/DbContext` call path, backend role/ownership checks, server validation, build/test results, and manual UI checks where relevant. A green test run with no meaningful tests is not sufficient evidence.
+- Structure review approves only names, boundaries, dependencies, and ownership; it does not waive the later build/test quality gate.
+- **DB-first handoff:** the project owner controls schema, `FUNewsManagement.DAL`, database configuration, and DB-related `Program.cs` registrations until the read-only connection/contract gate passes. Other members request data-contract changes through an issue and owner review. This is not permission to run migrations or mutate a database.
+- After the DB contract is approved, feature owners implement their Service/MVC files against the agreed repository interfaces. Cross-module News queries needed by History, Public/Lecturer, Category deletion, and Report must be included in the contract before parallel feature work. A later contract change requires its own reviewed issue.
