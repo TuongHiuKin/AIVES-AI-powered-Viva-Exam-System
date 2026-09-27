@@ -38,3 +38,7 @@ bld/
 ## OS generated
 .DS_Store
 Thumbs.db
+
+## Workspace-local tools and test artifacts
+.local/
+TestResults/

@@ -1,6 +1,0 @@
-<Solution>
-  <Project Path="FUNewsManagement.DAL/FUNewsManagement.DAL.csproj" />
-  <Project Path="FUNewsManagement.BLL/FUNewsManagement.BLL.csproj" />
-  <Project Path="FUNewsManagement.Tests/FUNewsManagement.Tests.csproj" />
-  <Project Path="StudentNameMVC/StudentNameMVC.csproj" />
-</Solution>

@@ -21,10 +21,10 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore NuGet Packages
-        run: dotnet restore
+        run: dotnet restore AIVESSystem.sln
 
       - name: Build Solution
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build AIVESSystem.sln --configuration Release --no-restore
 
       - name: Execute Automated Unit Tests
-        run: dotnet test --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test_results.trx"
+        run: dotnet test AIVESSystem.sln --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test_results.trx"

@@ -1,50 +1,85 @@
-# PRN222 Assignment 01 — Agent & Team Instructions: FU News Management System
+# AIVES — Agent & Team Instructions: PRN222 Assignment 01 (News Management System)
 
-This document directs agents to the project's architecture and Git skills. Read `.agents/skills/funews-architecture/SKILL.md` before architecture or feature work and `.agents/skills/team-git-workflow/SKILL.md` before explicitly requested Git operations. Do not search outside this workspace; preserve teammate changes; build and run relevant safe tests; never push or merge without explicit instruction.
+This document establishes the project identity, architecture rules, and Agent Skills routing for this repository.
 
-## 1. Project Overview & Target
-- **Course:** PRN222 (Application Development with .NET Core)
-- **Project:** FU News Management System (`FUNewsManagementSystem`)
-- **Technology Stack:** ASP.NET Core MVC (Web App), Entity Framework Core, LINQ, Microsoft SQL Server
+Read `.agents/skills/funews-architecture/SKILL.md` before performing architecture, feature, or review work.
+Read `.agents/skills/team-git-workflow/SKILL.md` before executing explicitly requested Git operations.
+Do not search outside this workspace; preserve teammate changes; run relevant automated tests; never push or merge without explicit user instruction.
+
+Authoritative project documents in `docs/`: `docs/business-rules.md` (business rules and approved schema decisions SC-01..SC-11), `docs/ARCHITECTURE.md` (structure, DAL contracts, verification and current implementation status), and `docs/TASKS.md` (31 functions, task assignments, ownership, and handoff).
+
+---
+
+## 1. Project Identity & Context
+
+- **Course:** PRN222 (Application Development with .NET Core) — Assignment 01
+- **Project Name:** **AIVES** (`AIVESSystem.sln`) — News Management System
+- **Technology Stack:** ASP.NET Core MVC (.NET 8), Entity Framework Core, LINQ, Microsoft SQL Server
 - **Main Demonstration Flow:** **News Article Management** (Staff)
 
-## 2. Hard Architectural Rules (Violations may result in 0 marks)
-1. **Strict 3-Layer Architecture:**
-   - Presentation: `StudentNameMVC` (Controllers, Views, ViewModels)
-   - Business Logic: `FUNewsManagement.BLL` (Service interfaces & implementations)
-   - Data Access: `FUNewsManagement.DAL` (Entities, Repository interfaces & classes, DAOs & DbContext)
-2. **Controller Database Access Rule:**
-   - **ABSOLUTE BAN:** Controllers MUST NOT inject or directly access `FUNewsManagementDbContext`, `DbSet`, or execute SQL queries.
-   - Controllers depend EXCLUSIVELY on Service interfaces (`INewsArticleService`, `ICategoryService`, `ISystemAccountService`, etc.).
-3. **Repository & DAO Pattern:**
-   - Services call Repositories.
-   - Repositories call Data Access Objects (DAOs).
-   - DAOs query the `FUNewsManagementDbContext` via LINQ.
-4. **Singleton Pattern:**
-   - All DAOs (`NewsArticleDAO`, `CategoryDAO`, `SystemAccountDAO`, `TagDAO`) MUST implement a thread-safe **Singleton Pattern** (via `Instance` property).
+> [!IMPORTANT]
+> **Disregard Obsolete Historical Specifications:**
+> This repository is intentionally dedicated to PRN222 Assignment 1 (News Management System).
+> Historical planning documents in git history describing an "AI-powered Viva Exam System" (Python/FastAPI, NestJS, Next.js, PostgreSQL) are **obsolete**.
+> Do NOT migrate this solution to other languages, frameworks, or database engines.
+
+---
+
+## 2. Solution & Project Mapping (3-Layer Architecture)
+
+The solution is organized into strict layers targeting .NET 8:
+
+| Layer | Project Folder | Project File | Key Contents & Responsibilities |
+|---|---|---|---|
+| **Presentation** (`AIVES.MVC`) | `StudentNameMVC` | `StudentNameMVC.csproj` | Controllers, Razor Views with modals, ViewModels, `Program.cs`, `appsettings.json`. (*`StudentNameMVC` is the physical template project mapping to `AIVES.MVC` per assignment submission rules*). |
+| **Business Logic** (`AIVES.BLL`) | `AIVES.BLL` | `AIVES.BLL.csproj` | Service interfaces (`Interfaces/`), service implementations (`Services/`), business validation, use case coordination. |
+| **Data Access** (`AIVES.DAL`) | `AIVES.DAL` | `AIVES.DAL.csproj` | `Context/AIVESDbContext.cs`, `Entities/`, thread-safe Singleton `DAOs/`, and `Repositories/`. |
+| **Testing** | `AIVES.Tests` | `AIVES.Tests.csproj` | Automated unit tests (`dotnet test`). |
+| **Database** | `database/` | `001-create-schema.sql` | DB-first SQL Server schema script for database `AIVES`. |
+
+**Dependency Direction:** `StudentNameMVC → AIVES.BLL → AIVES.DAL`.
+- `AIVES.BLL` references `AIVES.DAL`.
+- `AIVES.DAL` must NEVER reference `AIVES.BLL` or `StudentNameMVC`.
+- `AIVES.BLL` must NEVER reference `StudentNameMVC`.
+- `StudentNameMVC` references `AIVES.DAL` solely for DI registration in `Program.cs`.
+
+---
+
+## 3. Mandatory Architectural & Assignment Rules
+
+### Documented Assignment Requirements
+1. **Application Call Flow:**
+   `Razor View → Controller → Service → Repository → DAO → AIVESDbContext → SQL Server`.
+2. **Controller Database Access Ban:**
+   Controllers MUST NOT inject or access `AIVESDbContext`, `DbSet`, or execute SQL queries. Controllers depend exclusively on BLL Service interfaces (`INewsArticleService`, `ICategoryService`, `IAuthService`, etc.).
+3. **Repository & DAO Flow:**
+   Services call Repositories. Repositories call DAOs. DAOs query `AIVESDbContext` via LINQ. DAOs must NOT be bypassed.
+4. **Thread-Safe Singleton Pattern on DAOs:**
+   All DAOs (`NewsArticleDAO`, `CategoryDAO`, `SystemAccountDAO`, `TagDAO`) MUST implement a thread-safe Singleton Pattern (via `Instance` property).
 5. **Configuration Sources:**
-   - Database connection string MUST come from `appsettings.json` (`ConnectionStrings:DefaultConnection`).
-   - Default Administrator account credentials MUST come from `appsettings.json` (`DefaultAdmin:Email` and `DefaultAdmin:Password`). Never hard-code passwords in C# files.
+   - Connection string from `appsettings.json` (`ConnectionStrings:DefaultConnection`).
+   - Default Administrator credentials from `appsettings.json` (`DefaultAdmin:Email` and `DefaultAdmin:Password`). Never hard-code passwords in C# files.
 6. **Default Route:**
-   - The default URL route MUST land on `Account/Login`.
+   Default URL route must land on `Account/Login`.
 7. **UI Requirements:**
    - Create and Update operations for News, Categories, and Accounts MUST use **Popup Modals / Dialogs**.
    - Delete operations MUST display an explicit **Confirmation Modal / Dialog** with Cancel and Confirm buttons.
 8. **Business Rules:**
-   - A Category CANNOT be deleted if it is currently referenced by any News Article. This rule MUST be enforced in `CategoryService.DeleteCategory()`.
+   - A Category CANNOT be deleted if it is currently referenced by any News Article (`CategoryService.DeleteCategory()`).
+   - Staff Profile and Own News History must resolve identity strictly from authenticated claims, never trusting client-supplied IDs.
+   - Admin Reports query News Articles within `[StartDate, EndDate]` ordered descending by `CreatedDate`.
 
-## 3. Pull Request & Quality Gate
-- Before any PR is merged to `main`, automated unit tests MUST pass in GitHub Actions.
-- Never commit broken builds, hardcoded database credentials, or empty exception catches.
+### Team Engineering Decisions
+1. **Safe Singleton DAO Lifetime (Context-Per-Operation):**
+   `AIVESDbContext` is Scoped. Singletons MUST NOT store a scoped `AIVESDbContext` in an instance or static field. The Scoped Repository passes `AIVESDbContext` into the DAO method as a parameter.
+2. **Framework Target:** Solution targets .NET 8 across all projects; CI workflows use .NET 8 SDK.
+3. **DB-First Schema Management:** Database schema is authored in `database/001-create-schema.sql` and mapped into `AIVESDbContext`. Do not mix runtime migrations.
 
-## 4. Team workflow: architecture review before implementation
-- The owner has authorized the structural refactor on `kien/restructure-mvc-bll-dal`. This does not authorize implementing unrelated features, changing database state, or claiming empty named files constitute completed MVC/layers.
-- The current zero-byte `.cs` and feature `.cshtml` files are placeholders. A project/folder/reference diagram is only an architectural plan; a working three-layer flow must later be verified through real methods and a successful build.
-- Every implementation change must belong to one assigned GitHub issue with function IDs, explicit file ownership, dependencies, acceptance criteria, and a named reviewer. Read the issue and the function plan when available before editing. Do not expand into another member's files without agreement on the issue/PR.
-- One member owns each shared file at a time, especially `Program.cs`, project files, entity/DbContext mapping, `_Layout.cshtml`, and shared JavaScript. Agree on interfaces and model contracts in an issue before parallel implementation. Use separate branches/PRs; do not merge a scaffold-only branch into `main` while the solution is broken.
-- Target a framework explicitly allowed by Assignment 1 (.NET 5/6/7/8) and make the CI SDK match; the solution now targets .NET 8.
-- Do not infer table columns, key types, or News–Tag cardinality from filenames or generated planning text. The exact instructor/database schema must be provided or identified within the approved project scope before EF mapping or tag behavior is implemented. Mark schema-dependent issues blocked until then.
-- For completed implementation issues, show the real `View → Controller → Service → Repository → DAO/DbContext` call path, backend role/ownership checks, server validation, build/test results, and manual UI checks where relevant. A green test run with no meaningful tests is not sufficient evidence.
-- Structure review approves only names, boundaries, dependencies, and ownership; it does not waive the later build/test quality gate.
-- **DB-first handoff:** the project owner controls schema, `FUNewsManagement.DAL`, database configuration, and DB-related `Program.cs` registrations until the read-only connection/contract gate passes. Other members request data-contract changes through an issue and owner review. This is not permission to run migrations or mutate a database.
-- After the DB contract is approved, feature owners implement their Service/MVC files against the agreed repository interfaces. Cross-module News queries needed by History, Public/Lecturer, Category deletion, and Report must be included in the contract before parallel feature work. A later contract change requires its own reviewed issue.
+---
+
+## 4. Git & Team Collaboration Rules
+
+1. **Branch Naming:** Every member works on a task branch following `<member-name>/<feature-name>` (e.g. `kien/news-management`, `vy/category-management`, `an/authentication`, `minh/account-management`).
+2. **Explicit Publishing Only:** Committing, pushing, and creating Pull Requests require explicit user authorization. Never push or open a PR automatically after code generation.
+3. **Working-Tree Protection:** Never run `git reset`, `git clean`, or `git stash drop` on uncommitted or teammate changes. Always inspect `git status` before touching Git state.
+4. **PR Quality Gate:** Automated unit tests in `AIVES.Tests` must pass (`dotnet test`) before PR review and merge. Merging directly to `main` without review is prohibited.
