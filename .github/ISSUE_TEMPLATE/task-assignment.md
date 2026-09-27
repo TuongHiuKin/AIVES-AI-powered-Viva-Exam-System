@@ -6,7 +6,7 @@ labels: ["task"]
 assignees: ""
 ---
 
-> Đọc `AGENTS.md` và `docs/assignment01-team-rule-and-issue-plan.md` trước khi làm. Một issue chỉ có một người chịu trách nhiệm chính; ghi rõ người review.
+> Đọc `AGENTS.md`, `docs/business-rules.md`, `docs/ARCHITECTURE.md` và task tương ứng trong `docs/TASKS.md` trước khi làm. Một issue chỉ có một người chịu trách nhiệm chính; ghi rõ người review.
 
 ## Mục tiêu và phạm vi
 
@@ -15,7 +15,7 @@ assignees: ""
 - **Module / Function IDs:** <!-- Ví dụ ARCH-01, NEWS-01..NEWS-07; dùng ID trong function plan -->
 - **Ưu tiên:** <!-- P0/P1/P2/P3 -->
 - **Người thực hiện / người review:** <!-- GitHub username hoặc tên thành viên -->
-- **Issue phụ thuộc:** <!-- Link issue; nếu cần schema thật, ghi BLOCKED BY SCHEMA -->
+- **Issue phụ thuộc:** <!-- Link issue; nếu còn thiếu cột/khóa chi tiết, ghi CHỜ THIẾT KẾ CHI TIẾT D00 và nêu đúng phần thiếu; không chờ script giảng viên -->
 - **Ngoài phạm vi:** <!-- Những chức năng/file thuộc issue khác -->
 
 ## File được phép thay đổi và hợp đồng giữa các lớp
@@ -33,7 +33,7 @@ assignees: ""
 - [ ] Controller chỉ phụ thuộc Service interface; không dùng DbContext/DbSet/DAO/Repository trực tiếp.
 - [ ] Service chứa business rule và gọi Repository; Repository gọi DAO; DAO truy vấn scoped DbContext bằng EF Core/LINQ.
 - [ ] DAO có Singleton thread-safe qua `Instance` nếu thuộc bốn DAO bắt buộc; DbContext không Singleton.
-- [ ] Không đoán schema News–Tag hoặc kiểu cột; đối chiếu schema thật trước khi map.
+- [ ] Tuân thủ SC-01..SC-11 đã được chủ dự án duyệt; đối chiếu schema 001/002 và contract DAL trong ARCHITECTURE.md trước khi code. Giảng viên không cung cấp script DB; không tự thay đổi quan hệ/quy tắc xóa đã chốt.
 - [ ] Connection string và DefaultAdmin lấy từ `appsettings.json`; role Staff = 1, Lecturer = 2.
 - [ ] Backend kiểm tra role/ownership; form thay đổi dữ liệu có server validation và antiforgery.
 - [ ] Nếu liên quan News/Category/Account: Create/Update dùng modal, Delete có Cancel/Confirm; CategoryService chặn xóa Category đang được News dùng.
@@ -44,7 +44,7 @@ assignees: ""
 
 - [ ] Sơ đồ project/reference và danh sách file hiện có/file đề xuất rõ ràng; không gọi file rỗng là chức năng đã xong.
 - [ ] Phạm vi từng issue, người phụ trách, thứ tự phụ thuộc và file dùng chung đã được người review duyệt.
-- [ ] Các giả định về schema/Tag và tên method chưa chốt được ghi là câu hỏi mở.
+- [ ] Các chi tiết kỹ thuật D00 hoặc tên method chưa chốt được ghi là câu hỏi mở; không ghi lại quan hệ News–Tag đã duyệt là chưa biết.
 - [ ] Không sửa mã nguồn, không thêm package, không chạy migration/database write trong issue này.
 
 ### IMPLEMENTATION: chỉ áp dụng sau khi cấu trúc được duyệt

@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="AIVES.DAL/AIVES.DAL.csproj" />
+  <Project Path="AIVES.BLL/AIVES.BLL.csproj" />
+  <Project Path="AIVES.Tests/AIVES.Tests.csproj" />
+  <Project Path="StudentNameMVC/StudentNameMVC.csproj" />
+</Solution>
