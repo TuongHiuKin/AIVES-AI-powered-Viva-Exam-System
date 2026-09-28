@@ -153,5 +153,102 @@ public class AccountController : Controller
         return View(viewModel);
     }
 
+    [Authorize(Roles = "Admin")]
+    [HttpGet]
+    public IActionResult CreateModal()
+    {
+        return PartialView("_CreateModalPartial", new AccountCreateViewModel());
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(AccountCreateViewModel model, CancellationToken ct)
+    {
+        if (!ModelState.IsValid)
+        {
+            Response.StatusCode = 400;
+            return PartialView("_CreateModalPartial", model);
+        }
+
+        try
+        {
+            await _accountService.CreateAccountAsync(
+                model.AccountName,
+                model.AccountEmail,
+                model.AccountPassword,
+                model.AccountRole,
+                ct);
+
+            TempData["SuccessMessage"] = "Tạo mới tài khoản thành công!";
+            return Json(new { success = true, redirectUrl = Url.Action(nameof(Index)) });
+        }
+        catch (Exception ex) when (ex is ArgumentException or InvalidOperationException)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            Response.StatusCode = 400;
+            return PartialView("_CreateModalPartial", model);
+        }
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet]
+    public async Task<IActionResult> EditModal(int id, CancellationToken ct)
+    {
+        if (id <= 0) return NotFound();
+
+        var account = await _accountService.GetAccountByIdAsync(id, includeDeleted: true, ct);
+        if (account == null) return NotFound();
+
+        var model = new AccountEditViewModel
+        {
+            AccountId = account.AccountId,
+            AccountName = account.AccountName,
+            AccountEmail = account.AccountEmail,
+            AccountRole = account.AccountRole
+        };
+
+        return PartialView("_EditModalPartial", model);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, AccountEditViewModel model, CancellationToken ct)
+    {
+        if (id != model.AccountId) return BadRequest();
+
+        if (!ModelState.IsValid)
+        {
+            Response.StatusCode = 400;
+            return PartialView("_EditModalPartial", model);
+        }
+
+        try
+        {
+            var updated = await _accountService.UpdateAccountAsync(
+                id,
+                model.AccountName,
+                model.AccountEmail,
+                model.AccountRole,
+                model.NewPassword,
+                ct);
+
+            if (!updated)
+            {
+                return NotFound();
+            }
+
+            TempData["SuccessMessage"] = "Cập nhật tài khoản thành công!";
+            return Json(new { success = true, redirectUrl = Url.Action(nameof(Index)) });
+        }
+        catch (Exception ex) when (ex is ArgumentException or InvalidOperationException)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            Response.StatusCode = 400;
+            return PartialView("_EditModalPartial", model);
+        }
+    }
+
     #endregion
 }
