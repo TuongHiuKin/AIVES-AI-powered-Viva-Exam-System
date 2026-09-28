@@ -1,0 +1,37 @@
+@model StudentNameMVC.ViewModels.NewsArticleDeleteViewModel
+
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow border-0">
+            <form id="deleteNewsForm" asp-controller="NewsArticle" asp-action="Delete" asp-route-id="@Model.NewsArticleId" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteModalLabel">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> Xác nhận xóa bài viết
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 text-center">
+                    <div class="mb-3 text-danger">
+                        <i class="bi bi-trash3" style="font-size: 3rem;"></i>
+                    </div>
+                    <p class="fs-5 mb-2">Bạn có chắc chắn muốn xóa bài viết này không?</p>
+                    <div class="alert alert-light border fw-bold text-dark text-break">
+                        "@Model.NewsTitle"
+                    </div>
+                    <p class="text-muted small mb-0">
+                        <i class="bi bi-info-circle me-1"></i> Lưu ý: Thao tác này sẽ xóa bài viết và gỡ các liên kết gắn thẻ, nhưng chuyên mục và các thẻ (tags) dùng chung vẫn được giữ nguyên.
+                    </p>
+                </div>
+                <div class="modal-footer bg-light justify-content-center">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i> Hủy bỏ
+                    </button>
+                    <button type="submit" class="btn btn-danger px-4" id="btnConfirmDelete">
+                        <i class="bi bi-trash me-1"></i> Xác nhận xóa
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
