@@ -13,6 +13,7 @@ builder.Services.AddAivesDataAccess(connectionString);
 
 // Đăng ký Business Logic Services (TV5)
 builder.Services.AddScoped<ISystemAccountService, SystemAccountService>();
+builder.Services.AddScoped<INewsArticleService, NewsArticleService>();
 
 // Cấu hình Cookie Authentication (AUTH-01, AUTH-02)
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
