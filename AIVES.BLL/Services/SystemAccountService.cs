@@ -185,4 +185,21 @@ public class SystemAccountService : ISystemAccountService
 
         return await _accountRepo.UpdateProfileAsync(command, ct);
     }
+
+    public async Task<SystemAccount?> AuthenticateAsync(string email, string password, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+            return null;
+
+        var normalizedEmail = NormalizeEmail(email);
+        var account = await _accountRepo.GetByEmailAsync(normalizedEmail, ct);
+        if (account == null || account.IsDeleted)
+            return null;
+
+        var verifyResult = _passwordHasher.VerifyHashedPassword(account, account.AccountPasswordHash, password);
+        if (verifyResult == PasswordVerificationResult.Failed)
+            return null;
+
+        return account;
+    }
 }

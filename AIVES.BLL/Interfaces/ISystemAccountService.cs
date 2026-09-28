@@ -20,4 +20,7 @@ public interface ISystemAccountService
 
     // --- 4. Hợp đồng dùng chung cho TV4 (PROFILE-01 - Staff tự cập nhật thông tin) ---
     Task<bool> UpdateProfileAsync(int id, string name, string email, string? newPassword = null, CancellationToken ct = default);
+
+    // --- 5. Xác thực đăng nhập Staff / Lecturer ---
+    Task<SystemAccount?> AuthenticateAsync(string email, string password, CancellationToken ct = default);
 }
