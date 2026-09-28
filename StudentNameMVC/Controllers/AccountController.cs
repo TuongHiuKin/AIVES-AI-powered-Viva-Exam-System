@@ -250,5 +250,94 @@ public class AccountController : Controller
         }
     }
 
+    [Authorize(Roles = "Admin")]
+    [HttpGet]
+    public async Task<IActionResult> DeleteModal(int id, CancellationToken ct)
+    {
+        if (id <= 0) return NotFound();
+
+        var account = await _accountService.GetAccountByIdAsync(id, includeDeleted: true, ct);
+        if (account == null) return NotFound();
+
+        var model = new AccountDeleteViewModel
+        {
+            AccountId = account.AccountId,
+            AccountName = account.AccountName,
+            AccountEmail = account.AccountEmail,
+            RoleName = account.AccountRole == 1 ? "Staff" : "Lecturer",
+            IsHardDelete = false
+        };
+
+        return PartialView("_DeleteConfirmPartial", model);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(int id, CancellationToken ct)
+    {
+        if (id <= 0) return BadRequest();
+
+        var deleted = await _accountService.SoftDeleteAccountAsync(id, ct);
+        if (!deleted)
+        {
+            return NotFound();
+        }
+
+        TempData["SuccessMessage"] = "Khóa tài khoản thành công!";
+        return Json(new { success = true, redirectUrl = Url.Action(nameof(Index)) });
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet]
+    public async Task<IActionResult> HardDeleteModal(int id, CancellationToken ct)
+    {
+        if (id <= 0) return NotFound();
+
+        var account = await _accountService.GetAccountByIdAsync(id, includeDeleted: true, ct);
+        if (account == null) return NotFound();
+
+        var isReferenced = await _accountService.IsAccountReferencedAsync(id, ct);
+
+        var model = new AccountDeleteViewModel
+        {
+            AccountId = account.AccountId,
+            AccountName = account.AccountName,
+            AccountEmail = account.AccountEmail,
+            RoleName = account.AccountRole == 1 ? "Staff" : "Lecturer",
+            IsHardDelete = true,
+            IsReferenced = isReferenced
+        };
+
+        return PartialView("_HardDeleteConfirmPartial", model);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> HardDelete(int id, CancellationToken ct)
+    {
+        if (id <= 0) return BadRequest();
+
+        var result = await _accountService.HardDeleteAccountAsync(id, ct);
+        if (result == AIVES.DAL.Repositories.Models.DeleteResult.InUse)
+        {
+            Response.StatusCode = 400;
+            return Json(new
+            {
+                success = false,
+                message = "Không thể xóa vĩnh viễn tài khoản này vì đã có bài viết tin tức tham chiếu (là Tác giả hoặc Người chỉnh sửa gần nhất)."
+            });
+        }
+
+        if (result == AIVES.DAL.Repositories.Models.DeleteResult.NotFound)
+        {
+            return NotFound();
+        }
+
+        TempData["SuccessMessage"] = "Xóa vĩnh viễn tài khoản thành công!";
+        return Json(new { success = true, redirectUrl = Url.Action(nameof(Index)) });
+    }
+
     #endregion
 }
