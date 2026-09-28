@@ -1,0 +1,46 @@
+@model AIVES.MVC.ViewModels.AdminReportViewModel
+
+@{
+    ViewData["Title"] = "Admin Report";
+}
+
+<h1>Admin Report</h1>
+
+<form asp-action="AdminReport" method="post">
+    <div>
+        <label for="StartDate">Start Date:</label>
+        <input asp-for="StartDate" type="date" />
+        <span asp-validation-for="StartDate"></span>
+    </div>
+    <div>
+        <label for="EndDate">End Date:</label>
+        <input asp-for="EndDate" type="date" />
+        <span asp-validation-for="EndDate"></span>
+    </div>
+    <button type="submit">Generate Report</button>
+</form>
+
+@if (Model.ReportData.Any())
+{
+    <table>
+        <thead>
+            <tr>
+                <th>Article ID</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Created Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.ReportData)
+            {
+                <tr>
+                    <td>@item.NewsArticleId</td>
+                    <td>@item.Title</td>
+                    <td>@item.Author</td>
+                    <td>@item.CreatedDate.ToString("yyyy-MM-dd")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
