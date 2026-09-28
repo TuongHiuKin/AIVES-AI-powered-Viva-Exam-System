@@ -7,4 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AIVES.DAL\AIVES.DAL.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
 </Project>

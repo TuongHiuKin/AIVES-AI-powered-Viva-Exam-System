@@ -1,0 +1,29 @@
+@{
+    ViewData["Title"] = "Tổng quan";
+}
+
+<header class="page-header">
+    <div>
+        <p class="eyebrow">@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value</p>
+        <h1>Xin chào, @User.Identity?.Name</h1>
+    </div>
+</header>
+
+<div class="quick-links">
+    @if (User.IsInRole(ApplicationRoles.Admin))
+    {
+        <a class="quick-link" asp-controller="Account" asp-action="Index">Quản lý tài khoản</a>
+        <a class="quick-link" asp-controller="Report" asp-action="Index">Báo cáo</a>
+    }
+    else if (User.IsInRole(ApplicationRoles.Staff))
+    {
+        <a class="quick-link" asp-controller="NewsArticle" asp-action="Index">Quản lý tin tức</a>
+        <a class="quick-link" asp-controller="Category" asp-action="Index">Quản lý danh mục</a>
+        <a class="quick-link" asp-controller="Profile" asp-action="Index">Hồ sơ</a>
+        <a class="quick-link" asp-controller="History" asp-action="Index">Lịch sử bài viết</a>
+    }
+    else if (User.IsInRole(ApplicationRoles.Lecturer))
+    {
+        <a class="quick-link" asp-controller="Home" asp-action="Index">Tin đang hoạt động</a>
+    }
+</div>

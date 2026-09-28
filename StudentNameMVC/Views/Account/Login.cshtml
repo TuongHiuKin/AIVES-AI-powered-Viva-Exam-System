@@ -1,0 +1,44 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Đăng nhập";
+}
+
+<div class="auth-shell">
+    <section class="auth-panel" aria-labelledby="login-title">
+        <div class="auth-heading">
+            <span class="brand-mark" aria-hidden="true">A</span>
+            <div>
+                <p class="eyebrow">AIVES News Management</p>
+                <h1 id="login-title">Đăng nhập</h1>
+            </div>
+        </div>
+
+        <form asp-action="Login" method="post" novalidate>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+            <input asp-for="ReturnUrl" type="hidden" />
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" autocomplete="username" autofocus />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" class="form-control" autocomplete="current-password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-check mb-4">
+                <input asp-for="RememberMe" class="form-check-input" />
+                <label asp-for="RememberMe" class="form-check-label"></label>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+        </form>
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

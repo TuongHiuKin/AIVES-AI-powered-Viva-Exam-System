@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - AIVES</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="app-header">
+        <nav class="navbar navbar-expand-lg" aria-label="Điều hướng chính">
+            <div class="container-fluid app-container">
+                <a class="navbar-brand" asp-controller="Account" asp-action="Dashboard">
+                    <span class="brand-mark" aria-hidden="true">A</span>
+                    <span>AIVES</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation"
+                        aria-controls="mainNavigation" aria-expanded="false" aria-label="Mở điều hướng">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="mainNavigation">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        @if (User.IsInRole(ApplicationRoles.Admin))
+                        {
+                            <partial name="_NavAdmin" />
+                        }
+                        else if (User.IsInRole(ApplicationRoles.Staff))
+                        {
+                            <partial name="_NavStaff" />
+                        }
+                        else if (User.IsInRole(ApplicationRoles.Lecturer))
+                        {
+                            <partial name="_NavLecturer" />
+                        }
+
+                        <div class="user-actions ms-lg-auto">
+                            <span class="user-name">@User.Identity.Name</span>
+                            <form asp-controller="Account" asp-action="Logout" method="post">
+                                <button type="submit" class="btn btn-outline-secondary btn-sm">Đăng xuất</button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="ms-lg-auto">
+                            <a class="btn btn-primary btn-sm" asp-controller="Account" asp-action="Login">Đăng nhập</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="app-main app-container">
+        @if (TempData["SuccessMessage"] is string successMessage)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="status">
+                @successMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] is string errorMessage)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @errorMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+            </div>
+        }
+
+        @RenderBody()
+    </main>
+
+    <div id="modalContainer" aria-live="polite"></div>
+
+    <footer class="app-footer">
+        <div class="app-container">AIVES · PRN222 Assignment 01</div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
