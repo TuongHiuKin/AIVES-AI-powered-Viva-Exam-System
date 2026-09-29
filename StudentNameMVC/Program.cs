@@ -34,6 +34,11 @@ builder.Services.AddScoped<INewsArticleService, NewsArticleService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<ActiveAccountCookieEvents>();
 
+// Group 6 - Viva Exam Reporting Services
+builder.Services.AddSingleton<AIVES.BLL.Interfaces.ExamReporting.IExamReportRepository, AIVES.BLL.Repositories.ExamReporting.MockExamReportRepository>();
+builder.Services.AddScoped<AIVES.BLL.Interfaces.ExamReporting.IStudentReportService, AIVES.BLL.Services.ExamReporting.StudentReportService>();
+builder.Services.AddScoped<AIVES.BLL.Interfaces.ExamReporting.IClassReportService, AIVES.BLL.Services.ExamReporting.ClassReportService>();
+
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
