@@ -1,5 +1,7 @@
 # AIVES — Corrected Agent Skills Review Report: PRN222 Assignment 1 (News Management System)
 
+> Historical review dated 2026-09-27, before the user's Group 6 viva-reporting direction. This report does not override current AGENTS.md, architecture skill or docs/business-rules.md and does not validate the revised skill. Retained as evidence of the prior News review only.
+
 **Document ID:** `AIVES-DOC-SKILL-REVIEW-02` (Corrected & Superseding Version 01)  
 **Review Type:** Independent Architecture, Skill Structure, Compliance & Safety Audit  
 **Target Repository:** `D:\School\AIVES_AI_powered_Viva_Exam_System`  

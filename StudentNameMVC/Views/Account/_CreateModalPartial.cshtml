@@ -52,12 +52,12 @@
                             Vai trò hệ thống <span class="text-danger">*</span>
                         </label>
                         <select asp-for="AccountRole" class="form-select">
-                            <option value="1">Nhân viên (Staff)</option>
+                            <option value="1">Sinh viên (Student)</option>
                             <option value="2">Giảng viên (Lecturer)</option>
                         </select>
                         <span asp-validation-for="AccountRole" class="text-danger small"></span>
                         <div class="form-text small text-muted">
-                            <i class="bi bi-info-circle me-1"></i>Staff có quyền quản lý bài viết và chuyên mục; Lecturer có quyền đọc tin bài đang kích hoạt.
+                            <i class="bi bi-info-circle me-1"></i>Sinh viên có quyền tham gia thi vấn đáp và xem báo cáo kết quả cá nhân; Giảng viên có quyền cấu hình kỳ thi, theo dõi thống kê lớp và xuất bảng điểm.
                         </div>
                     </div>
                 </div>

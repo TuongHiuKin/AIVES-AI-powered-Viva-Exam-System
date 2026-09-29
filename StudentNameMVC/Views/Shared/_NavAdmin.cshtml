@@ -1,7 +1,7 @@
 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
     <li class="nav-item">
         <a class="nav-link fw-semibold" asp-controller="Account" asp-action="Dashboard">
-            <i class="bi bi-speedometer2 me-1"></i> Tổng quan
+            <i class="bi bi-speedometer2 me-1 text-primary"></i> Bảng điều khiển Admin
         </a>
     </li>
     <li class="nav-item">
@@ -10,8 +10,13 @@
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link fw-semibold" asp-controller="Report" asp-action="Index">
-            <i class="bi bi-bar-chart-line-fill me-1"></i> Báo cáo Thống kê
+        <a class="nav-link fw-semibold" asp-controller="ClassReports" asp-action="Index">
+            <i class="bi bi-bar-chart-steps me-1 text-warning"></i> Thống kê Lớp học (Nhóm 6)
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link fw-semibold" asp-controller="StudentReports" asp-action="Index">
+            <i class="bi bi-mortarboard me-1 text-info"></i> Báo cáo Sinh viên (Nhóm 6)
         </a>
     </li>
 </ul>

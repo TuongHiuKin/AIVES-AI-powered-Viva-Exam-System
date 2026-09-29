@@ -8,7 +8,7 @@
         <h2 class="h3 fw-bold text-dark mb-1">
             <i class="bi bi-people-fill text-primary me-2"></i>Quản lý Tài khoản
         </h2>
-        <p class="text-muted small mb-0">Quản trị danh sách tài khoản Staff và Lecturer trong hệ thống</p>
+        <p class="text-muted small mb-0">Quản trị danh sách tài khoản Sinh viên và Giảng viên trong hệ thống AIVES</p>
     </div>
     <div>
         <button type="button" class="btn btn-primary shadow-sm" onclick="openCreateModal()">
@@ -36,11 +36,11 @@
         <div class="card border-0 shadow-sm rounded-3 bg-white border-start border-success border-4">
             <div class="card-body d-flex align-items-center justify-content-between p-3">
                 <div>
-                    <span class="text-muted small fw-semibold text-uppercase">Nhân viên (Staff)</span>
+                    <span class="text-muted small fw-semibold text-uppercase">Sinh viên (Học viên)</span>
                     <h3 class="fw-bold mb-0 text-success">@Model.TotalStaff</h3>
                 </div>
                 <div class="bg-success-subtle text-success p-3 rounded-circle">
-                    <i class="bi bi-person-badge fs-4"></i>
+                    <i class="bi bi-person-fill fs-4"></i>
                 </div>
             </div>
         </div>
@@ -120,13 +120,13 @@
                                     @if (account.AccountRole == 1)
                                     {
                                         <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1">
-                                            <i class="bi bi-person-badge me-1"></i> Staff
+                                            <i class="bi bi-person-fill me-1"></i> Sinh viên
                                         </span>
                                     }
                                     else
                                     {
                                         <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle px-3 py-1">
-                                            <i class="bi bi-mortarboard me-1"></i> Lecturer
+                                            <i class="bi bi-mortarboard me-1"></i> Giảng viên
                                         </span>
                                     }
                                 </td>

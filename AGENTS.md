@@ -1,92 +1,33 @@
-# AIVES — Agent & Team Instructions: PRN222 Assignment 01 (News Management System)
+# AIVES — Agent & Team Instructions
 
-This document establishes the project identity, architecture rules, and Agent Skills routing for this repository.
+## Mục tiêu hiện hành
 
-Read `.agents/skills/funews-architecture/SKILL.md` before performing architecture, feature, or review work.
-Read `.agents/skills/team-git-workflow/SKILL.md` before executing explicitly requested Git operations.
-Do not search outside this workspace; preserve teammate changes; run relevant automated tests; never push or merge without explicit user instruction.
+Ưu tiên **nhóm 6 — Phản hồi & báo cáo thi vấn đáp**: báo cáo cá nhân theo lượt thi, thống kê lớp và biểu đồ. Đây là định hướng mới người dùng đã xác nhận; News Management là module/lịch sử còn trong source, không phải tiêu chí nghiệm thu nhóm 6.
 
-Authoritative project documents in `docs/`: `docs/business-rules.md` (business rules and approved schema decisions SC-01..SC-11), `docs/ARCHITECTURE.md` (structure, DAL contracts, verification and current implementation status), and `docs/TASKS.md` (31 functions, task assignments, ownership, and handoff).
+Nền kỹ thuật hiện hành vẫn là ASP.NET Core MVC .NET 8 + BLL + DAL, EF Core, LINQ, SQL Server. Không suy ra việc đổi nghiệp vụ cho phép đổi stack, tự đổi schema hoặc phục hồi project khác từ Git history.
 
----
+## Đọc đúng tài liệu trước khi làm
 
-## 1. Project Identity & Context
+- Architecture, feature, review: đọc `.agents/skills/funews-architecture/SKILL.md`. Tên skill được giữ để tương thích các lời gọi cũ, nội dung đã theo nhóm 6.
+- Git tasks: đọc `.agents/skills/team-git-workflow/SKILL.md`.
+- Nghiệp vụ đã duyệt: `docs/business-rules.md` (DEC-01..DEC-12).
+- Kiến trúc/trạng thái: `docs/ARCHITECTURE.md`.
+- Task/phụ thuộc: `docs/TASKS.md`; nghiệm thu: `docs/CODE-REVIEW-CHECKLIST.md`.
+- Phạm vi triển khai, contract và fixture: `docs/G6-IMPLEMENTATION-HANDOFF.md`. Phân biệt quyết định đã duyệt với phương án kỹ thuật/fixture đề xuất.
+- `docs/archive/` chỉ lưu lịch sử News; không dùng làm hướng dẫn nghiệp vụ nhóm 6.
 
-- **Course:** PRN222 (Application Development with .NET Core) — Assignment 01
-- **Project Name:** **AIVES** (`AIVESSystem.sln`) — News Management System
-- **Technology Stack:** ASP.NET Core MVC (.NET 8), Entity Framework Core, LINQ, Microsoft SQL Server
-- **Main Demonstration Flow:** **News Article Management** (Staff)
+## Ranh giới và an toàn
 
-> [!IMPORTANT]
-> **Disregard Obsolete Historical Specifications:**
-> This repository is intentionally dedicated to PRN222 Assignment 1 (News Management System).
-> Historical planning documents in git history describing an "AI-powered Viva Exam System" (Python/FastAPI, NestJS, Next.js, PostgreSQL) are **obsolete**.
-> Do NOT migrate this solution to other languages, frameworks, or database engines.
+- Luồng dữ liệu thật: View → Controller → Service → Repository → DAO → DbContext → SQL Server. Controller không gọi DB/Repository/DAO; BLL không dùng DbContext.
+- MVC → BLL → DAL; MVC cấu hình DAL tại Program.cs. Không reference vòng. DAO Singleton thread-safe, không giữ scoped DbContext; context/repositories scoped.
+- Không tự map Staff thành Sinh viên hoặc đổi mã role News; kiểm tra principal và phạm vi dữ liệu theo contract được duyệt.
+- Chỉ trong workspace hiện tại. Bảo toàn module cũ và thay đổi teammate; không reset/clean/discard để thuận tiện.
+- Review chỉ đọc/test; implement cần yêu cầu riêng nêu task/phạm vi. Không coi tài liệu này là quyền tự triển khai tất cả.
+- Không tự chạy script DB, migration, seed, test ghi DB hoặc đổi framework/package. Thay đổi schema/Auth/file chung phải có owner và phạm vi cho phép.
+- Mock chỉ ở test/harness được nhận diện; không bypass production authentication hoặc tuyên bố mock là AI/SQL thật.
+- Build/test phần sửa trước bàn giao; công khai phần chưa kiểm chứng và snapshot review.
 
----
+## Git
 
-## 2. Solution & Project Mapping (3-Layer Architecture)
-
-The solution is organized into strict layers targeting .NET 8:
-
-| Layer | Project Folder | Project File | Key Contents & Responsibilities |
-|---|---|---|---|
-| **Presentation** (`AIVES.MVC`) | `StudentNameMVC` | `StudentNameMVC.csproj` | Controllers, Razor Views with modals, ViewModels, `Program.cs`, `appsettings.json`. (*`StudentNameMVC` is the physical template project mapping to `AIVES.MVC` per assignment submission rules*). |
-| **Business Logic** (`AIVES.BLL`) | `AIVES.BLL` | `AIVES.BLL.csproj` | Service interfaces (`Interfaces/`), service implementations (`Services/`), business validation, use case coordination. |
-| **Data Access** (`AIVES.DAL`) | `AIVES.DAL` | `AIVES.DAL.csproj` | `Context/AIVESDbContext.cs`, `Entities/`, thread-safe Singleton `DAOs/`, and `Repositories/`. |
-| **Testing** | `AIVES.Tests` | `AIVES.Tests.csproj` | Automated unit tests (`dotnet test`). |
-| **Database** | `database/` | `001-create-schema.sql` | DB-first SQL Server schema script for database `AIVES`. |
-
-**Dependency Direction:** `StudentNameMVC → AIVES.BLL → AIVES.DAL`.
-- `AIVES.BLL` references `AIVES.DAL`.
-- `AIVES.DAL` must NEVER reference `AIVES.BLL` or `StudentNameMVC`.
-- `AIVES.BLL` must NEVER reference `StudentNameMVC`.
-- `StudentNameMVC` references `AIVES.DAL` solely for DI registration in `Program.cs`.
-
----
-
-## 3. Mandatory Architectural & Assignment Rules
-
-### Documented Assignment Requirements
-1. **Application Call Flow:**
-   `Razor View → Controller → Service → Repository → DAO → AIVESDbContext → SQL Server`.
-2. **Controller Database Access Ban:**
-   Controllers MUST NOT inject or access `AIVESDbContext`, `DbSet`, or execute SQL queries. Controllers depend exclusively on BLL Service interfaces (`INewsArticleService`, `ICategoryService`, `IAuthService`, etc.).
-3. **Repository & DAO Flow:**
-   Services call Repositories. Repositories call DAOs. DAOs query `AIVESDbContext` via LINQ. DAOs must NOT be bypassed.
-4. **Thread-Safe Singleton Pattern on DAOs:**
-   All DAOs (`NewsArticleDAO`, `CategoryDAO`, `SystemAccountDAO`, `TagDAO`) MUST implement a thread-safe Singleton Pattern (via `Instance` property).
-5. **Configuration Sources:**
-   - Connection string from `appsettings.json` (`ConnectionStrings:DefaultConnection`).
-   - Default Administrator credentials from `appsettings.json` (`DefaultAdmin:Email` and `DefaultAdmin:Password`). Never hard-code passwords in C# files.
-6. **Default Route:**
-   Default URL route must land on `Account/Login`.
-7. **UI Requirements:**
-   - Create and Update operations for News, Categories, and Accounts MUST use **Popup Modals / Dialogs**.
-   - Delete operations MUST display an explicit **Confirmation Modal / Dialog** with Cancel and Confirm buttons.
-8. **Business Rules:**
-   - A Category CANNOT be deleted if it is currently referenced by any News Article (`CategoryService.DeleteCategory()`).
-   - Staff Profile and Own News History must resolve identity strictly from authenticated claims, never trusting client-supplied IDs.
-   - Admin Reports query News Articles within `[StartDate, EndDate]` ordered descending by `CreatedDate`.
-
-### Team Engineering Decisions
-1. **Safe Singleton DAO Lifetime (Context-Per-Operation):**
-   `AIVESDbContext` is Scoped. Singletons MUST NOT store a scoped `AIVESDbContext` in an instance or static field. The Scoped Repository passes `AIVESDbContext` into the DAO method as a parameter.
-2. **Framework Target:** Solution targets .NET 8 across all projects; CI workflows use .NET 8 SDK.
-3. **DB-First Schema Management:** Database schema is authored in `database/001-create-schema.sql` and mapped into `AIVESDbContext`. Do not mix runtime migrations.
-
----
-
-## 4. Git & Team Collaboration Rules
-
-1. **Branch Naming:** Every member works on a task branch following `<member-name>/<feature-name>` (e.g. `kien/news-management`, `vy/category-management`, `an/authentication`, `minh/account-management`).
-2. **Explicit Publishing Only:** Committing, pushing, and creating Pull Requests require explicit user authorization. Never push or open a PR automatically after code generation.
-3. **Working-Tree Protection:** Never run `git reset`, `git clean`, or `git stash drop` on uncommitted or teammate changes. Always inspect `git status` before touching Git state.
-4. **PR Quality Gate:** Automated unit tests in `AIVES.Tests` must pass (`dotnet test`) before PR review and merge. Merging directly to `main` without review is prohibited.
-
----
-
-## 5. Autonomous Execution & Direct Edit Authorization
-
-- **Full Authorization Granted:** The user has explicitly granted full permission for the assistant to make code edits, update project files, and execute non-destructive build/test commands directly.
-- **No Confirmation Interruption:** Do NOT pause to ask "Do you want me to add/edit this?" or ask for confirmation before modifying source code. Always apply changes directly to the respective files.
+Nhánh task theo `<member-name>/<feature-name>`; xác định người làm trước khi tạo nhánh. Kiểm tra status và bảo toàn thay đổi sẵn có; chỉ stage file đúng task.
+Không tự commit/push/PR/merge nếu chưa có yêu cầu rõ. Không force-push hoặc push thẳng main. Unit tests phải pass trước PR; không merge main không qua review.

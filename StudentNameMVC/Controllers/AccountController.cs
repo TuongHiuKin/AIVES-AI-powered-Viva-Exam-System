@@ -80,7 +80,20 @@ public class AccountController : Controller
 
     [Authorize]
     [HttpGet]
-    public IActionResult Dashboard() => View();
+    public IActionResult Dashboard()
+    {
+        if (User.IsInRole(ApplicationRoles.Lecturer))
+        {
+            return RedirectToAction("Index", "ClassReports");
+        }
+
+        if (User.IsInRole(ApplicationRoles.Staff))
+        {
+            return RedirectToAction("Index", "StudentReports");
+        }
+
+        return View();
+    }
 
     [Authorize]
     [HttpPost]
@@ -102,9 +115,14 @@ public class AccountController : Controller
             return RedirectToAction(nameof(Dashboard));
         }
 
+        if (User.IsInRole(ApplicationRoles.Lecturer))
+        {
+            return RedirectToAction("Index", "ClassReports");
+        }
+
         if (User.IsInRole(ApplicationRoles.Staff))
         {
-            return RedirectToAction("Index", "NewsArticle");
+            return RedirectToAction("Index", "StudentReports");
         }
 
         return RedirectToAction(nameof(Dashboard));
@@ -271,7 +289,7 @@ public class AccountController : Controller
             AccountId = account.AccountId,
             AccountName = account.AccountName,
             AccountEmail = account.AccountEmail,
-            RoleName = account.AccountRole == 1 ? "Staff" : "Lecturer",
+            RoleName = account.AccountRole == 1 ? "Sinh viên" : "Giảng viên",
             IsHardDelete = false
         };
 
@@ -317,7 +335,7 @@ public class AccountController : Controller
             AccountId = account.AccountId,
             AccountName = account.AccountName,
             AccountEmail = account.AccountEmail,
-            RoleName = account.AccountRole == 1 ? "Staff" : "Lecturer",
+            RoleName = account.AccountRole == 1 ? "Sinh viên" : "Giảng viên",
             IsHardDelete = true,
             IsReferenced = isReferenced
         };

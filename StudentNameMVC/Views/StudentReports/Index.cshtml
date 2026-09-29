@@ -1,0 +1,280 @@
+@model AIVES.BLL.Models.ExamReporting.StudentReportDto
+@{
+    ViewData["Title"] = "Báo cáo Kết quả Học tập & Thi Vấn Đáp (Sinh viên)";
+    var availableExams = ViewBag.AvailableExams as List<AIVES.BLL.Models.ExamReporting.ExamSettingsSnapshot> ?? new();
+    string selectedExamId = ViewBag.SelectedExamId as string ?? "EXAM01";
+    string selectedStudentId = ViewBag.SelectedStudentId as string ?? "SV01";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header & Switcher Demo -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <div>
+            <h2 class="fw-bold mb-1 text-primary">
+                <i class="bi bi-mortarboard-fill me-2"></i>Báo Cáo Học Tập & Phản Hồi Thi Vấn Đáp AI
+            </h2>
+            <p class="text-muted mb-0">Hệ thống khảo thí thông minh AIVES · Xem lại chi tiết Transcript vấn đáp, câu hỏi đào sâu của AI và nhận xét nâng cao năng lực.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
+            <span class="fw-semibold text-secondary"><i class="bi bi-person-bounding-box me-1"></i>Chuyển hồ sơ SV:</span>
+            <div class="btn-group shadow-sm" role="group">
+                <a asp-action="Index" asp-route-studentId="SV01" asp-route-examId="@selectedExamId"
+                   class="btn btn-sm @(selectedStudentId == "SV01" ? "btn-primary fw-bold" : "btn-outline-primary")">
+                    SV01 (Nguyễn Văn A)
+                </a>
+                <a asp-action="Index" asp-route-studentId="SV02" asp-route-examId="@selectedExamId"
+                   class="btn btn-sm @(selectedStudentId == "SV02" ? "btn-primary fw-bold" : "btn-outline-primary")">
+                    SV02 (Trần Thị B)
+                </a>
+                <a asp-action="Index" asp-route-studentId="SV03" asp-route-examId="@selectedExamId"
+                   class="btn btn-sm @(selectedStudentId == "SV03" ? "btn-primary fw-bold" : "btn-outline-primary")">
+                    SV03 (Lê Văn C)
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @if (Model != null)
+    {
+        <!-- Summary Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0 bg-primary text-white h-100">
+                    <div class="card-body py-3">
+                        <small class="text-white-50 text-uppercase fw-bold">Học viên</small>
+                        <h4 class="fw-bold mb-1">@Model.StudentName</h4>
+                        <span class="badge bg-light text-primary">MSSV: @Model.StudentId</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0 bg-white h-100 border-start border-4 border-info">
+                    <div class="card-body py-3">
+                        <small class="text-muted text-uppercase fw-bold">Số lượt thi hoàn thành</small>
+                        <h3 class="fw-bold text-dark mb-1">
+                            @Model.CompletedAttemptsCount / @Model.MaxAllowedAttemptsCount
+                        </h3>
+                        <small class="text-muted">
+                            (Đã chấm: <strong>@Model.GradedAttemptsCount</strong>, Chờ chấm: <strong>@Model.PendingAttemptsCount</strong>)
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0 bg-white h-100 border-start border-4 border-success">
+                    <div class="card-body py-3">
+                        <small class="text-muted text-uppercase fw-bold">Điểm trung bình học tập</small>
+                        <h3 class="fw-bold text-success mb-1">
+                            @(Model.AverageScore.HasValue ? Model.AverageScore.Value.ToString("0.00") : "Chưa có")
+                        </h3>
+                        <small class="text-muted">Tính từ @Model.GradedAttemptsCount lượt có kết quả đầy đủ</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0 bg-white h-100 border-start border-4 border-warning">
+                    <div class="card-body py-3">
+                        <small class="text-muted text-uppercase fw-bold">Tỷ lệ đạt chuẩn</small>
+                        <h3 class="fw-bold text-warning mb-1">
+                            @(Model.PassRatePercentage.HasValue ? $"{Model.PassRatePercentage.Value:0.#}%" : "Chưa có")
+                        </h3>
+                        <small class="text-muted">Căn cứ Rubric & Chuẩn đầu ra</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attempts Details -->
+        <h4 class="fw-bold text-dark mb-3">
+            <i class="bi bi-journal-check text-primary me-2"></i>Chi Tiết Bài Thi & Nhận Xét Của AI Từng Lượt
+        </h4>
+
+        @if (!Model.Attempts.Any())
+        {
+            <div class="alert alert-info">Chưa có bản ghi lượt thi nào cho sinh viên này.</div>
+        }
+        else
+        {
+            <div class="accordion shadow-sm" id="attemptsAccordion">
+                @foreach (var attempt in Model.Attempts)
+                {
+                    bool isExpanded = attempt.AttemptOrdinal == 1;
+                    string collapseId = $"collapseAttempt_{attempt.AttemptId}";
+                    string headingId = $"headingAttempt_{attempt.AttemptId}";
+
+                    <div class="accordion-item mb-3 border rounded-3 overflow-hidden shadow-sm">
+                        <h2 class="accordion-header" id="@headingId">
+                            <button class="accordion-button @(isExpanded ? "" : "collapsed") bg-light" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#@collapseId"
+                                    aria-expanded="@(isExpanded ? "true" : "false")" aria-controls="@collapseId">
+                                <div class="d-flex flex-wrap align-items-center justify-content-between w-100 me-3">
+                                    <div>
+                                        <span class="badge bg-secondary me-2">Lượt thi #@attempt.AttemptOrdinal</span>
+                                        <span class="fw-bold text-dark">
+                                            @(attempt.CompletedAt.HasValue ? attempt.CompletedAt.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm") : "Chưa hoàn thành")
+                                        </span>
+                                    </div>
+                                    <div class="mt-2 mt-md-0 d-flex gap-2 align-items-center">
+                                        @if (attempt.ExamState == AIVES.BLL.Models.ExamReporting.ExamState.Abandoned)
+                                        {
+                                            <span class="badge bg-danger">Bỏ dở (DEC-01: Không tính lượt)</span>
+                                        }
+                                        else if (attempt.GradingState == AIVES.BLL.Models.ExamReporting.GradingState.Pending)
+                                        {
+                                            <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split me-1"></i>Đang chờ AI chấm</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge @(attempt.IsPassed ? "bg-success" : "bg-danger")">
+                                                @(attempt.IsPassed ? "ĐẠT CHUẨN" : "CHƯA ĐẠT")
+                                            </span>
+                                            <span class="badge bg-primary">
+                                                Điểm: @attempt.TotalEarnedScore / @attempt.TotalMaxScore (@attempt.NormalizedScore.ToString("0.0")/10)
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+                            </button>
+                        </h2>
+                        <div id="@collapseId" class="accordion-collapse collapse @(isExpanded ? "show" : "")"
+                             aria-labelledby="@headingId" data-bs-parent="#attemptsAccordion">
+                            <div class="accordion-body p-4 bg-white">
+                                @if (attempt.ExamState == AIVES.BLL.Models.ExamReporting.ExamState.Abandoned)
+                                {
+                                    <div class="alert alert-secondary mb-0">
+                                        <i class="bi bi-exclamation-circle me-1"></i> Lượt thi này sinh viên đã hủy hoặc bỏ dở giữa chừng. Theo quy định DEC-01, lượt thi này không được tính vào số lượt hoàn thành và không có điểm.
+                                    </div>
+                                }
+                                else if (!attempt.QuestionResults.Any())
+                                {
+                                    <div class="alert alert-light">Không có câu hỏi nào trong lượt thi này.</div>
+                                }
+                                else
+                                {
+                                    <div class="vstack gap-4">
+                                        @foreach (var q in attempt.QuestionResults)
+                                        {
+                                            <div class="card border rounded-3 shadow-none overflow-hidden">
+                                                <!-- Card Header with Bloom Level and Scores -->
+                                                <div class="card-header bg-light d-flex flex-wrap justify-content-between align-items-center py-2 px-3">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <span class="fw-bold text-dark">
+                                                            <i class="bi bi-question-circle-fill text-primary me-1"></i> Câu @q.QuestionId
+                                                        </span>
+                                                        <span class="badge bg-info text-dark">
+                                                            <i class="bi bi-diagram-3 me-1"></i>Thang Bloom: @q.CognitiveLevel
+                                                        </span>
+                                                    </div>
+                                                    <div class="d-flex align-items-center gap-2 mt-2 mt-sm-0">
+                                                        @if (q.GradingState == AIVES.BLL.Models.ExamReporting.GradingState.Pending)
+                                                        {
+                                                            <span class="badge bg-warning text-dark">Chờ AI chấm điểm</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge @(q.IsPassed ? "bg-success" : "bg-danger")">
+                                                                @(q.IsPassed ? "ĐẠT" : "CHƯA ĐẠT")
+                                                            </span>
+                                                            <span class="badge bg-secondary" title="Điểm do AI đề xuất">
+                                                                <i class="bi bi-robot me-1"></i>AI: @q.AiSuggestedScore/@q.MaxScore
+                                                            </span>
+                                                            <span class="badge bg-success" title="Điểm do Giảng viên chốt cuối cùng (Human-in-the-loop)">
+                                                                <i class="bi bi-person-check-fill me-1"></i>GV chốt: @q.TeacherFinalScore/@q.MaxScore
+                                                            </span>
+                                                        }
+                                                    </div>
+                                                </div>
+
+                                                <div class="card-body p-3">
+                                                    <!-- Question Title -->
+                                                    <h6 class="card-title fw-bold text-dark mb-3">
+                                                        @q.QuestionTitle
+                                                    </h6>
+
+                                                    <!-- Teacher Notes if any -->
+                                                    @if (!string.IsNullOrEmpty(q.TeacherNotes))
+                                                    {
+                                                        <div class="alert alert-light border border-success py-2 px-3 mb-3 small">
+                                                            <i class="bi bi-info-circle-fill text-success me-1"></i>
+                                                            <strong>Ghi chú của Giảng viên:</strong> @q.TeacherNotes
+                                                        </div>
+                                                    }
+
+                                                    <!-- Dialogue Transcript Flow (Lõi Nhóm 3) -->
+                                                    <div class="bg-light p-3 rounded-3 mb-3 border">
+                                                        <div class="fw-semibold text-secondary small mb-2 text-uppercase">
+                                                            <i class="bi bi-mic-fill text-danger me-1"></i> Nhật Ký Vấn Đáp Giọng Nói (Speech-to-Text Transcript):
+                                                        </div>
+
+                                                        <!-- Student Initial Answer -->
+                                                        <div class="mb-3 ps-3 border-start border-3 border-primary">
+                                                            <div class="small fw-bold text-primary mb-1">
+                                                                <i class="bi bi-person-fill"></i> Thí sinh trả lời ban đầu:
+                                                            </div>
+                                                            <p class="mb-0 text-dark fst-italic">"@q.StudentInitialAnswerTranscript"</p>
+                                                        </div>
+
+                                                        <!-- AI Follow-up Question -->
+                                                        @if (!string.IsNullOrEmpty(q.AiFollowUpQuestion))
+                                                        {
+                                                            <div class="mb-3 ps-3 border-start border-3 border-warning bg-white p-2 rounded">
+                                                                <div class="small fw-bold text-warning-emphasis mb-1">
+                                                                    <i class="bi bi-robot"></i> <strong>AI Giám Khảo Hỏi Xoáy / Làm Rõ (Adaptive Follow-up):</strong>
+                                                                </div>
+                                                                <p class="mb-0 text-dark fw-semibold">@q.AiFollowUpQuestion</p>
+                                                            </div>
+
+                                                            <!-- Student Follow-up Answer -->
+                                                            <div class="ps-3 border-start border-3 border-success">
+                                                                <div class="small fw-bold text-success mb-1">
+                                                                    <i class="bi bi-person-fill"></i> Thí sinh phản hồi câu hỏi đào sâu:
+                                                                </div>
+                                                                <p class="mb-0 text-dark fst-italic">"@q.StudentFollowUpAnswerTranscript"</p>
+                                                            </div>
+                                                        }
+                                                    </div>
+
+                                                    <!-- AI Learning Feedback & Analysis (Nhóm 4 & Nhóm 6) -->
+                                                    <div class="row g-2">
+                                                        @if (!string.IsNullOrEmpty(q.Strengths))
+                                                        {
+                                                            <div class="col-md-6">
+                                                                <div class="p-2 px-3 rounded bg-success-subtle text-success-emphasis border border-success-subtle h-100">
+                                                                    <small class="fw-bold d-block"><i class="bi bi-check-circle-fill me-1"></i> Điểm Mạnh Đạt Được:</small>
+                                                                    <small>@q.Strengths</small>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                        @if (!string.IsNullOrEmpty(q.Weaknesses))
+                                                        {
+                                                            <div class="col-md-6">
+                                                                <div class="p-2 px-3 rounded bg-danger-subtle text-danger-emphasis border border-danger-subtle h-100">
+                                                                    <small class="fw-bold d-block"><i class="bi bi-exclamation-triangle-fill me-1"></i> Điểm Yếu & Ý Còn Thiếu:</small>
+                                                                    <small>@q.Weaknesses</small>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    </div>
+
+                                                    <!-- Rubric & Overall Feedback -->
+                                                    <div class="mt-3 pt-2 border-top">
+                                                        <small class="text-muted d-block mb-1">
+                                                            <strong><i class="bi bi-chat-square-dots-fill text-primary me-1"></i> Đánh giá chi tiết của AI:</strong> @q.AiFeedback
+                                                        </small>
+                                                        <small class="text-muted d-block">
+                                                            <strong><i class="bi bi-card-checklist text-secondary me-1"></i> Tiêu chí Rubric:</strong> @q.RubricCriteria
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>
