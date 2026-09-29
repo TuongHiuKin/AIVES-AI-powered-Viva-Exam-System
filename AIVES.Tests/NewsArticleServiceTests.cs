@@ -168,6 +168,108 @@ public class NewsArticleServiceTests
     }
 
     [Fact]
+    public async Task CreateNewsAsync_WithNonExistentTagId_ThrowsArgumentException_AndDoesNotSave()
+    {
+        // Act & Assert: TagId 99999 không tồn tại
+        var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
+            _service.CreateNewsAsync(
+                title: "Tiêu đề tag sai",
+                content: "Nội dung",
+                categoryId: 1,
+                status: 1,
+                createdById: 10,
+                tagIds: new[] { 1, 99999 }
+            ));
+
+        Assert.Contains("99999", ex.Message);
+        Assert.Empty(_newsRepo.Articles); // Đảm bảo không lưu bài viết
+    }
+
+    [Fact]
+    public async Task CreateNewsAsync_WithDuplicateTagIds_DeduplicatesAndSavesSuccessfully()
+    {
+        // Act: Gửi TagId trùng lặp [1, 1, 2]
+        var id = await _service.CreateNewsAsync(
+            title: "Tiêu đề trùng tag",
+            content: "Nội dung",
+            categoryId: 1,
+            status: 1,
+            createdById: 10,
+            tagIds: new[] { 1, 1, 2 }
+        );
+
+        // Assert
+        Assert.True(id > 0);
+        var created = await _service.GetNewsByIdAsync(id);
+        Assert.NotNull(created);
+        Assert.Equal(2, created.NewsTags.Count);
+        Assert.Contains(created.NewsTags, nt => nt.TagId == 1);
+        Assert.Contains(created.NewsTags, nt => nt.TagId == 2);
+    }
+
+    [Fact]
+    public async Task CreateNewsAsync_WithEmptyOrNullTags_SavesSuccessfully()
+    {
+        // Act: Gửi rỗng hoặc null
+        var id1 = await _service.CreateNewsAsync("Bài 1", "Nội dung", 1, 1, 10, Array.Empty<int>());
+        var id2 = await _service.CreateNewsAsync("Bài 2", "Nội dung", 1, 1, 10, null!);
+
+        // Assert
+        Assert.True(id1 > 0);
+        Assert.True(id2 > 0);
+        Assert.Equal(2, _newsRepo.Articles.Count);
+    }
+
+    [Fact]
+    public async Task UpdateNewsAsync_WithNonExistentTagId_ThrowsArgumentException_AndDoesNotModify()
+    {
+        // Arrange
+        var id = await _service.CreateNewsAsync("Bài ban đầu", "Nội dung ban đầu", 1, 1, 10, new[] { 1 });
+
+        // Act & Assert
+        var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
+            _service.UpdateNewsAsync(
+                id: id,
+                title: "Tiêu đề mới",
+                content: "Nội dung mới",
+                categoryId: 1,
+                status: 1,
+                updatedById: 20,
+                tagIds: new[] { 99999 }
+            ));
+
+        Assert.Contains("99999", ex.Message);
+        var original = await _service.GetNewsByIdAsync(id);
+        Assert.NotNull(original);
+        Assert.Equal("Bài ban đầu", original.NewsTitle);
+    }
+
+    [Fact]
+    public async Task UpdateNewsAsync_WithDuplicateTagIds_DeduplicatesAndUpdatesSuccessfully()
+    {
+        // Arrange
+        var id = await _service.CreateNewsAsync("Bài ban đầu", "Nội dung ban đầu", 1, 1, 10, new[] { 1 });
+
+        // Act
+        var result = await _service.UpdateNewsAsync(
+            id: id,
+            title: "Tiêu đề đã sửa",
+            content: "Nội dung đã sửa",
+            categoryId: 1,
+            status: 1,
+            updatedById: 20,
+            tagIds: new[] { 2, 2 }
+        );
+
+        // Assert
+        Assert.True(result);
+        var updated = await _service.GetNewsByIdAsync(id);
+        Assert.NotNull(updated);
+        Assert.Single(updated.NewsTags);
+        Assert.Equal(2, updated.NewsTags.First().TagId);
+    }
+
+    [Fact]
     public async Task DeleteNewsAsync_WithValidId_ReturnsTrue()
     {
         // Arrange: tạo trước bài viết
@@ -258,7 +360,8 @@ public class NewsArticleServiceTests
                 CategoryId = input.CategoryId,
                 NewsStatus = input.Status,
                 CreatedById = input.CreatedById,
-                CreatedDate = DateTime.UtcNow
+                CreatedDate = DateTime.UtcNow,
+                NewsTags = input.TagIds.Select(tid => new NewsTag { TagId = tid }).ToList()
             };
             Articles.Add(article);
             return Task.FromResult(article.NewsArticleId);
@@ -275,6 +378,7 @@ public class NewsArticleServiceTests
             article.NewsStatus = input.Status;
             article.UpdatedById = input.UpdatedById;
             article.ModifiedDate = input.ModifiedUtc;
+            article.NewsTags = input.TagIds.Select(tid => new NewsTag { TagId = tid }).ToList();
             return Task.FromResult(true);
         }
 

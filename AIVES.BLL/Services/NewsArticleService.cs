@@ -63,13 +63,8 @@ public class NewsArticleService : INewsArticleService
         if (category == null)
             throw new ArgumentException($"Category with ID {categoryId} does not exist.", nameof(categoryId));
 
-        // 3. Filter valid Tags (SC-02, SC-03: allow empty, no duplicates)
-        var distinctTagIds = new List<int>();
-        if (tagIds != null && tagIds.Count > 0)
-        {
-            var validTags = await _tagRepo.GetByIdsAsync(tagIds, ct);
-            distinctTagIds = validTags.Select(t => t.TagId).Distinct().ToList();
-        }
+        // 3. Filter and validate Tags (SC-02, SC-03: allow empty, deduplicate, reject non-existent)
+        var distinctTagIds = await ValidateAndResolveTagIdsAsync(tagIds, ct);
 
         // 4. Delegate persistence to DAL
         var command = new NewsCreate(
@@ -121,13 +116,8 @@ public class NewsArticleService : INewsArticleService
         if (category == null)
             throw new ArgumentException($"Category with ID {categoryId} does not exist.", nameof(categoryId));
 
-        // 4. Filter valid Tags
-        var distinctTagIds = new List<int>();
-        if (tagIds != null && tagIds.Count > 0)
-        {
-            var validTags = await _tagRepo.GetByIdsAsync(tagIds, ct);
-            distinctTagIds = validTags.Select(t => t.TagId).Distinct().ToList();
-        }
+        // 4. Filter and validate Tags
+        var distinctTagIds = await ValidateAndResolveTagIdsAsync(tagIds, ct);
 
         // 5. Delegate persistence to DAL with system UTC modified time
         var command = new NewsUpdate(
@@ -179,5 +169,24 @@ public class NewsArticleService : INewsArticleService
             throw new ArgumentException("Start date cannot be after end date.");
 
         return await _newsRepo.GetByCreatedDateRangeAsync(startUtc, endExclusiveUtc, ct);
+    }
+
+    private async Task<List<int>> ValidateAndResolveTagIdsAsync(IReadOnlyCollection<int>? tagIds, CancellationToken ct)
+    {
+        if (tagIds == null || tagIds.Count == 0)
+        {
+            return new List<int>();
+        }
+
+        var distinctRequestedTagIds = tagIds.Distinct().ToList();
+        var validTags = await _tagRepo.GetByIdsAsync(distinctRequestedTagIds, ct);
+        var validTagIdSet = validTags.Select(t => t.TagId).ToHashSet();
+        var missingTagIds = distinctRequestedTagIds.Where(tid => !validTagIdSet.Contains(tid)).ToList();
+        if (missingTagIds.Count > 0)
+        {
+            throw new ArgumentException($"One or more selected tags do not exist: {string.Join(", ", missingTagIds)}.", nameof(tagIds));
+        }
+
+        return distinctRequestedTagIds;
     }
 }
