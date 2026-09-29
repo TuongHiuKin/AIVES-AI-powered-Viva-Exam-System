@@ -6,15 +6,22 @@ using Microsoft.AspNetCore.Identity;
 
 namespace AIVES.BLL.Services;
 
-public class SystemAccountService : ISystemAccountService
+public class SystemAccountService : ISystemAccountService, ISystemAccountServices
 {
     private readonly ISystemAccountRepository _accountRepo;
     private readonly PasswordHasher<SystemAccount> _passwordHasher;
+    private readonly INewsArticleRepository? _articlesRepo;
 
     public SystemAccountService(ISystemAccountRepository accountRepo)
     {
         _accountRepo = accountRepo ?? throw new ArgumentNullException(nameof(accountRepo));
         _passwordHasher = new PasswordHasher<SystemAccount>();
+    }
+
+    public SystemAccountService(ISystemAccountRepository accountRepo, INewsArticleRepository articlesRepo)
+        : this(accountRepo)
+    {
+        _articlesRepo = articlesRepo ?? throw new ArgumentNullException(nameof(articlesRepo));
     }
 
     private static string NormalizeEmail(string email)
@@ -56,21 +63,21 @@ public class SystemAccountService : ISystemAccountService
         if (role is not (1 or 2))
             throw new ArgumentException("Vai trò không hợp lệ. Chỉ chấp nhận Staff (1) hoặc Lecturer (2).", nameof(role));
 
-        // 2. Check email uniqueness (kể cả các tài khoản đã soft-delete theo SC-10/BR-26)
-        var exists = await _accountRepo.EmailExistsAsync(normalizedEmail, exceptId: null, ct);
-        if (exists)
-            throw new InvalidOperationException("Địa chỉ email này đã tồn tại trong hệ thống.");
+        // 2. Check email uniqueness
+        var emailExists = await _accountRepo.EmailExistsAsync(normalizedEmail, exceptId: null, ct);
+        if (emailExists)
+            throw new InvalidOperationException("Địa chỉ email này đã được sử dụng bởi một tài khoản khác.");
 
-        // 3. Hash password using ASP.NET Core Identity PasswordHasher
-        var dummyAccount = new SystemAccount { AccountEmail = normalizedEmail };
-        var passwordHash = _passwordHasher.HashPassword(dummyAccount, password);
+        // 3. Hash password
+        var dummy = new SystemAccount { AccountEmail = normalizedEmail };
+        var passwordHash = _passwordHasher.HashPassword(dummy, password);
 
         // 4. Delegate to repository
         var command = new AccountCreate(
             Name: trimmedName,
             Email: normalizedEmail,
-            PasswordHash: passwordHash,
-            Role: role
+            Role: role,
+            PasswordHash: passwordHash
         );
 
         return await _accountRepo.CreateAsync(command, ct);
@@ -201,5 +208,44 @@ public class SystemAccountService : ISystemAccountService
             return null;
 
         return account;
+    }
+
+    public async Task<List<NewsArticle>> GetNewsArticlesFromUserAsync(int accountId, CancellationToken ct = default)
+    {
+        if (_articlesRepo == null)
+            throw new InvalidOperationException("INewsArticleRepository not provided.");
+        var exist = await _accountRepo.GetByIdAsync(accountId, includeDeleted: false, ct);
+        if (exist == null)
+            throw new ArgumentException("Cannot find this user", nameof(accountId));
+        return await _articlesRepo.GetByCreatorAsync(accountId, null, ct);
+    }
+
+    public async Task<List<NewsArticle>> GetNewsArticlesLecturerAsync(int accountId, CancellationToken ct = default)
+    {
+        if (_articlesRepo == null)
+            throw new InvalidOperationException("INewsArticleRepository not provided.");
+        var exist = await _accountRepo.GetByIdAsync(accountId, includeDeleted: false, ct);
+        if (exist == null)
+            throw new ArgumentException("Cannot find this user", nameof(accountId));
+        if (exist.AccountRole != 2)
+        {
+            throw new ArgumentException("Only Lecturers are allowed to view this", nameof(accountId));
+        }
+        return await _articlesRepo.GetByCreatorAsync(accountId, null, ct);
+    }
+
+    public async Task<List<NewsArticle>> GetNewsArticlesPublicAsync(CancellationToken ct = default)
+    {
+        if (_articlesRepo == null)
+            throw new InvalidOperationException("INewsArticleRepository not provided.");
+        return await _articlesRepo.GetActiveAsync(null, ct);
+    }
+}
+
+public class SystemAccountServices : SystemAccountService
+{
+    public SystemAccountServices(INewsArticleRepository articlesRepo, ISystemAccountRepository systemAccountRepo)
+        : base(systemAccountRepo, articlesRepo)
+    {
     }
 }
