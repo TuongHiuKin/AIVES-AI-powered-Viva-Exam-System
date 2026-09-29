@@ -83,3 +83,10 @@ The solution is organized into strict layers targeting .NET 8:
 2. **Explicit Publishing Only:** Committing, pushing, and creating Pull Requests require explicit user authorization. Never push or open a PR automatically after code generation.
 3. **Working-Tree Protection:** Never run `git reset`, `git clean`, or `git stash drop` on uncommitted or teammate changes. Always inspect `git status` before touching Git state.
 4. **PR Quality Gate:** Automated unit tests in `AIVES.Tests` must pass (`dotnet test`) before PR review and merge. Merging directly to `main` without review is prohibited.
+
+---
+
+## 5. Autonomous Execution & Direct Edit Authorization
+
+- **Full Authorization Granted:** The user has explicitly granted full permission for the assistant to make code edits, update project files, and execute non-destructive build/test commands directly.
+- **No Confirmation Interruption:** Do NOT pause to ask "Do you want me to add/edit this?" or ask for confirmation before modifying source code. Always apply changes directly to the respective files.
