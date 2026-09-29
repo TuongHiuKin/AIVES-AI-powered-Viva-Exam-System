@@ -97,17 +97,17 @@ public class AccountController : Controller
 
     private IActionResult RedirectToDefaultRolePage()
     {
-        if (User.IsInRole(ApplicationRoles.Admin))
+        if (User.IsInRole(ApplicationRoles.Admin) || User.IsInRole(ApplicationRoles.Lecturer))
         {
-            return RedirectToAction(nameof(Dashboard));
+            return RedirectToAction("Index", "ClassReports");
         }
 
         if (User.IsInRole(ApplicationRoles.Staff))
         {
-            return RedirectToAction("Index", "NewsArticle");
+            return RedirectToAction("Index", "StudentReports");
         }
 
-        return RedirectToAction(nameof(Dashboard));
+        return RedirectToAction("Index", "StudentReports");
     }
 
     #endregion

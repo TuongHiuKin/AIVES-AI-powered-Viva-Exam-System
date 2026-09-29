@@ -147,6 +147,27 @@ public class ExamReportingTests
         Assert.Equal(3, totalCountInBins);
     }
 
+    [Fact]
+    public async Task ClassReport_Exports_Valid_Csv_With_Utf8_Bom_And_Student_Data()
+    {
+        var csvBytes = await _classService.ExportClassGradeSheetCsvAsync("GV01", "SE1701", "EXAM01");
+
+        Assert.NotNull(csvBytes);
+        Assert.NotEmpty(csvBytes);
+
+        // UTF-8 BOM check: 0xEF, 0xBB, 0xBF
+        Assert.Equal(0xEF, csvBytes[0]);
+        Assert.Equal(0xBB, csvBytes[1]);
+        Assert.Equal(0xBF, csvBytes[2]);
+
+        var csvContent = System.Text.Encoding.UTF8.GetString(csvBytes);
+        Assert.Contains("Mã sinh viên", csvContent);
+        Assert.Contains("SV01", csvContent);
+        Assert.Contains("SV02", csvContent);
+        Assert.Contains("SV03", csvContent);
+        Assert.Contains("Nguyễn Văn A", csvContent);
+    }
+
     private class FakeExamReportRepository : IExamReportRepository
     {
         public List<ExamSettingsSnapshot> Exams { get; } = new();

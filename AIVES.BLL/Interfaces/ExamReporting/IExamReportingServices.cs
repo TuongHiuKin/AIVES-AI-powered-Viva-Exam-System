@@ -25,4 +25,13 @@ public interface IClassReportService
         string examId,
         int? specificAttemptOrdinal = null,
         CancellationToken ct = default);
+
+    /// <summary>
+    /// Xuất bảng điểm lớp học ra file CSV hỗ trợ tiếng Việt (UTF-8 with BOM) theo mẫu của trường (Nhóm 6)
+    /// </summary>
+    Task<byte[]> ExportClassGradeSheetCsvAsync(
+        string teacherId,
+        string classId,
+        string examId,
+        CancellationToken ct = default);
 }

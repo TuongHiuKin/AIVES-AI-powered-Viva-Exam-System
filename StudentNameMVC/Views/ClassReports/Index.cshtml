@@ -14,12 +14,20 @@
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom">
         <div>
             <h2 class="fw-bold mb-1 text-primary">
-                <i class="bi bi-bar-chart-steps me-2"></i>Thống Kê Toàn Lớp & Phân Tích Thi Vấn Đáp
+                <i class="bi bi-bar-chart-steps me-2"></i>Thống Kê Năng Lực Học Tập Toàn Lớp
             </h2>
-            <p class="text-muted mb-0">Xác định câu hỏi khó nhất, tỷ lệ trả lời tốt và biểu đồ phân bố điểm tổng hợp của sinh viên.</p>
+            <p class="text-muted mb-0">Hệ thống khảo thí thông minh AIVES · Phân tích câu hỏi khó nhất, tỷ lệ đạt chuẩn và phân bố điểm số sinh viên.</p>
         </div>
         <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
-            <span class="badge bg-secondary p-2"><i class="bi bi-person-workspace me-1"></i>Giảng viên: @selectedTeacherId</span>
+            <!-- Export Grade Sheet Button (Nhóm 6) -->
+            <a asp-action="ExportGradeSheet" 
+               asp-route-teacherId="@selectedTeacherId" 
+               asp-route-classId="@selectedClassId" 
+               asp-route-examId="@selectedExamId" 
+               class="btn btn-success fw-semibold shadow-sm">
+                <i class="bi bi-file-earmark-excel-fill me-1"></i> Xuất Bảng Điểm (Excel / CSV)
+            </a>
+            <span class="badge bg-secondary p-2"><i class="bi bi-person-workspace me-1"></i>GV: @selectedTeacherId</span>
         </div>
     </div>
 
@@ -136,7 +144,7 @@
                     @foreach (var hq in Model.HardestQuestions)
                     {
                         <li>
-                            <strong>[@hq.QuestionId]</strong> @hq.QuestionTitle 
+                            <strong>[@hq.QuestionId - Thang Bloom: @hq.CognitiveLevel]</strong> @hq.QuestionTitle 
                             — <em>Số lượt không đạt: @hq.FailedCount / @hq.TotalAssessed (Tỷ lệ đạt: @hq.PassRate%)</em>
                         </li>
                     }
@@ -177,6 +185,7 @@
                                     <tr>
                                         <th class="ps-3">Hạng</th>
                                         <th>Mã câu</th>
+                                        <th>Cấp độ Bloom</th>
                                         <th>Tỷ lệ đạt</th>
                                         <th>Đạt / Đã chấm</th>
                                         <th>Đánh giá</th>
@@ -188,6 +197,7 @@
                                         <tr>
                                             <td class="ps-3 fw-bold">#@q.Rank</td>
                                             <td class="fw-semibold text-primary">@q.QuestionId</td>
+                                            <td><span class="badge bg-light text-dark border">@q.CognitiveLevel</span></td>
                                             <td>
                                                 <div class="d-flex align-items-center gap-2">
                                                     <div class="progress flex-grow-1" style="height: 8px;">
@@ -222,11 +232,70 @@
             </div>
         </div>
 
+        <!-- Grade Sheet Table Preview for Class (Nhóm 6) -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-file-earmark-spreadsheet-fill text-success me-2"></i>Bảng Điểm Tổng Hợp Lớp Học Phần (@Model.ClassId)
+                    </h5>
+                    <small class="text-muted">Danh sách điểm thi vấn đáp chuẩn bị xuất báo cáo học vụ</small>
+                </div>
+                <a asp-action="ExportGradeSheet" 
+                   asp-route-teacherId="@selectedTeacherId" 
+                   asp-route-classId="@selectedClassId" 
+                   asp-route-examId="@selectedExamId" 
+                   class="btn btn-sm btn-outline-success fw-semibold">
+                    <i class="bi bi-download me-1"></i> Tải file .CSV Excel
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-3">STT</th>
+                                <th>Mã SV</th>
+                                <th>Họ và tên</th>
+                                <th>Lớp</th>
+                                <th>Lượt thi 1</th>
+                                <th>Lượt thi 2</th>
+                                <th>Điểm TB (Thang 10)</th>
+                                <th>Kết quả</th>
+                                <th>Ghi chú</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{ int stt = 1; }
+                            @foreach (var row in Model.GradeExportRows)
+                            {
+                                <tr>
+                                    <td class="ps-3">@(stt++)</td>
+                                    <td class="fw-bold text-primary">@row.StudentId</td>
+                                    <td class="fw-semibold">@row.StudentName</td>
+                                    <td>@row.ClassId</td>
+                                    <td><span class="badge bg-light text-dark border">@row.Attempt1Score</span></td>
+                                    <td><span class="badge bg-light text-dark border">@row.Attempt2Score</span></td>
+                                    <td><span class="fw-bold text-success fs-6">@row.AverageScore</span></td>
+                                    <td>
+                                        <span class="badge @(row.ResultStatus == "ĐẠT" ? "bg-success" : "bg-danger")">
+                                            @row.ResultStatus
+                                        </span>
+                                    </td>
+                                    <td class="text-muted small">@row.Note</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- Full Question Statistics Table -->
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-header bg-white py-3">
                 <h5 class="fw-bold mb-0 text-dark">
-                    <i class="bi bi-table text-secondary me-2"></i>Chi Tiết Thống Kê Từng Câu Hỏi
+                    <i class="bi bi-table text-secondary me-2"></i>Chi Tiết Thống Kê Từng Câu Hỏi Trong Ngân Hàng
                 </h5>
             </div>
             <div class="card-body p-0">
@@ -235,13 +304,14 @@
                         <thead class="table-light">
                             <tr>
                                 <th class="ps-3">Mã</th>
-                                <th style="width: 45%;">Nội dung câu hỏi</th>
+                                <th style="width: 40%;">Nội dung câu hỏi</th>
+                                <th>Cấp độ nhận thức</th>
                                 <th>Tổng đánh giá</th>
                                 <th>Đạt</th>
                                 <th>Không đạt</th>
                                 <th>Tỷ lệ đạt</th>
                                 <th>Tỷ lệ không đạt</th>
-                                <th>Ghi chú</th>
+                                <th>Đánh giá</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -250,6 +320,7 @@
                                 <tr class="@(q.IsHardest ? "table-danger" : "")">
                                     <td class="ps-3 fw-bold">@q.QuestionId</td>
                                     <td>@q.QuestionTitle</td>
+                                    <td><span class="badge bg-info text-dark">@q.CognitiveLevel</span></td>
                                     <td><span class="badge bg-light text-dark border">@q.TotalAssessed</span></td>
                                     <td class="text-success fw-bold">@q.PassedCount</td>
                                     <td class="text-danger fw-bold">@q.FailedCount</td>

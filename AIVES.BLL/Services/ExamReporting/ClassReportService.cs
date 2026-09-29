@@ -1,3 +1,4 @@
+using System.Text;
 using AIVES.BLL.Interfaces.ExamReporting;
 using AIVES.BLL.Models.ExamReporting;
 
@@ -50,14 +51,54 @@ public class ClassReportService : IClassReportService
             .ToList();
 
         var studentAverages = new List<decimal>();
-        foreach (var group in studentAttemptsGroup)
+        var gradeExportRows = new List<ClassGradeExportRowDto>();
+
+        // Nhóm tất cả sinh viên có lượt thi trong lớp (kể cả chưa graded)
+        var allStudentsInClass = allAttempts
+            .GroupBy(a => a.StudentId)
+            .OrderBy(g => g.Key)
+            .ToList();
+
+        foreach (var group in allStudentsInClass)
         {
-            var attemptsList = group.ToList();
-            if (attemptsList.Count > 0)
+            var studentId = group.Key;
+            var studentName = group.First().StudentName;
+            var studentGradedAttempts = group
+                .Where(a => a.ExamState == ExamState.Completed && a.GradingState == GradingState.Graded)
+                .OrderBy(a => a.AttemptOrdinal)
+                .ToList();
+
+            decimal? avgScore = null;
+            if (studentGradedAttempts.Count > 0)
             {
-                var avg = Math.Round(attemptsList.Sum(a => a.NormalizedScore) / attemptsList.Count, 1);
-                studentAverages.Add(avg);
+                avgScore = Math.Round(studentGradedAttempts.Sum(a => a.NormalizedScore) / studentGradedAttempts.Count, 1);
+                studentAverages.Add(avgScore.Value);
             }
+
+            var att1 = group.FirstOrDefault(a => a.AttemptOrdinal == 1);
+            var att2 = group.FirstOrDefault(a => a.AttemptOrdinal == 2);
+
+            string att1Str = att1 != null
+                ? (att1.GradingState == GradingState.Graded ? $"{att1.NormalizedScore:0.0}" : "Đang chấm")
+                : "Chưa thi";
+
+            string att2Str = att2 != null
+                ? (att2.ExamState == ExamState.Abandoned ? "Bỏ dở" : (att2.GradingState == GradingState.Graded ? $"{att2.NormalizedScore:0.0}" : "Đang chấm"))
+                : "Chưa thi";
+
+            bool isPassed = avgScore.HasValue && avgScore.Value >= settings.PassThresholdScore;
+
+            gradeExportRows.Add(new ClassGradeExportRowDto
+            {
+                StudentId = studentId,
+                StudentName = studentName,
+                ClassId = classId,
+                Attempt1Score = att1Str,
+                Attempt2Score = att2Str,
+                AverageScore = avgScore.HasValue ? $"{avgScore.Value:0.0}" : "Chưa có",
+                ResultStatus = isPassed ? "ĐẠT" : "CHƯA ĐẠT",
+                Note = studentGradedAttempts.Count < group.Count() ? "Có lượt thi chờ chấm / bỏ dở" : "Đã hoàn thành"
+            });
         }
 
         // DEC-06: Biểu đồ phân bố điểm X = Điểm số trung bình, Y = Số lượng sinh viên (mỗi SV tính đúng 1 lần)
@@ -125,6 +166,7 @@ public class ClassReportService : IClassReportService
             {
                 QuestionId = group.Key,
                 QuestionTitle = first.QuestionTitle,
+                CognitiveLevel = first.CognitiveLevel,
                 TotalAssessed = totalAssessed,
                 PassedCount = passedCount,
                 FailedCount = failedCount,
@@ -135,7 +177,6 @@ public class ClassReportService : IClassReportService
         }
 
         // DEC-09, DEC-10: Xác định câu khó nhất (tỷ lệ không đạt cao nhất, hiển thị tất cả các câu đồng hạng)
-        // Loại trừ các câu không có dữ liệu đánh giá (totalAssessed == 0)
         var assessedQuestions = questionStatsList.Where(q => q.TotalAssessed > 0).ToList();
         var maxFailRate = assessedQuestions.Count > 0 ? assessedQuestions.Max(q => q.FailRate) : 0m;
 
@@ -166,13 +207,56 @@ public class ClassReportService : IClassReportService
             ClassName = $"Lớp {classId}",
             ExamId = examId,
             ExamTitle = settings.ExamTitle,
-            TotalStudentsCount = studentAttemptsGroup.Count,
+            TotalStudentsCount = allStudentsInClass.Count,
             AverageClassScore = classAverageScore,
             FilteredAttemptOrdinal = specificAttemptOrdinal,
             DataScopeLabel = dataScopeLabel,
             QuestionStats = rankedStats,
             HardestQuestions = hardestQuestions,
-            ScoreDistribution = scoreDistribution
+            ScoreDistribution = scoreDistribution,
+            GradeExportRows = gradeExportRows
         };
+    }
+
+    public async Task<byte[]> ExportClassGradeSheetCsvAsync(
+        string teacherId,
+        string classId,
+        string examId,
+        CancellationToken ct = default)
+    {
+        var stats = await GetClassStatisticsAsync(teacherId, classId, examId, null, ct);
+        if (stats == null)
+        {
+            throw new InvalidOperationException("Không tìm thấy dữ liệu lớp để xuất bảng điểm.");
+        }
+
+        var sb = new StringBuilder();
+        // Header
+        sb.AppendLine("STT,Mã sinh viên,Họ và tên,Lớp,Lượt thi 1,Lượt thi 2,Điểm trung bình (Thang 10),Kết quả,Ghi chú");
+
+        int stt = 1;
+        foreach (var row in stats.GradeExportRows)
+        {
+            sb.AppendLine($"{stt++},{EscapeCsv(row.StudentId)},{EscapeCsv(row.StudentName)},{EscapeCsv(row.ClassId)},{EscapeCsv(row.Attempt1Score)},{EscapeCsv(row.Attempt2Score)},{EscapeCsv(row.AverageScore)},{EscapeCsv(row.ResultStatus)},{EscapeCsv(row.Note)}");
+        }
+
+        // Ghi kèm BOM UTF-8 để Microsoft Excel trên Windows tự nhận font tiếng Việt không bị lỗi font
+        var preamble = Encoding.UTF8.GetPreamble();
+        var bytes = Encoding.UTF8.GetBytes(sb.ToString());
+        var result = new byte[preamble.Length + bytes.Length];
+        Buffer.BlockCopy(preamble, 0, result, 0, preamble.Length);
+        Buffer.BlockCopy(bytes, 0, result, preamble.Length, bytes.Length);
+
+        return result;
+    }
+
+    private static string EscapeCsv(string text)
+    {
+        if (string.IsNullOrEmpty(text)) return "\"\"";
+        if (text.Contains(',') || text.Contains('"') || text.Contains('\n'))
+        {
+            return $"\"{text.Replace("\"", "\"\"")}\"";
+        }
+        return $"\"{text}\"";
     }
 }

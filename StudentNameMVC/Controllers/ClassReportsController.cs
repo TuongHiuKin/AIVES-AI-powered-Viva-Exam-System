@@ -57,4 +57,28 @@ public class ClassReportsController : Controller
             return View(null);
         }
     }
+
+    [HttpGet]
+    public async Task<IActionResult> ExportGradeSheet(
+        string? teacherId = "GV01",
+        string? classId = "SE1701",
+        string? examId = "EXAM01",
+        CancellationToken ct = default)
+    {
+        teacherId ??= "GV01";
+        classId ??= "SE1701";
+        examId ??= "EXAM01";
+
+        try
+        {
+            var fileBytes = await _classReportService.ExportClassGradeSheetCsvAsync(teacherId, classId, examId, ct);
+            var fileName = $"BangDiem_Lop_{classId}_{examId}.csv";
+            return File(fileBytes, "text/csv; charset=utf-8", fileName);
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = $"Lỗi khi xuất bảng điểm: {ex.Message}";
+            return RedirectToAction(nameof(Index), new { teacherId, classId, examId });
+        }
+    }
 }
