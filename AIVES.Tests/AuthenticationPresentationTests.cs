@@ -64,7 +64,7 @@ public sealed class AuthenticationPresentationTests
     [Fact]
     public async Task Cookie_validation_rejects_an_inactive_database_account()
     {
-        var authService = new StubAuthService { IsActive = false };
+        var authService = new StubAuthService { IsSessionValid = false };
         var authenticationService = new RecordingAuthenticationService();
         var services = new ServiceCollection()
             .AddSingleton<IAuthenticationService>(authenticationService)
@@ -91,12 +91,44 @@ public sealed class AuthenticationPresentationTests
         Assert.Null(context.Principal);
         Assert.True(authenticationService.SignedOut);
         Assert.Equal(17, authService.LastAccountId);
+        Assert.Equal(ApplicationRoles.Staff, authService.LastClaimedRole);
+    }
+
+    [Fact]
+    public async Task Cookie_validation_rejects_a_stale_database_role()
+    {
+        var authService = new StubAuthService { IsSessionValid = false };
+        var authenticationService = new RecordingAuthenticationService();
+        var services = new ServiceCollection()
+            .AddSingleton<IAuthenticationService>(authenticationService)
+            .BuildServiceProvider();
+        var httpContext = new DefaultHttpContext { RequestServices = services };
+        var principal = AuthenticationClaimsFactory.CreatePrincipal(new AuthenticatedUser(
+            "17",
+            "Former Staff Member",
+            "member@example.test",
+            ApplicationRoles.Staff));
+        var scheme = new AuthenticationScheme(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            null,
+            typeof(CookieAuthenticationHandler));
+        var context = new CookieValidatePrincipalContext(
+            httpContext,
+            scheme,
+            new CookieAuthenticationOptions(),
+            new AuthenticationTicket(principal, scheme.Name));
+
+        await new ActiveAccountCookieEvents(authService).ValidatePrincipal(context);
+
+        Assert.Null(context.Principal);
+        Assert.True(authenticationService.SignedOut);
+        Assert.Equal(ApplicationRoles.Staff, authService.LastClaimedRole);
     }
 
     [Fact]
     public async Task Cookie_validation_keeps_configuration_admin_without_database_lookup()
     {
-        var authService = new StubAuthService { IsActive = false };
+        var authService = new StubAuthService { IsSessionValid = false };
         var httpContext = new DefaultHttpContext();
         var principal = AuthenticationClaimsFactory.CreatePrincipal(new AuthenticatedUser(
             ApplicationRoles.AdminSubjectId,
@@ -121,8 +153,9 @@ public sealed class AuthenticationPresentationTests
 
     private sealed class StubAuthService : IAuthService
     {
-        public bool IsActive { get; init; }
+        public bool IsSessionValid { get; init; }
         public int? LastAccountId { get; private set; }
+        public string? LastClaimedRole { get; private set; }
 
         public Task<AuthenticationResult> AuthenticateAsync(
             string email,
@@ -130,12 +163,14 @@ public sealed class AuthenticationPresentationTests
             CancellationToken cancellationToken = default) =>
             Task.FromResult(AuthenticationResult.Failure);
 
-        public Task<bool> IsAccountActiveAsync(
+        public Task<bool> IsAccountSessionValidAsync(
             int accountId,
+            string claimedRole,
             CancellationToken cancellationToken = default)
         {
             LastAccountId = accountId;
-            return Task.FromResult(IsActive);
+            LastClaimedRole = claimedRole;
+            return Task.FromResult(IsSessionValid);
         }
     }
 

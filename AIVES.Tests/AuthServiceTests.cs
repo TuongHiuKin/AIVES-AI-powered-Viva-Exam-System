@@ -87,20 +87,30 @@ public sealed class AuthServiceTests
     }
 
     [Fact]
-    public async Task Account_activity_uses_non_deleted_repository_lookup()
+    public async Task Account_session_requires_active_account_and_matching_current_role()
     {
         var repository = new StubAccountRepository
         {
-            IdAccount = new SystemAccount { AccountId = 12, IsDeleted = false }
+            IdAccount = new SystemAccount
+            {
+                AccountId = 12,
+                AccountRole = 1,
+                IsDeleted = false
+            }
         };
         var service = CreateService(repository);
 
-        Assert.True(await service.IsAccountActiveAsync(12));
+        Assert.True(await service.IsAccountSessionValidAsync(12, ApplicationRoles.Staff));
         Assert.False(repository.LastIncludeDeleted);
 
+        repository.IdAccount.AccountRole = 2;
+        Assert.False(await service.IsAccountSessionValidAsync(12, ApplicationRoles.Staff));
+        Assert.True(await service.IsAccountSessionValidAsync(12, ApplicationRoles.Lecturer));
+
         repository.IdAccount = null;
-        Assert.False(await service.IsAccountActiveAsync(12));
-        Assert.False(await service.IsAccountActiveAsync(0));
+        Assert.False(await service.IsAccountSessionValidAsync(12, ApplicationRoles.Staff));
+        Assert.False(await service.IsAccountSessionValidAsync(0, ApplicationRoles.Staff));
+        Assert.False(await service.IsAccountSessionValidAsync(12, string.Empty));
     }
 
     private static AuthService CreateService(

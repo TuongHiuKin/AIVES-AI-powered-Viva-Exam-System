@@ -63,11 +63,12 @@ public sealed class AuthService(
                 role);
     }
 
-    public async Task<bool> IsAccountActiveAsync(
+    public async Task<bool> IsAccountSessionValidAsync(
         int accountId,
+        string claimedRole,
         CancellationToken cancellationToken = default)
     {
-        if (accountId <= 0)
+        if (accountId <= 0 || string.IsNullOrWhiteSpace(claimedRole))
         {
             return false;
         }
@@ -77,7 +78,14 @@ public sealed class AuthService(
             includeDeleted: false,
             cancellationToken);
 
-        return account is { IsDeleted: false };
+        if (account is not { IsDeleted: false })
+        {
+            return false;
+        }
+
+        var currentRole = ApplicationRoles.FromDatabaseRole(account.AccountRole);
+        return currentRole is not null &&
+               string.Equals(currentRole, claimedRole, StringComparison.Ordinal);
     }
 
     private static string NormalizeEmail(string email) => email.Trim().ToLowerInvariant();

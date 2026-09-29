@@ -20,9 +20,13 @@ public sealed class ActiveAccountCookieEvents(IAuthService authService) : Cookie
         var isDatabaseRole = string.Equals(role, ApplicationRoles.Staff, StringComparison.Ordinal) ||
                              string.Equals(role, ApplicationRoles.Lecturer, StringComparison.Ordinal);
 
-        if (!isDatabaseRole ||
+        if (role is null ||
+            !isDatabaseRole ||
             !int.TryParse(subject, out var accountId) ||
-            !await authService.IsAccountActiveAsync(accountId, context.HttpContext.RequestAborted))
+            !await authService.IsAccountSessionValidAsync(
+                accountId,
+                role,
+                context.HttpContext.RequestAborted))
         {
             context.RejectPrincipal();
             await context.HttpContext.SignOutAsync(

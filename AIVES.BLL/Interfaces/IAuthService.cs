@@ -9,7 +9,8 @@ public interface IAuthService
         string password,
         CancellationToken cancellationToken = default);
 
-    Task<bool> IsAccountActiveAsync(
+    Task<bool> IsAccountSessionValidAsync(
         int accountId,
+        string claimedRole,
         CancellationToken cancellationToken = default);
 }
