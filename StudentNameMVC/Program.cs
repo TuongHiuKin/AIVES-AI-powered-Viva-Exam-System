@@ -11,6 +11,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddAivesDataAccess(connectionString);
 
 // Register BLL Services
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<INewsArticleService, NewsArticleService>();
 
 // Authentication & Authorization
@@ -38,6 +39,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=NewsArticle}/{action=Index}/{id?}");
+    pattern: "{controller=Account}/{action=Login}/{id?}");
 
 app.Run();

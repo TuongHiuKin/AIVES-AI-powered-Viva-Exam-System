@@ -1,0 +1,23 @@
+@{
+    ViewData["Title"] = "Từ chối truy cập";
+    Layout = "_Layout";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 text-center">
+        <div class="card shadow-sm border-0 p-5">
+            <div class="card-body">
+                <i class="bi bi-shield-x text-danger display-1 mb-3"></i>
+                <h2 class="text-danger fw-bold">Từ chối truy cập (403)</h2>
+                <p class="text-muted mt-3">
+                    Bạn không có quyền truy cập vào chức năng hoặc tài nguyên này.
+                </p>
+                <div class="mt-4">
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Quay lại Đăng nhập
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

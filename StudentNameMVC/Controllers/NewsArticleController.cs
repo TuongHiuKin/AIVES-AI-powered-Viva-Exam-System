@@ -7,7 +7,7 @@ using StudentNameMVC.ViewModels;
 
 namespace StudentNameMVC.Controllers;
 
-// [Authorize(Roles = "1,Staff")] // Tạm tắt trong giai đoạn phát triển khi TV2 chưa hoàn thành màn Login
+[Authorize(Roles = "1,Staff")]
 public class NewsArticleController : Controller
 {
     private readonly INewsArticleService _newsService;

@@ -221,4 +221,18 @@ public class NewsArticleControllerTests
         Assert.True(service.UpdateCalled);
         Assert.Equal(expectedStaffId, service.LastUpdatedById);
     }
+
+    [Fact]
+    public void NewsArticleController_IsDecoratedWithAuthorizeForStaff()
+    {
+        var authAttr = typeof(NewsArticleController)
+            .GetCustomAttributes(typeof(Microsoft.AspNetCore.Authorization.AuthorizeAttribute), inherit: true)
+            .Cast<Microsoft.AspNetCore.Authorization.AuthorizeAttribute>()
+            .FirstOrDefault();
+
+        Assert.NotNull(authAttr);
+        Assert.NotNull(authAttr.Roles);
+        Assert.Contains("1", authAttr.Roles);
+        Assert.Contains("Staff", authAttr.Roles);
+    }
 }
