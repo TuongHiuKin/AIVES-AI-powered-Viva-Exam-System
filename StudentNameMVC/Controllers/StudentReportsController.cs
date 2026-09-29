@@ -1,10 +1,11 @@
 using AIVES.BLL.Interfaces.ExamReporting;
+using AIVES.BLL.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace StudentNameMVC.Controllers;
 
-[Authorize]
+[Authorize(Roles = $"{ApplicationRoles.Admin},{ApplicationRoles.Staff}")]
 public class StudentReportsController : Controller
 {
     private readonly IStudentReportService _studentReportService;

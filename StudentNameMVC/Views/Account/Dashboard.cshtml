@@ -1,29 +1,271 @@
+@using AIVES.BLL.Security
 @{
-    ViewData["Title"] = "Tổng quan";
+    ViewData["Title"] = "Bảng điều khiển Tổng quan";
+    var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+    var userName = User.Identity?.Name ?? "Người dùng";
 }
 
-<header class="page-header">
-    <div>
-        <p class="eyebrow">@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value</p>
-        <h1>Xin chào, @User.Identity?.Name</h1>
+<div class="container-fluid py-4">
+    <!-- Header Banner -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4 bg-gradient bg-primary text-white p-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    @if (User.IsInRole(ApplicationRoles.Admin))
+                    {
+                        <span class="badge bg-light text-primary fw-bold px-3 py-2 rounded-pill">
+                            <i class="bi bi-shield-lock-fill me-1"></i> QUẢN TRỊ VIÊN TOÀN HỆ THỐNG
+                        </span>
+                    }
+                    else if (User.IsInRole(ApplicationRoles.Lecturer))
+                    {
+                        <span class="badge bg-light text-primary fw-bold px-3 py-2 rounded-pill">
+                            <i class="bi bi-mortarboard-fill me-1"></i> GIẢNG VIÊN KHẢO THÍ
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-light text-primary fw-bold px-3 py-2 rounded-pill">
+                            <i class="bi bi-person-fill me-1"></i> SINH VIÊN / THÍ SINH
+                        </span>
+                    }
+                    <span class="badge bg-white bg-opacity-25 px-3 py-2 rounded-pill">
+                        <i class="bi bi-cpu me-1"></i> AIVES Core v2.0
+                    </span>
+                </div>
+                <h1 class="h2 fw-bold mb-1">Xin chào, @userName!</h1>
+                <p class="mb-0 text-white-50">Hệ thống Thi Vấn Đáp Thông Minh Tích Hợp Trí Tuệ Nhân Tạo (AI-powered Viva Exam System)</p>
+            </div>
+            <div class="mt-3 mt-md-0 text-end">
+                <span class="d-block small text-white-50">Hôm nay</span>
+                <span class="fw-semibold fs-5">@DateTime.Now.ToString("dddd, dd/MM/yyyy", new System.Globalization.CultureInfo("vi-VN"))</span>
+            </div>
+        </div>
     </div>
-</header>
 
-<div class="quick-links">
     @if (User.IsInRole(ApplicationRoles.Admin))
     {
-        <a class="quick-link" asp-controller="Account" asp-action="Index">Quản lý tài khoản</a>
-        <a class="quick-link" asp-controller="Report" asp-action="Index">Báo cáo</a>
-    }
-    else if (User.IsInRole(ApplicationRoles.Staff))
-    {
-        <a class="quick-link" asp-controller="NewsArticle" asp-action="Index">Quản lý tin tức</a>
-        <a class="quick-link" asp-controller="Category" asp-action="Index">Quản lý danh mục</a>
-        <a class="quick-link" asp-controller="Profile" asp-action="Index">Hồ sơ</a>
-        <a class="quick-link" asp-controller="History" asp-action="Index">Lịch sử bài viết</a>
+        <!-- ADMIN CONTROL CENTER -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-bold text-dark mb-0">
+                <i class="bi bi-grid-1x2-fill text-primary me-2"></i>Trung Tâm Điều Hành Quản Trị (Admin Portal)
+            </h4>
+            <span class="text-muted small">Quyền hạn cao nhất · Quản trị tài khoản, báo cáo và hệ thống</span>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <!-- Card 1: Quản lý tài khoản -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm rounded-4 hover-shadow transition">
+                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="bg-primary-subtle text-primary p-3 rounded-4">
+                                    <i class="bi bi-people-fill fs-3"></i>
+                                </div>
+                                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1">Nhóm 7</span>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-2">Quản Lý Tài Khoản</h5>
+                            <p class="text-muted small mb-3">
+                                Quản trị danh sách tài khoản Sinh viên và Giảng viên, tạo tài khoản mới, phân quyền và mở/khóa truy cập.
+                            </p>
+                        </div>
+                        <div>
+                            <a asp-controller="Account" asp-action="Index" class="btn btn-outline-primary w-100 fw-semibold">
+                                <i class="bi bi-gear-fill me-1"></i> Quản lý Tài khoản
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Thống kê lớp học (Nhóm 6) -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm rounded-4 hover-shadow transition">
+                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="bg-warning-subtle text-warning-emphasis p-3 rounded-4">
+                                    <i class="bi bi-bar-chart-steps fs-3"></i>
+                                </div>
+                                <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill px-3 py-1">Nhóm 6</span>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-2">Thống Kê Lớp Học</h5>
+                            <p class="text-muted small mb-3">
+                                Phân tích câu hỏi khó nhất/dễ nhất theo Bloom, biểu đồ phân bố điểm số và xếp hạng câu hỏi chuẩn hóa.
+                            </p>
+                        </div>
+                        <div>
+                            <a asp-controller="ClassReports" asp-action="Index" class="btn btn-outline-warning text-dark w-100 fw-semibold">
+                                <i class="bi bi-graph-up-arrow me-1"></i> Xem Thống Kê
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Báo cáo cá nhân sinh viên (Nhóm 6) -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm rounded-4 hover-shadow transition">
+                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="bg-info-subtle text-info-emphasis p-3 rounded-4">
+                                    <i class="bi bi-mortarboard-fill fs-3"></i>
+                                </div>
+                                <span class="badge bg-info-subtle text-info-emphasis rounded-pill px-3 py-1">Nhóm 6</span>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-2">Báo Cáo Sinh Viên</h5>
+                            <p class="text-muted small mb-3">
+                                Tra cứu kết quả thi viva của từng sinh viên: chi tiết transcript hội thoại với AI, câu hỏi xoáy và nhận xét rubric.
+                            </p>
+                        </div>
+                        <div>
+                            <a asp-controller="StudentReports" asp-action="Index" class="btn btn-outline-info text-dark w-100 fw-semibold">
+                                <i class="bi bi-person-lines-fill me-1"></i> Báo Cáo Sinh Viên
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Xuất bảng điểm CSV (Nhóm 6) -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm rounded-4 hover-shadow transition">
+                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="bg-success-subtle text-success p-3 rounded-4">
+                                    <i class="bi bi-file-earmark-excel-fill fs-3"></i>
+                                </div>
+                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1">Excel Export</span>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-2">Xuất Bảng Điểm</h5>
+                            <p class="text-muted small mb-3">
+                                Tải xuống bảng điểm khảo thí toàn lớp theo chuẩn CSV UTF-8 BOM, tương thích chuẩn hiển thị Tiếng Việt trên Excel.
+                            </p>
+                        </div>
+                        <div>
+                            <a asp-controller="ClassReports" asp-action="ExportGradeSheet" 
+                               asp-route-teacherId="GV01" asp-route-classId="SE1701" asp-route-examId="EXAM01" 
+                               class="btn btn-outline-success w-100 fw-semibold">
+                                <i class="bi bi-download me-1"></i> Tải Bảng Điểm Demo
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trạng thái Hệ thống & Nghiệp vụ AIVES -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                <h5 class="fw-bold text-dark mb-1">
+                    <i class="bi bi-shield-check text-success me-2"></i>Tổng Quan Trạng Thái Hệ Thống AIVES
+                </h5>
+                <p class="text-muted small mb-0">Các phân hệ nghiệp vụ theo tài liệu đặc tả đề tài AIVES</p>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-3 bg-light border">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-bold text-dark">Nhóm 6: Phản hồi & Báo cáo</span>
+                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Hoàn thành</span>
+                            </div>
+                            <p class="small text-muted mb-0">
+                                Đã hoàn thành 100% 12 quy tắc nghiệp vụ DEC-01 đến DEC-12: Báo cáo cá nhân, theo dõi số lượt thi, phân tích câu hỏi khó nhất, biểu đồ lớp và xuất CSV UTF-8 BOM.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-3 bg-light border">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-bold text-dark">Nhóm 7: Quản trị Hệ thống</span>
+                                <span class="badge bg-primary"><i class="bi bi-gear-fill me-1"></i> Đang hoạt động</span>
+                            </div>
+                            <p class="small text-muted mb-0">
+                                Quản lý tài khoản Admin, Giảng viên và Sinh viên. Đăng nhập phân quyền Cookie Authentication, bảo mật Anti-Forgery Token.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-3 bg-light border">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-bold text-dark">Nhóm 1 - 5: Lõi AI Viva & Giám sát</span>
+                                <span class="badge bg-secondary"><i class="bi bi-clock-history me-1"></i> Roadmap tiếp theo</span>
+                            </div>
+                            <p class="small text-muted mb-0">
+                                Ngân hàng câu hỏi Bloom, phòng thi vấn đáp ảo STT/TTS và AI Adaptive Follow-up question engine.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     }
     else if (User.IsInRole(ApplicationRoles.Lecturer))
     {
-        <a class="quick-link" asp-controller="Home" asp-action="Index">Tin đang hoạt động</a>
+        <!-- LECTURER DASHBOARD -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm rounded-4 p-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="bg-warning-subtle text-warning-emphasis p-3 rounded-4">
+                            <i class="bi bi-bar-chart-steps fs-2"></i>
+                        </div>
+                        <div>
+                            <h4 class="fw-bold mb-1">Thống Kê Lớp Học Phần</h4>
+                            <p class="text-muted small mb-0">Xem biểu đồ phân bố điểm, tỷ lệ đạt rubric và câu hỏi khó nhất</p>
+                        </div>
+                    </div>
+                    <p class="text-muted">Theo dõi và phân tích năng lực học tập của sinh viên theo từng đợt thi vấn đáp và từng lượt trả lời.</p>
+                    <div class="mt-auto">
+                        <a asp-controller="ClassReports" asp-action="Index" class="btn btn-warning fw-semibold text-dark">
+                            <i class="bi bi-bar-chart-line me-1"></i> Truy cập Thống Kê Lớp
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm rounded-4 p-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="bg-info-subtle text-info-emphasis p-3 rounded-4">
+                            <i class="bi bi-person-lines-fill fs-2"></i>
+                        </div>
+                        <div>
+                            <h4 class="fw-bold mb-1">Báo Cáo Chi Tiết Sinh Viên</h4>
+                            <p class="text-muted small mb-0">Xem đối chiếu transcript hội thoại với AI và nhận xét rubric</p>
+                        </div>
+                    </div>
+                    <p class="text-muted">Tra cứu chi tiết từng lượt thi, câu hỏi chính, câu hỏi đào sâu của AI và nhận xét chi tiết.</p>
+                    <div class="mt-auto">
+                        <a asp-controller="StudentReports" asp-action="Index" class="btn btn-info fw-semibold text-dark">
+                            <i class="bi bi-search me-1"></i> Tra Cứu Sinh Viên
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- STUDENT DASHBOARD -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 text-center">
+            <div class="py-4">
+                <div class="bg-info-subtle text-info-emphasis p-3 rounded-circle d-inline-block mb-3">
+                    <i class="bi bi-mortarboard-fill display-4"></i>
+                </div>
+                <h3 class="fw-bold text-dark mb-2">Báo Cáo Kết Quả Thi Vấn Đáp Cá Nhân</h3>
+                <p class="text-muted mx-auto" style="max-width: 600px;">
+                    Bạn có thể xem lại toàn bộ lịch sử các lượt thi vấn đáp thông minh của mình, transcript đối thoại với AI, điểm từng câu hỏi và nhận xét đánh giá chi tiết.
+                </p>
+                <div class="mt-3">
+                    <a asp-controller="StudentReports" asp-action="Index" class="btn btn-primary btn-lg fw-semibold px-4 shadow-sm">
+                        <i class="bi bi-eye-fill me-2"></i> Xem Báo Cáo Kết Quả Của Tôi
+                    </a>
+                </div>
+            </div>
+        </div>
     }
 </div>

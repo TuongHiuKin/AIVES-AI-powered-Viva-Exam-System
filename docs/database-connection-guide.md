@@ -1,5 +1,7 @@
 # Hướng Dẫn Thiết Lập Database & Cấu Hình Kết Nối AIVES
 
+> Phạm vi: hướng dẫn này dành cho **schema News hiện hữu** (SystemAccount/Category/NewsArticle/Tag/NewsTag), không tạo schema thi vấn đáp nhóm 6. Không chạy lại scripts để chuẩn bị demo báo cáo thi. Định hướng hiện hành và điều kiện thay DB nằm ở [ARCHITECTURE.md](ARCHITECTURE.md) và [G6-IMPLEMENTATION-HANDOFF.md](G6-IMPLEMENTATION-HANDOFF.md). Các bước dưới chỉ áp dụng khi được giao setup/bảo trì DB News riêng.
+
 Tài liệu này hướng dẫn cách chạy script SQL Server để khởi tạo cơ sở dữ liệu `AIVES` và cấu hình chuỗi kết nối trong `appsettings.json` cho ứng dụng ASP.NET Core MVC (PRN222 Assignment 1).
 
 ---

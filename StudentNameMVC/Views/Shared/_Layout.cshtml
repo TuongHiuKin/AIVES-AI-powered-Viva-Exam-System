@@ -12,7 +12,7 @@
     <header class="app-header">
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm" aria-label="Điều hướng chính">
             <div class="container-fluid px-4">
-                <a class="navbar-brand fw-bold text-uppercase tracking-wider" asp-controller="ClassReports" asp-action="Index">
+                <a class="navbar-brand fw-bold text-uppercase tracking-wider" asp-controller="Account" asp-action="Dashboard">
                     <i class="bi bi-mortarboard-fill text-warning me-2"></i>AIVES Viva Exam
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation"
@@ -20,6 +20,16 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="mainNavigation">
+                    @{
+                        var roleClaimValue = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value;
+                        var friendlyRole = roleClaimValue switch
+                        {
+                            ApplicationRoles.Admin => "Quản trị viên",
+                            ApplicationRoles.Lecturer => "Giảng viên",
+                            ApplicationRoles.Staff => "Sinh viên",
+                            _ => roleClaimValue
+                        };
+                    }
                     @if (User.Identity?.IsAuthenticated == true)
                     {
                         @if (User.IsInRole(ApplicationRoles.Admin))
@@ -39,7 +49,7 @@
                             <li class="nav-item me-3">
                                 <span class="badge bg-secondary text-light py-2 px-3">
                                     <i class="bi bi-person-circle me-1"></i> @User.Identity.Name
-                                    <span class="ms-1 fw-bold text-warning">(@User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value)</span>
+                                    <span class="ms-1 fw-bold text-warning">(@friendlyRole)</span>
                                 </span>
                             </li>
                             <li class="nav-item">
