@@ -214,14 +214,18 @@ public class NewsArticleController : Controller
 
     private int? GetCurrentUserId()
     {
+        if (User?.Identity?.IsAuthenticated != true)
+        {
+            return null;
+        }
+
         var claimVal = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (int.TryParse(claimVal, out var id) && id > 0)
         {
             return id;
         }
 
-        // Tự động gán AccountId = 1 (Tài khoản Staff Member đã seed trong DB) khi test cục bộ
-        return 1;
+        return null;
     }
 
     private async Task PopulateDropdownsAsync(NewsArticleFormViewModel model)

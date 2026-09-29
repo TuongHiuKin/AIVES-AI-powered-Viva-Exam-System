@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -26,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AIVES.BLL\AIVES.BLL.csproj" />
     <ProjectReference Include="..\AIVES.DAL\AIVES.DAL.csproj" />
+    <ProjectReference Include="..\StudentNameMVC\StudentNameMVC.csproj" />
   </ItemGroup>
 
 </Project>
