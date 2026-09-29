@@ -12,12 +12,10 @@ namespace StudentNameMVC.Controllers;
 public class AccountController : Controller
 {
     private readonly IAuthService _authService;
-    private readonly ISystemAccountService _accountService;
 
-    public AccountController(IAuthService authService, ISystemAccountService accountService)
+    public AccountController(IAuthService authService)
     {
         _authService = authService ?? throw new ArgumentNullException(nameof(authService));
-        _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
     }
 
     #region Authentication (TV2 - AUTH-01, AUTH-02)
@@ -118,14 +116,17 @@ public class AccountController : Controller
 
     [Authorize(Roles = ApplicationRoles.Admin)]
     [HttpGet]
-    public async Task<IActionResult> Index(string? keyword, CancellationToken ct)
+    public async Task<IActionResult> Index(
+        string? keyword,
+        [FromServices] ISystemAccountService accountService,
+        CancellationToken ct)
     {
-        var accounts = await _accountService.SearchAccountsAsync(keyword, ct);
+        var accounts = await accountService.SearchAccountsAsync(keyword, ct);
 
         var items = new List<AccountItemViewModel>();
         foreach (var a in accounts)
         {
-            var isReferenced = await _accountService.IsAccountReferencedAsync(a.AccountId, ct);
+            var isReferenced = await accountService.IsAccountReferencedAsync(a.AccountId, ct);
             items.Add(new AccountItemViewModel
             {
                 AccountId = a.AccountId,
@@ -156,7 +157,10 @@ public class AccountController : Controller
     [Authorize(Roles = ApplicationRoles.Admin)]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(AccountCreateViewModel model, CancellationToken ct)
+    public async Task<IActionResult> Create(
+        AccountCreateViewModel model,
+        [FromServices] ISystemAccountService accountService,
+        CancellationToken ct)
     {
         if (!ModelState.IsValid)
         {
@@ -166,7 +170,7 @@ public class AccountController : Controller
 
         try
         {
-            await _accountService.CreateAccountAsync(
+            await accountService.CreateAccountAsync(
                 model.AccountName,
                 model.AccountEmail,
                 model.AccountPassword,
@@ -186,11 +190,14 @@ public class AccountController : Controller
 
     [Authorize(Roles = ApplicationRoles.Admin)]
     [HttpGet]
-    public async Task<IActionResult> EditModal(int id, CancellationToken ct)
+    public async Task<IActionResult> EditModal(
+        int id,
+        [FromServices] ISystemAccountService accountService,
+        CancellationToken ct)
     {
         if (id <= 0) return NotFound();
 
-        var account = await _accountService.GetAccountByIdAsync(id, includeDeleted: true, ct);
+        var account = await accountService.GetAccountByIdAsync(id, includeDeleted: true, ct);
         if (account == null) return NotFound();
 
         var model = new AccountEditViewModel
@@ -207,7 +214,11 @@ public class AccountController : Controller
     [Authorize(Roles = ApplicationRoles.Admin)]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, AccountEditViewModel model, CancellationToken ct)
+    public async Task<IActionResult> Edit(
+        int id,
+        AccountEditViewModel model,
+        [FromServices] ISystemAccountService accountService,
+        CancellationToken ct)
     {
         if (id != model.AccountId) return BadRequest();
 
@@ -219,7 +230,7 @@ public class AccountController : Controller
 
         try
         {
-            var updated = await _accountService.UpdateAccountAsync(
+            var updated = await accountService.UpdateAccountAsync(
                 id,
                 model.AccountName,
                 model.AccountEmail,
@@ -245,11 +256,14 @@ public class AccountController : Controller
 
     [Authorize(Roles = ApplicationRoles.Admin)]
     [HttpGet]
-    public async Task<IActionResult> DeleteModal(int id, CancellationToken ct)
+    public async Task<IActionResult> DeleteModal(
+        int id,
+        [FromServices] ISystemAccountService accountService,
+        CancellationToken ct)
     {
         if (id <= 0) return NotFound();
 
-        var account = await _accountService.GetAccountByIdAsync(id, includeDeleted: true, ct);
+        var account = await accountService.GetAccountByIdAsync(id, includeDeleted: true, ct);
         if (account == null) return NotFound();
 
         var model = new AccountDeleteViewModel
@@ -267,11 +281,14 @@ public class AccountController : Controller
     [Authorize(Roles = ApplicationRoles.Admin)]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(int id, CancellationToken ct)
+    public async Task<IActionResult> Delete(
+        int id,
+        [FromServices] ISystemAccountService accountService,
+        CancellationToken ct)
     {
         if (id <= 0) return BadRequest();
 
-        var deleted = await _accountService.SoftDeleteAccountAsync(id, ct);
+        var deleted = await accountService.SoftDeleteAccountAsync(id, ct);
         if (!deleted)
         {
             return NotFound();
@@ -283,14 +300,17 @@ public class AccountController : Controller
 
     [Authorize(Roles = ApplicationRoles.Admin)]
     [HttpGet]
-    public async Task<IActionResult> HardDeleteModal(int id, CancellationToken ct)
+    public async Task<IActionResult> HardDeleteModal(
+        int id,
+        [FromServices] ISystemAccountService accountService,
+        CancellationToken ct)
     {
         if (id <= 0) return NotFound();
 
-        var account = await _accountService.GetAccountByIdAsync(id, includeDeleted: true, ct);
+        var account = await accountService.GetAccountByIdAsync(id, includeDeleted: true, ct);
         if (account == null) return NotFound();
 
-        var isReferenced = await _accountService.IsAccountReferencedAsync(id, ct);
+        var isReferenced = await accountService.IsAccountReferencedAsync(id, ct);
 
         var model = new AccountDeleteViewModel
         {
@@ -308,11 +328,14 @@ public class AccountController : Controller
     [Authorize(Roles = ApplicationRoles.Admin)]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> HardDelete(int id, CancellationToken ct)
+    public async Task<IActionResult> HardDelete(
+        int id,
+        [FromServices] ISystemAccountService accountService,
+        CancellationToken ct)
     {
         if (id <= 0) return BadRequest();
 
-        var result = await _accountService.HardDeleteAccountAsync(id, ct);
+        var result = await accountService.HardDeleteAccountAsync(id, ct);
         if (result == AIVES.DAL.Repositories.Models.DeleteResult.InUse)
         {
             Response.StatusCode = 400;
