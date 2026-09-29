@@ -158,8 +158,30 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-        // Mở Modal Tạo mới (NEWS-03)
+        function cleanupExistingModal(modalInstance) {
+            if (modalInstance) {
+                try {
+                    modalInstance.hide();
+                    modalInstance.dispose();
+                } catch (e) { }
+            }
+            const existingModalEl = document.querySelector('#modalContainer .modal');
+            if (existingModalEl) {
+                const existingInstance = bootstrap.Modal.getInstance(existingModalEl);
+                if (existingInstance) {
+                    try {
+                        existingInstance.hide();
+                        existingInstance.dispose();
+                    } catch (e) { }
+                }
+            }
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open').css({ overflow: '', paddingRight: '' });
+        }
+
+        // Mở Modal Tạo mới (NEWS-02)
         function openCreateModal() {
+            cleanupExistingModal();
             $.get('@Url.Action("CreateModal", "NewsArticle")', function (data) {
                 $('#modalContainer').html(data);
                 const modal = new bootstrap.Modal(document.getElementById('newsModal'));
@@ -172,6 +194,7 @@
 
         // Mở Modal Chỉnh sửa (NEWS-04)
         function openEditModal(id) {
+            cleanupExistingModal();
             $.get('@Url.Action("EditModal", "NewsArticle")', { id: id }, function (data) {
                 $('#modalContainer').html(data);
                 const modal = new bootstrap.Modal(document.getElementById('newsModal'));
@@ -184,6 +207,7 @@
 
         // Mở Modal Xác nhận xóa (NEWS-05)
         function openDeleteModal(id) {
+            cleanupExistingModal();
             $.get('@Url.Action("DeleteModal", "NewsArticle")', { id: id }, function (data) {
                 $('#modalContainer').html(data);
                 const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
@@ -196,7 +220,7 @@
 
         // Đính kèm xử lý submit AJAX cho Form Create / Edit
         function bindAjaxForm(formSelector, modalInstance) {
-            $(formSelector).on('submit', function (e) {
+            $(formSelector).off('submit').on('submit', function (e) {
                 e.preventDefault();
                 const form = $(this);
                 const submitBtn = form.find('#btnSubmitNews');
@@ -213,11 +237,18 @@
                     error: function (xhr) {
                         submitBtn.prop('disabled', false).find('.spinner-border').remove();
                         if (xhr.status === 400) {
-                            // Render lại lỗi validation ngay trong modal mà không reload trang
+                            // Dispose modal cũ hoàn toàn trước khi render modal mới với lỗi validation
+                            cleanupExistingModal(modalInstance);
                             $('#modalContainer').html(xhr.responseText);
-                            const updatedModal = new bootstrap.Modal(document.getElementById('newsModal'));
-                            bindAjaxForm(formSelector, updatedModal);
-                            updatedModal.show();
+                            const newModalEl = document.getElementById('newsModal');
+                            if (newModalEl) {
+                                const updatedModal = new bootstrap.Modal(newModalEl);
+                                bindAjaxForm(formSelector, updatedModal);
+                                if ($.validator && $.validator.unobtrusive) {
+                                    $.validator.unobtrusive.parse($(formSelector));
+                                }
+                                updatedModal.show();
+                            }
                         } else {
                             alert('Đã xảy ra lỗi khi lưu bài viết.');
                         }
@@ -228,7 +259,7 @@
 
         // Đính kèm xử lý submit AJAX cho Form Delete Confirm
         function bindAjaxDeleteForm(formSelector, modalInstance) {
-            $(formSelector).on('submit', function (e) {
+            $(formSelector).off('submit').on('submit', function (e) {
                 e.preventDefault();
                 const form = $(this);
                 const deleteBtn = form.find('#btnConfirmDelete');
