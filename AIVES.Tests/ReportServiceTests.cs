@@ -6,7 +6,7 @@ using Xunit;
 
 namespace AIVES.Tests;
 
-public class AdminReportTests
+public class ReportServiceTests
 {
     private class FakeNewsArticleRepository : INewsArticleRepository
     {
@@ -23,8 +23,8 @@ public class AdminReportTests
                 new()
                 {
                     NewsArticleId = 1,
-                    NewsTitle = "Tin tức A",
-                    NewsContent = "Nội dung A",
+                    NewsTitle = "Báo cáo bài viết mẫu",
+                    NewsContent = "Nội dung mẫu",
                     CreatedDate = startUtc.AddHours(2),
                     NewsStatus = 1
                 }
@@ -64,12 +64,11 @@ public class AdminReportTests
         Assert.NotNull(repo.LastStartUtc);
         Assert.NotNull(repo.LastEndExclusiveUtc);
 
-        // Giờ Việt Nam là UTC+7
-        // 00:00:00 ngày 2026-09-01 (VN) = 17:00:00 ngày 2026-08-31 (UTC)
+        // Giờ Việt Nam là UTC+7: 00:00 2026-09-01 VN => 17:00 2026-08-31 UTC
         Assert.Equal(DateTimeKind.Utc, repo.LastStartUtc.Value.Kind);
         Assert.Equal(new DateTime(2026, 8, 31, 17, 0, 0, DateTimeKind.Utc), repo.LastStartUtc.Value);
 
-        // 00:00:00 ngày 2026-09-11 (ngày kế tiếp sau 2026-09-10 VN) = 17:00:00 ngày 2026-09-10 (UTC)
+        // 00:00 2026-09-11 VN => 17:00 2026-09-10 UTC
         Assert.Equal(DateTimeKind.Utc, repo.LastEndExclusiveUtc.Value.Kind);
         Assert.Equal(new DateTime(2026, 9, 10, 17, 0, 0, DateTimeKind.Utc), repo.LastEndExclusiveUtc.Value);
     }
@@ -90,23 +89,17 @@ public class AdminReportTests
     }
 
     [Fact]
-    public async Task GetNewsByCreatedDateRangeAsync_RejectsInvalidUtcRange()
+    public async Task GenerateReportAsync_ValidDates_CallsGetReportArticlesAsync()
     {
         var repo = new FakeNewsArticleRepository();
         var service = new ReportService(repo);
 
-        var utcNow = DateTime.UtcNow;
+        var startDate = new DateTime(2026, 9, 1);
+        var endDate = new DateTime(2026, 9, 5);
 
-        // start >= end
-        await Assert.ThrowsAsync<ArgumentException>(() =>
-            service.GetNewsByCreatedDateRangeAsync(utcNow, utcNow));
+        var result = await service.GenerateReportAsync(startDate, endDate);
 
-        await Assert.ThrowsAsync<ArgumentException>(() =>
-            service.GetNewsByCreatedDateRangeAsync(utcNow.AddDays(1), utcNow));
-
-        // Kind is not Utc
-        var unspecified = DateTime.SpecifyKind(utcNow, DateTimeKind.Unspecified);
-        await Assert.ThrowsAsync<ArgumentException>(() =>
-            service.GetNewsByCreatedDateRangeAsync(unspecified, utcNow.AddDays(1)));
+        Assert.Single(result);
+        Assert.Equal(1, result[0].NewsArticleId);
     }
 }

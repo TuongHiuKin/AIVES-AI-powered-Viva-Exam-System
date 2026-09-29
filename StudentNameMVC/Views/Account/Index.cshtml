@@ -188,11 +188,42 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
+        // Dọn dẹp modal cũ và backdrop trước khi mở modal mới hoặc re-render (tránh kẹt backdrop)
+        function cleanupExistingModal() {
+            $('.modal').each(function () {
+                const instance = bootstrap.Modal.getInstance(this);
+                if (instance) {
+                    try {
+                        instance.hide();
+                        instance.dispose();
+                    } catch (e) {
+                        // Bỏ qua lỗi dispose nếu modal đang trong trạng thái chuyển tiếp
+                    }
+                }
+            });
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open').css({
+                'overflow': '',
+                'padding-right': ''
+            });
+        }
+
+        // Tự động dọn dẹp backdrop khi bất kỳ modal nào đóng lại
+        $(document).on('hidden.bs.modal', '.modal', function () {
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open').css({
+                'overflow': '',
+                'padding-right': ''
+            });
+        });
+
         // Mở Modal Tạo mới tài khoản (ACC-03)
         function openCreateModal() {
+            cleanupExistingModal();
             $.get('@Url.Action("CreateModal", "Account")', function (data) {
                 $('#modalContainer').html(data);
-                const modal = new bootstrap.Modal(document.getElementById('accountModal'));
+                const modalEl = document.getElementById('accountModal');
+                const modal = new bootstrap.Modal(modalEl);
                 bindAjaxForm('#createAccountForm', modal);
                 modal.show();
             }).fail(function () {
@@ -202,9 +233,11 @@
 
         // Mở Modal Chỉnh sửa tài khoản (ACC-04)
         function openEditModal(id) {
+            cleanupExistingModal();
             $.get('@Url.Action("EditModal", "Account")', { id: id }, function (data) {
                 $('#modalContainer').html(data);
-                const modal = new bootstrap.Modal(document.getElementById('accountModal'));
+                const modalEl = document.getElementById('accountModal');
+                const modal = new bootstrap.Modal(modalEl);
                 bindAjaxForm('#editAccountForm', modal);
                 modal.show();
             }).fail(function () {
@@ -214,9 +247,11 @@
 
         // Mở Modal Xác nhận xóa mềm (ACC-05)
         function openDeleteModal(id) {
+            cleanupExistingModal();
             $.get('@Url.Action("DeleteModal", "Account")', { id: id }, function (data) {
                 $('#modalContainer').html(data);
-                const modal = new bootstrap.Modal(document.getElementById('deleteAccountModal'));
+                const modalEl = document.getElementById('deleteAccountModal');
+                const modal = new bootstrap.Modal(modalEl);
                 bindAjaxDeleteForm('#deleteAccountForm', modal);
                 modal.show();
             }).fail(function () {
@@ -226,9 +261,11 @@
 
         // Mở Modal Xác nhận xóa vĩnh viễn (ACC-05)
         function openHardDeleteModal(id) {
+            cleanupExistingModal();
             $.get('@Url.Action("HardDeleteModal", "Account")', { id: id }, function (data) {
                 $('#modalContainer').html(data);
-                const modal = new bootstrap.Modal(document.getElementById('hardDeleteAccountModal'));
+                const modalEl = document.getElementById('hardDeleteAccountModal');
+                const modal = new bootstrap.Modal(modalEl);
                 bindAjaxDeleteForm('#hardDeleteAccountForm', modal);
                 modal.show();
             }).fail(function () {
@@ -238,7 +275,7 @@
 
         // Xử lý submit AJAX cho Form Create / Edit
         function bindAjaxForm(formSelector, modalInstance) {
-            $(formSelector).on('submit', function (e) {
+            $(formSelector).off('submit').on('submit', function (e) {
                 e.preventDefault();
                 const form = $(this);
                 const submitBtn = form.find('#btnSubmitAccount');
@@ -249,17 +286,24 @@
                     type: 'POST',
                     data: form.serialize(),
                     success: function (res) {
-                        modalInstance.hide();
+                        if (modalInstance) {
+                            modalInstance.hide();
+                        }
+                        cleanupExistingModal();
                         window.location.reload();
                     },
                     error: function (xhr) {
                         submitBtn.prop('disabled', false).find('.spinner-border').remove();
                         if (xhr.status === 400) {
-                            // Render lại lỗi validation ngay trong modal
+                            // Dọn dẹp modal cũ và backdrop trước khi render lại form chứa validation errors
+                            cleanupExistingModal();
                             $('#modalContainer').html(xhr.responseText);
-                            const updatedModal = new bootstrap.Modal(document.getElementById('accountModal'));
-                            bindAjaxForm(formSelector, updatedModal);
-                            updatedModal.show();
+                            const modalEl = document.getElementById('accountModal');
+                            if (modalEl) {
+                                const updatedModal = new bootstrap.Modal(modalEl);
+                                bindAjaxForm(formSelector, updatedModal);
+                                updatedModal.show();
+                            }
                         } else {
                             alert('Đã xảy ra lỗi khi lưu thông tin tài khoản.');
                         }
@@ -270,7 +314,7 @@
 
         // Xử lý submit AJAX cho Form Delete / HardDelete
         function bindAjaxDeleteForm(formSelector, modalInstance) {
-            $(formSelector).on('submit', function (e) {
+            $(formSelector).off('submit').on('submit', function (e) {
                 e.preventDefault();
                 const form = $(this);
                 const deleteBtn = form.find('button[type="submit"]');
@@ -281,7 +325,10 @@
                     type: 'POST',
                     data: form.serialize(),
                     success: function () {
-                        modalInstance.hide();
+                        if (modalInstance) {
+                            modalInstance.hide();
+                        }
+                        cleanupExistingModal();
                         window.location.reload();
                     },
                     error: function (xhr) {

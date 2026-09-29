@@ -8,11 +8,11 @@ namespace StudentNameMVC.Controllers;
 [Authorize(Roles = "Admin")]
 public class ReportController : Controller
 {
-    private readonly INewsArticleService _newsService;
+    private readonly IReportService _reportService;
 
-    public ReportController(INewsArticleService newsService)
+    public ReportController(IReportService reportService)
     {
-        _newsService = newsService ?? throw new ArgumentNullException(nameof(newsService));
+        _reportService = reportService ?? throw new ArgumentNullException(nameof(reportService));
     }
 
     [HttpGet]
@@ -48,7 +48,7 @@ public class ReportController : Controller
 
         try
         {
-            var articles = await _newsService.GetReportArticlesAsync(startDate.Value, endDate.Value, ct);
+            var articles = await _reportService.GetReportArticlesAsync(startDate.Value, endDate.Value, ct);
 
             viewModel.Articles = articles.Select(a => new ReportItemViewModel
             {
@@ -67,5 +67,11 @@ public class ReportController : Controller
         }
 
         return View(viewModel);
+    }
+
+    [HttpGet]
+    public IActionResult AdminReport(DateTime? startDate, DateTime? endDate, CancellationToken ct)
+    {
+        return RedirectToAction(nameof(Index), new { startDate, endDate });
     }
 }
