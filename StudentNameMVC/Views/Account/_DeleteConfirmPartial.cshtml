@@ -1,0 +1,38 @@
+@model StudentNameMVC.ViewModels.AccountDeleteViewModel
+
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow border-0 rounded-3">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title fw-bold" id="deleteAccountModalLabel">
+                    <i class="bi bi-lock-fill me-2"></i>Xác nhận Khóa tài khoản
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="deleteAccountForm" asp-controller="Account" asp-action="Delete" asp-route-id="@Model.AccountId" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body p-4 text-center">
+                    <div class="text-danger mb-3">
+                        <i class="bi bi-exclamation-circle-fill display-4"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Bạn có chắc chắn muốn khóa tài khoản này?</h5>
+                    <p class="text-muted mb-3">
+                        Tài khoản <strong class="text-dark">@Model.AccountName</strong> (<code>@Model.AccountEmail</code> - @Model.RoleName)
+                        sẽ bị chuyển sang trạng thái <strong>Đã khóa (Xóa mềm)</strong> và không thể đăng nhập vào hệ thống.
+                    </p>
+                    <div class="alert alert-info py-2 small mb-0 text-start">
+                        <i class="bi bi-info-circle me-1"></i>Các bài viết tin tức do tài khoản này tạo hoặc chỉnh sửa trước đây vẫn được bảo toàn nguyên vẹn.
+                    </div>
+                </div>
+                <div class="modal-footer bg-light px-4 py-3 justify-content-center">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg me-1"></i> Hủy bỏ
+                    </button>
+                    <button type="submit" class="btn btn-danger px-4 fw-semibold">
+                        <i class="bi bi-lock-fill me-1"></i> Xác nhận khóa
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

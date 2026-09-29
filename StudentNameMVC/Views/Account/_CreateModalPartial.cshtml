@@ -1,0 +1,75 @@
+@model StudentNameMVC.ViewModels.AccountCreateViewModel
+
+<div class="modal fade" id="accountModal" tabindex="-1" aria-labelledby="createAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow border-0 rounded-3">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold" id="createAccountModalLabel">
+                    <i class="bi bi-person-plus-fill me-2"></i>Thêm mới Tài khoản
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="createAccountForm" asp-controller="Account" asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body p-4">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="AccountName" class="form-label fw-semibold">
+                            Họ và tên <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="AccountName" class="form-control" placeholder="Nhập họ và tên..." autofocus />
+                        <span asp-validation-for="AccountName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="AccountEmail" class="form-label fw-semibold">
+                            Địa chỉ Email <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="AccountEmail" class="form-control" placeholder="name@example.com" />
+                        <span asp-validation-for="AccountEmail" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="AccountPassword" class="form-label fw-semibold">
+                                Mật khẩu <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="AccountPassword" class="form-control" placeholder="Tối thiểu 6 ký tự..." />
+                            <span asp-validation-for="AccountPassword" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ConfirmPassword" class="form-label fw-semibold">
+                                Xác nhận mật khẩu <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="ConfirmPassword" class="form-control" placeholder="Nhập lại mật khẩu..." />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="AccountRole" class="form-label fw-semibold">
+                            Vai trò hệ thống <span class="text-danger">*</span>
+                        </label>
+                        <select asp-for="AccountRole" class="form-select">
+                            <option value="1">Nhân viên (Staff)</option>
+                            <option value="2">Giảng viên (Lecturer)</option>
+                        </select>
+                        <span asp-validation-for="AccountRole" class="text-danger small"></span>
+                        <div class="form-text small text-muted">
+                            <i class="bi bi-info-circle me-1"></i>Staff có quyền quản lý bài viết và chuyên mục; Lecturer có quyền đọc tin bài đang kích hoạt.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light px-4 py-3">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg me-1"></i> Hủy bỏ
+                    </button>
+                    <button type="submit" id="btnSubmitAccount" class="btn btn-primary fw-semibold">
+                        <i class="bi bi-check-lg me-1"></i> Lưu tài khoản
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

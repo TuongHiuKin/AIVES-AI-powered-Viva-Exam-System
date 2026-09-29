@@ -12,11 +12,15 @@ namespace StudentNameMVC.Controllers;
 public class AccountController : Controller
 {
     private readonly IAuthService _authService;
+    private readonly ISystemAccountService _accountService;
 
-    public AccountController(IAuthService authService)
+    public AccountController(IAuthService authService, ISystemAccountService accountService)
     {
         _authService = authService ?? throw new ArgumentNullException(nameof(authService));
+        _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
     }
+
+    #region Authentication (TV2 - AUTH-01, AUTH-02)
 
     [AllowAnonymous]
     [HttpGet]
@@ -107,4 +111,226 @@ public class AccountController : Controller
 
         return RedirectToAction(nameof(Dashboard));
     }
+
+    #endregion
+
+    #region Admin Account Management (TV5 - M01: ACC-01, ACC-02, ACC-03, ACC-04, ACC-05)
+
+    [Authorize(Roles = ApplicationRoles.Admin)]
+    [HttpGet]
+    public async Task<IActionResult> Index(string? keyword, CancellationToken ct)
+    {
+        var accounts = await _accountService.SearchAccountsAsync(keyword, ct);
+
+        var items = new List<AccountItemViewModel>();
+        foreach (var a in accounts)
+        {
+            var isReferenced = await _accountService.IsAccountReferencedAsync(a.AccountId, ct);
+            items.Add(new AccountItemViewModel
+            {
+                AccountId = a.AccountId,
+                AccountName = a.AccountName,
+                AccountEmail = a.AccountEmail,
+                AccountRole = a.AccountRole,
+                IsDeleted = a.IsDeleted,
+                IsReferenced = isReferenced
+            });
+        }
+
+        var viewModel = new AccountIndexViewModel
+        {
+            Keyword = keyword,
+            Accounts = items
+        };
+
+        return View(viewModel);
+    }
+
+    [Authorize(Roles = ApplicationRoles.Admin)]
+    [HttpGet]
+    public IActionResult CreateModal()
+    {
+        return PartialView("_CreateModalPartial", new AccountCreateViewModel());
+    }
+
+    [Authorize(Roles = ApplicationRoles.Admin)]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(AccountCreateViewModel model, CancellationToken ct)
+    {
+        if (!ModelState.IsValid)
+        {
+            Response.StatusCode = 400;
+            return PartialView("_CreateModalPartial", model);
+        }
+
+        try
+        {
+            await _accountService.CreateAccountAsync(
+                model.AccountName,
+                model.AccountEmail,
+                model.AccountPassword,
+                model.AccountRole,
+                ct);
+
+            TempData["SuccessMessage"] = "Tạo mới tài khoản thành công!";
+            return Json(new { success = true, redirectUrl = Url.Action(nameof(Index)) });
+        }
+        catch (Exception ex) when (ex is ArgumentException or InvalidOperationException)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            Response.StatusCode = 400;
+            return PartialView("_CreateModalPartial", model);
+        }
+    }
+
+    [Authorize(Roles = ApplicationRoles.Admin)]
+    [HttpGet]
+    public async Task<IActionResult> EditModal(int id, CancellationToken ct)
+    {
+        if (id <= 0) return NotFound();
+
+        var account = await _accountService.GetAccountByIdAsync(id, includeDeleted: true, ct);
+        if (account == null) return NotFound();
+
+        var model = new AccountEditViewModel
+        {
+            AccountId = account.AccountId,
+            AccountName = account.AccountName,
+            AccountEmail = account.AccountEmail,
+            AccountRole = account.AccountRole
+        };
+
+        return PartialView("_EditModalPartial", model);
+    }
+
+    [Authorize(Roles = ApplicationRoles.Admin)]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, AccountEditViewModel model, CancellationToken ct)
+    {
+        if (id != model.AccountId) return BadRequest();
+
+        if (!ModelState.IsValid)
+        {
+            Response.StatusCode = 400;
+            return PartialView("_EditModalPartial", model);
+        }
+
+        try
+        {
+            var updated = await _accountService.UpdateAccountAsync(
+                id,
+                model.AccountName,
+                model.AccountEmail,
+                model.AccountRole,
+                model.NewPassword,
+                ct);
+
+            if (!updated)
+            {
+                return NotFound();
+            }
+
+            TempData["SuccessMessage"] = "Cập nhật tài khoản thành công!";
+            return Json(new { success = true, redirectUrl = Url.Action(nameof(Index)) });
+        }
+        catch (Exception ex) when (ex is ArgumentException or InvalidOperationException)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            Response.StatusCode = 400;
+            return PartialView("_EditModalPartial", model);
+        }
+    }
+
+    [Authorize(Roles = ApplicationRoles.Admin)]
+    [HttpGet]
+    public async Task<IActionResult> DeleteModal(int id, CancellationToken ct)
+    {
+        if (id <= 0) return NotFound();
+
+        var account = await _accountService.GetAccountByIdAsync(id, includeDeleted: true, ct);
+        if (account == null) return NotFound();
+
+        var model = new AccountDeleteViewModel
+        {
+            AccountId = account.AccountId,
+            AccountName = account.AccountName,
+            AccountEmail = account.AccountEmail,
+            RoleName = account.AccountRole == 1 ? "Staff" : "Lecturer",
+            IsHardDelete = false
+        };
+
+        return PartialView("_DeleteConfirmPartial", model);
+    }
+
+    [Authorize(Roles = ApplicationRoles.Admin)]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(int id, CancellationToken ct)
+    {
+        if (id <= 0) return BadRequest();
+
+        var deleted = await _accountService.SoftDeleteAccountAsync(id, ct);
+        if (!deleted)
+        {
+            return NotFound();
+        }
+
+        TempData["SuccessMessage"] = "Khóa tài khoản thành công!";
+        return Json(new { success = true, redirectUrl = Url.Action(nameof(Index)) });
+    }
+
+    [Authorize(Roles = ApplicationRoles.Admin)]
+    [HttpGet]
+    public async Task<IActionResult> HardDeleteModal(int id, CancellationToken ct)
+    {
+        if (id <= 0) return NotFound();
+
+        var account = await _accountService.GetAccountByIdAsync(id, includeDeleted: true, ct);
+        if (account == null) return NotFound();
+
+        var isReferenced = await _accountService.IsAccountReferencedAsync(id, ct);
+
+        var model = new AccountDeleteViewModel
+        {
+            AccountId = account.AccountId,
+            AccountName = account.AccountName,
+            AccountEmail = account.AccountEmail,
+            RoleName = account.AccountRole == 1 ? "Staff" : "Lecturer",
+            IsHardDelete = true,
+            IsReferenced = isReferenced
+        };
+
+        return PartialView("_HardDeleteConfirmPartial", model);
+    }
+
+    [Authorize(Roles = ApplicationRoles.Admin)]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> HardDelete(int id, CancellationToken ct)
+    {
+        if (id <= 0) return BadRequest();
+
+        var result = await _accountService.HardDeleteAccountAsync(id, ct);
+        if (result == AIVES.DAL.Repositories.Models.DeleteResult.InUse)
+        {
+            Response.StatusCode = 400;
+            return Json(new
+            {
+                success = false,
+                message = "Không thể xóa vĩnh viễn tài khoản này vì đã có bài viết tin tức tham chiếu (là Tác giả hoặc Người chỉnh sửa gần nhất)."
+            });
+        }
+
+        if (result == AIVES.DAL.Repositories.Models.DeleteResult.NotFound)
+        {
+            return NotFound();
+        }
+
+        TempData["SuccessMessage"] = "Xóa vĩnh viễn tài khoản thành công!";
+        return Json(new { success = true, redirectUrl = Url.Action(nameof(Index)) });
+    }
+
+    #endregion
 }

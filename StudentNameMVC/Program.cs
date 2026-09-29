@@ -25,9 +25,12 @@ builder.Services
         "DefaultAdmin:Email and DefaultAdmin:Password are required.")
     .ValidateOnStart();
 
+// BLL Services
 builder.Services.AddScoped<IPasswordHasher<SystemAccount>, PasswordHasher<SystemAccount>>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ISystemAccountService, SystemAccountService>();
 builder.Services.AddScoped<INewsArticleService, NewsArticleService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<ActiveAccountCookieEvents>();
 
 builder.Services

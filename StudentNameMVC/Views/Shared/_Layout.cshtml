@@ -8,13 +8,12 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100 bg-light">
     <header class="app-header">
-        <nav class="navbar navbar-expand-lg" aria-label="Điều hướng chính">
-            <div class="container-fluid app-container">
-                <a class="navbar-brand" asp-controller="Account" asp-action="Dashboard">
-                    <span class="brand-mark" aria-hidden="true">A</span>
-                    <span>AIVES</span>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm" aria-label="Điều hướng chính">
+            <div class="container-fluid px-4">
+                <a class="navbar-brand fw-bold text-uppercase tracking-wider" asp-controller="Account" asp-action="Dashboard">
+                    <i class="bi bi-newspaper text-warning me-2"></i>AIVES
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation"
                         aria-controls="mainNavigation" aria-expanded="false" aria-label="Mở điều hướng">
@@ -36,36 +35,50 @@
                             <partial name="_NavLecturer" />
                         }
 
-                        <div class="user-actions ms-lg-auto">
-                            <span class="user-name">@User.Identity.Name</span>
-                            <form asp-controller="Account" asp-action="Logout" method="post">
-                                <button type="submit" class="btn btn-outline-secondary btn-sm">Đăng xuất</button>
-                            </form>
-                        </div>
+                        <ul class="navbar-nav ms-auto align-items-center">
+                            <li class="nav-item me-3">
+                                <span class="badge bg-secondary text-light py-2 px-3">
+                                    <i class="bi bi-person-circle me-1"></i> @User.Identity.Name
+                                    <span class="ms-1 fw-bold text-warning">(@User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value)</span>
+                                </span>
+                            </li>
+                            <li class="nav-item">
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-box-arrow-right me-1"></i> Đăng xuất
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
                     }
                     else
                     {
-                        <div class="ms-lg-auto">
-                            <a class="btn btn-primary btn-sm" asp-controller="Account" asp-action="Login">Đăng nhập</a>
-                        </div>
+                        <ul class="navbar-nav ms-auto">
+                            <li class="nav-item">
+                                <a class="btn btn-outline-light btn-sm" asp-controller="Account" asp-action="Login">
+                                    <i class="bi bi-box-arrow-in-right me-1"></i> Đăng nhập
+                                </a>
+                            </li>
+                        </ul>
                     }
                 </div>
             </div>
         </nav>
     </header>
 
-    <main class="app-main app-container">
+    <main class="container-fluid px-4 py-4 flex-grow-1">
         @if (TempData["SuccessMessage"] is string successMessage)
         {
-            <div class="alert alert-success alert-dismissible fade show" role="status">
-                @successMessage
+            <div class="alert alert-success alert-dismissible fade show shadow-sm" role="status">
+                <i class="bi bi-check-circle-fill me-2"></i> @successMessage
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
             </div>
         }
         @if (TempData["ErrorMessage"] is string errorMessage)
         {
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                @errorMessage
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> @errorMessage
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
             </div>
         }
@@ -73,10 +86,13 @@
         @RenderBody()
     </main>
 
+    <!-- Nơi render Popup Modal động -->
     <div id="modalContainer" aria-live="polite"></div>
 
-    <footer class="app-footer">
-        <div class="app-container">AIVES · PRN222 Assignment 01</div>
+    <footer class="footer mt-auto py-3 bg-white border-top text-center text-muted small">
+        <div class="container">
+            <span>AIVES · PRN222 Assignment 01 · News Management System &copy; @DateTime.Now.Year</span>
+        </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

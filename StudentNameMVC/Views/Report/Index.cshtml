@@ -1,0 +1,249 @@
+@model StudentNameMVC.ViewModels.ReportIndexViewModel
+@{
+    ViewData["Title"] = "Báo cáo Thống kê Tin tức";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+    <div>
+        <h2 class="h3 fw-bold text-dark mb-1">
+            <i class="bi bi-bar-chart-line-fill text-primary me-2"></i>Báo cáo Thống kê Bài viết Tin tức
+        </h2>
+        <p class="text-muted small mb-0">Thống kê các bài viết được tạo trong khoảng thời gian theo giờ Việt Nam (UTC+7)</p>
+    </div>
+    <div>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i> In báo cáo
+        </button>
+    </div>
+</div>
+
+<!-- Bộ lọc khoảng ngày -->
+<div class="card border-0 shadow-sm rounded-3 mb-4">
+    <div class="card-body p-4">
+        <form asp-controller="Report" asp-action="Index" method="get" id="reportFilterForm">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small mb-3" role="alert"></div>
+
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4 col-lg-3">
+                    <label asp-for="StartDate" class="form-label fw-semibold small text-uppercase text-muted">
+                        Từ ngày (00:00:00) <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-calendar3"></i></span>
+                        <input asp-for="StartDate" type="date" class="form-control" id="inputStartDate"
+                               value="@(Model.StartDate?.ToString("yyyy-MM-dd"))" required />
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-lg-3">
+                    <label asp-for="EndDate" class="form-label fw-semibold small text-uppercase text-muted">
+                        Đến ngày (23:59:59) <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-calendar-check"></i></span>
+                        <input asp-for="EndDate" type="date" class="form-control" id="inputEndDate"
+                               value="@(Model.EndDate?.ToString("yyyy-MM-dd"))" required />
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-lg-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary fw-semibold w-100 py-2">
+                        <i class="bi bi-funnel-fill me-1"></i> Xem báo cáo
+                    </button>
+                </div>
+
+                <div class="col-12 mt-3">
+                    <div class="d-flex align-items-center flex-wrap gap-2">
+                        <span class="small text-muted fw-semibold me-2">Chọn nhanh:</span>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setPresetRange('today')">Hôm nay</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setPresetRange('last7days')">7 ngày qua</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setPresetRange('last30days')">30 ngày qua</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setPresetRange('thisMonth')">Tháng này</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Thẻ tóm tắt số liệu -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-3 bg-white border-start border-primary border-4">
+            <div class="card-body d-flex align-items-center justify-content-between p-3">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Tổng số bài viết</span>
+                    <h3 class="fw-bold mb-0 text-dark">@Model.TotalArticles</h3>
+                    <small class="text-muted">Trong khoảng thời gian đã chọn</small>
+                </div>
+                <div class="bg-primary-subtle text-primary p-3 rounded-circle">
+                    <i class="bi bi-file-earmark-text fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-3 bg-white border-start border-success border-4">
+            <div class="card-body d-flex align-items-center justify-content-between p-3">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Bài viết Hoạt động (Active)</span>
+                    <h3 class="fw-bold mb-0 text-success">@Model.ActiveArticles</h3>
+                    <small class="text-muted">Đang hiển thị cho độc giả</small>
+                </div>
+                <div class="bg-success-subtle text-success p-3 rounded-circle">
+                    <i class="bi bi-check-circle fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-3 bg-white border-start border-secondary border-4">
+            <div class="card-body d-flex align-items-center justify-content-between p-3">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Bài viết Tạm ẩn (Inactive)</span>
+                    <h3 class="fw-bold mb-0 text-secondary">@Model.InactiveArticles</h3>
+                    <small class="text-muted">Chưa công khai</small>
+                </div>
+                <div class="bg-secondary-subtle text-secondary p-3 rounded-circle">
+                    <i class="bi bi-pause-circle fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bảng chi tiết kết quả thống kê -->
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0 text-dark">
+            <i class="bi bi-table me-2 text-primary"></i>Danh sách Bài viết
+        </h5>
+        <span class="badge bg-light text-muted border">
+            Sắp xếp: Ngày tạo giảm dần (DESC)
+        </span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4" style="width: 70px;">ID</th>
+                        <th>Tiêu đề bài viết</th>
+                        <th>Chuyên mục</th>
+                        <th>Tác giả</th>
+                        <th class="text-center" style="width: 130px;">Trạng thái</th>
+                        <th style="width: 170px;">Ngày tạo (UTC+7)</th>
+                        <th>Nhãn (Tags)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Articles != null && Model.Articles.Any())
+                    {
+                        @foreach (var article in Model.Articles)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-semibold text-muted">#@article.NewsArticleId</td>
+                                <td>
+                                    <div class="fw-bold text-dark">@article.NewsTitle</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">@article.CategoryName</span>
+                                </td>
+                                <td>
+                                    <div class="small fw-semibold text-dark">@article.CreatedByName</div>
+                                </td>
+                                <td class="text-center">
+                                    @if (article.NewsStatus == 1)
+                                    {
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                            <i class="bi bi-check-circle me-1"></i> Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1">
+                                            <i class="bi bi-pause-circle me-1"></i> Inactive
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="small fw-semibold text-dark">
+                                        @article.CreatedDateLocal.ToString("dd/MM/yyyy HH:mm")
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (article.TagNames.Any())
+                                    {
+                                        <div class="d-flex flex-wrap gap-1">
+                                            @foreach (var tag in article.TagNames)
+                                            {
+                                                <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle small">
+                                                    #@tag
+                                                </span>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted fst-italic small">Không nhãn</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                <p class="mb-0">Không có bài viết nào được tạo trong khoảng thời gian đã chọn.</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function formatDate(d) {
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function setPresetRange(preset) {
+            const today = new Date();
+            let start = new Date();
+            let end = new Date();
+
+            switch (preset) {
+                case 'today':
+                    start = today;
+                    end = today;
+                    break;
+                case 'last7days':
+                    start = new Date();
+                    start.setDate(today.getDate() - 7);
+                    end = today;
+                    break;
+                case 'last30days':
+                    start = new Date();
+                    start.setDate(today.getDate() - 30);
+                    end = today;
+                    break;
+                case 'thisMonth':
+                    start = new Date(today.getFullYear(), today.getMonth(), 1);
+                    end = today;
+                    break;
+            }
+
+            document.getElementById('inputStartDate').value = formatDate(start);
+            document.getElementById('inputEndDate').value = formatDate(end);
+            document.getElementById('reportFilterForm').submit();
+        }
+    </script>
+}

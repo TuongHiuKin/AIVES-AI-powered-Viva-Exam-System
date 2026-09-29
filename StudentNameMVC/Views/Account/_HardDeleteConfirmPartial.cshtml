@@ -1,0 +1,63 @@
+@model StudentNameMVC.ViewModels.AccountDeleteViewModel
+
+<div class="modal fade" id="hardDeleteAccountModal" tabindex="-1" aria-labelledby="hardDeleteAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow border-0 rounded-3">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title fw-bold" id="hardDeleteAccountModalLabel">
+                    <i class="bi bi-trash3-fill text-danger me-2"></i>Xác nhận Xóa vĩnh viễn (Hard Delete)
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="hardDeleteAccountForm" asp-controller="Account" asp-action="HardDelete" asp-route-id="@Model.AccountId" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body p-4 text-center">
+                    <div class="text-danger mb-3">
+                        <i class="bi bi-slash-circle-fill display-4"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">CẢNH BÁO: XÓA VĨNH VIỄN KHỎI CƠ SỞ DỮ LIỆU</h5>
+                    <p class="text-muted mb-3">
+                        Tài khoản: <strong class="text-dark">@Model.AccountName</strong> (<code>@Model.AccountEmail</code> - @Model.RoleName)
+                    </p>
+
+                    @if (Model.IsReferenced)
+                    {
+                        <div class="alert alert-danger text-start p-3 rounded-3" role="alert">
+                            <h6 class="fw-bold text-danger mb-1">
+                                <i class="bi bi-shield-x me-1"></i> Không thể thực hiện xóa vĩnh viễn!
+                            </h6>
+                            <p class="small mb-0">
+                                Tài khoản này đang được bài viết tin tức tham chiếu (là <strong>Tác giả</strong> hoặc <strong>Người chỉnh sửa gần nhất</strong>).
+                                Theo quy tắc toàn vẹn <strong>SC-05 / SC-10</strong>, bạn chỉ được phép thực hiện <strong>Khóa / Xóa mềm</strong> để bảo toàn tác giả bài viết.
+                            </p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning text-start p-3 rounded-3" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i>
+                            Tài khoản này chưa có bài viết tin tức nào tham chiếu. Hành động này sẽ <strong>xóa hoàn toàn</strong> bản ghi tài khoản khỏi SQL Server và <strong>không thể phục hồi</strong>.
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer bg-light px-4 py-3 justify-content-center">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg me-1"></i> Hủy bỏ
+                    </button>
+                    @if (Model.IsReferenced)
+                    {
+                        <button type="button" class="btn btn-danger px-4 fw-semibold" disabled title="Tài khoản có bài viết tham chiếu">
+                            <i class="bi bi-lock-fill me-1"></i> Bị khóa bởi ràng buộc dữ liệu
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="btn btn-danger px-4 fw-semibold">
+                            <i class="bi bi-trash3-fill me-1"></i> Xác nhận xóa vĩnh viễn
+                        </button>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
