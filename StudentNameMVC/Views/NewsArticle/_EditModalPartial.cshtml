@@ -1,0 +1,97 @@
+@model StudentNameMVC.ViewModels.NewsArticleFormViewModel
+
+<div class="modal fade" id="newsModal" tabindex="-1" aria-labelledby="newsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content shadow border-0">
+            <form id="editNewsForm" asp-controller="NewsArticle" asp-action="Edit" asp-route-id="@Model.NewsArticleId" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="NewsArticleId" />
+
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="newsModalLabel">
+                        <i class="bi bi-pencil-square me-2"></i> Chỉnh sửa bài viết tin tức
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger p-2 mb-3" role="alert"></div>
+
+                    <!-- Tiêu đề bài viết -->
+                    <div class="mb-3">
+                        <label asp-for="NewsTitle" class="form-label fw-bold"></label>
+                        <span class="text-danger">*</span>
+                        <input asp-for="NewsTitle" class="form-control" placeholder="Nhập tiêu đề tin tức (tối đa 200 ký tự)..." maxlength="200" required />
+                        <span asp-validation-for="NewsTitle" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row">
+                        <!-- Chọn chuyên mục -->
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="CategoryId" class="form-label fw-bold"></label>
+                            <span class="text-danger">*</span>
+                            <select asp-for="CategoryId" class="form-select" asp-items="Model.CategoryOptions" required>
+                                <option value="">-- Chọn chuyên mục --</option>
+                            </select>
+                            <span asp-validation-for="CategoryId" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Chọn trạng thái -->
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="NewsStatus" class="form-label fw-bold"></label>
+                            <span class="text-danger">*</span>
+                            <select asp-for="NewsStatus" class="form-select" required>
+                                <option value="1">Hoạt động (Active / Hiển thị)</option>
+                                <option value="0">Không hoạt động (Inactive / Ẩn)</option>
+                            </select>
+                            <span asp-validation-for="NewsStatus" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Gắn thẻ Tags -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold"><i class="bi bi-tags me-1"></i> Gắn nhãn (Tags)</label>
+                        <div class="card p-2 bg-light border-0">
+                            @if (Model.TagOptions != null && Model.TagOptions.Any())
+                            {
+                                <div class="row g-2">
+                                    @foreach (var tag in Model.TagOptions)
+                                    {
+                                        <div class="col-md-4 col-sm-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="SelectedTagIds" value="@tag.Value" id="tag_edit_@tag.Value"
+                                                       @(tag.Selected ? "checked" : "") />
+                                                <label class="form-check-label" for="tag_edit_@tag.Value">
+                                                    @tag.Text
+                                                </label>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="text-muted mb-0 small">Chưa có nhãn (tag) nào trong hệ thống.</p>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Nội dung bài viết -->
+                    <div class="mb-3">
+                        <label asp-for="NewsContent" class="form-label fw-bold"></label>
+                        <span class="text-danger">*</span>
+                        <textarea asp-for="NewsContent" class="form-control" rows="6" placeholder="Nhập nội dung chi tiết bài viết..." required></textarea>
+                        <span asp-validation-for="NewsContent" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i> Hủy bỏ
+                    </button>
+                    <button type="submit" class="btn btn-warning fw-bold" id="btnSubmitNews">
+                        <i class="bi bi-save me-1"></i> Cập nhật thay đổi
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

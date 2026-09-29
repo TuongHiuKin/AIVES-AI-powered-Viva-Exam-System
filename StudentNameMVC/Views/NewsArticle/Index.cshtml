@@ -1,0 +1,284 @@
+@model StudentNameMVC.ViewModels.NewsArticleIndexViewModel
+
+@{
+    ViewData["Title"] = "Quản lý bài viết tin tức";
+}
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body p-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <div>
+                <h2 class="h4 fw-bold text-primary mb-1">
+                    <i class="bi bi-newspaper me-2"></i> Quản lý bài viết tin tức (News Articles)
+                </h2>
+                <p class="text-muted mb-0 small">
+                    Dành cho nhân viên (Staff) quản lý nội dung tin tức, chuyên mục và gắn thẻ phân loại.
+                </p>
+            </div>
+            <div>
+                <button type="button" class="btn btn-primary px-3 shadow-sm" onclick="openCreateModal()">
+                    <i class="bi bi-plus-lg me-1"></i> Tạo bài viết mới
+                </button>
+            </div>
+        </div>
+
+        <!-- Thanh tìm kiếm (NEWS-02) -->
+        <form method="get" asp-controller="NewsArticle" asp-action="Index" class="mb-4">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-6 col-lg-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+                        <input type="text" name="keyword" value="@Model.Keyword" class="form-control border-start-0 ps-0"
+                               placeholder="Tìm theo tiêu đề hoặc nội dung bài viết..." />
+                        @if (!string.IsNullOrWhiteSpace(Model.Keyword))
+                        {
+                            <a asp-action="Index" class="btn btn-outline-secondary" title="Xóa bộ lọc">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
+                        }
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-outline-primary px-3">
+                        Tìm kiếm
+                    </button>
+                </div>
+                <div class="col-auto ms-auto text-muted small">
+                    Tổng số: <strong>@Model.Articles.Count</strong> bài viết
+                </div>
+            </div>
+        </form>
+
+        <!-- Bảng danh sách bài viết (NEWS-01) -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle border">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 60px;" class="text-center">#</th>
+                        <th style="min-width: 250px;">Tiêu đề</th>
+                        <th style="min-width: 140px;">Chuyên mục</th>
+                        <th style="min-width: 160px;">Nhãn (Tags)</th>
+                        <th style="width: 120px;" class="text-center">Trạng thái</th>
+                        <th style="min-width: 140px;">Người tạo</th>
+                        <th style="min-width: 130px;">Ngày tạo</th>
+                        <th style="width: 150px;" class="text-center">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Articles != null && Model.Articles.Any())
+                    {
+                        foreach (var article in Model.Articles)
+                        {
+                            <tr>
+                                <td class="text-center text-muted fw-bold">@article.NewsArticleId</td>
+                                <td>
+                                    <div class="fw-bold text-dark mb-1">@article.NewsTitle</div>
+                                    <div class="text-muted small text-truncate" style="max-width: 350px;">
+                                        @article.NewsContent
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="bi bi-folder me-1 text-primary"></i> @article.CategoryName
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (article.TagNames != null && article.TagNames.Any())
+                                    {
+                                        <div class="d-flex flex-wrap gap-1">
+                                            @foreach (var tag in article.TagNames)
+                                            {
+                                                <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle">
+                                                    #@tag
+                                                </span>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted fst-italic small">Không có nhãn</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    @if (article.NewsStatus == 1)
+                                    {
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                            <i class="bi bi-check-circle me-1"></i> Hoạt động
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1">
+                                            <i class="bi bi-pause-circle me-1"></i> Tạm ẩn
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="small fw-semibold">@article.CreatedByName</div>
+                                </td>
+                                <td>
+                                    <div class="small text-muted">@article.CreatedDate.ToString("dd/MM/yyyy HH:mm")</div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button type="button" class="btn btn-outline-warning" title="Chỉnh sửa"
+                                                onclick="openEditModal(@article.NewsArticleId)">
+                                            <i class="bi bi-pencil-square"></i> Sửa
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger" title="Xóa"
+                                                onclick="openDeleteModal(@article.NewsArticleId)">
+                                            <i class="bi bi-trash"></i> Xóa
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                <p class="mb-1">Không tìm thấy bài viết tin tức nào.</p>
+                                <button type="button" class="btn btn-sm btn-primary mt-2" onclick="openCreateModal()">
+                                    <i class="bi bi-plus-lg me-1"></i> Tạo bài viết đầu tiên
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function cleanupExistingModal(modalInstance) {
+            if (modalInstance) {
+                try {
+                    modalInstance.hide();
+                    modalInstance.dispose();
+                } catch (e) { }
+            }
+            const existingModalEl = document.querySelector('#modalContainer .modal');
+            if (existingModalEl) {
+                const existingInstance = bootstrap.Modal.getInstance(existingModalEl);
+                if (existingInstance) {
+                    try {
+                        existingInstance.hide();
+                        existingInstance.dispose();
+                    } catch (e) { }
+                }
+            }
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open').css({ overflow: '', paddingRight: '' });
+        }
+
+        // Mở Modal Tạo mới (NEWS-02)
+        function openCreateModal() {
+            cleanupExistingModal();
+            $.get('@Url.Action("CreateModal", "NewsArticle")', function (data) {
+                $('#modalContainer').html(data);
+                const modal = new bootstrap.Modal(document.getElementById('newsModal'));
+                bindAjaxForm('#createNewsForm', modal);
+                modal.show();
+            }).fail(function () {
+                alert('Không thể tải biểu mẫu tạo bài viết.');
+            });
+        }
+
+        // Mở Modal Chỉnh sửa (NEWS-04)
+        function openEditModal(id) {
+            cleanupExistingModal();
+            $.get('@Url.Action("EditModal", "NewsArticle")', { id: id }, function (data) {
+                $('#modalContainer').html(data);
+                const modal = new bootstrap.Modal(document.getElementById('newsModal'));
+                bindAjaxForm('#editNewsForm', modal);
+                modal.show();
+            }).fail(function () {
+                alert('Không thể tải bài viết để chỉnh sửa.');
+            });
+        }
+
+        // Mở Modal Xác nhận xóa (NEWS-05)
+        function openDeleteModal(id) {
+            cleanupExistingModal();
+            $.get('@Url.Action("DeleteModal", "NewsArticle")', { id: id }, function (data) {
+                $('#modalContainer').html(data);
+                const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+                bindAjaxDeleteForm('#deleteNewsForm', modal);
+                modal.show();
+            }).fail(function () {
+                alert('Không thể tải thông tin xóa bài viết.');
+            });
+        }
+
+        // Đính kèm xử lý submit AJAX cho Form Create / Edit
+        function bindAjaxForm(formSelector, modalInstance) {
+            $(formSelector).off('submit').on('submit', function (e) {
+                e.preventDefault();
+                const form = $(this);
+                const submitBtn = form.find('#btnSubmitNews');
+                submitBtn.prop('disabled', true).prepend('<span class="spinner-border spinner-border-sm me-1" role="status"></span>');
+
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function (res) {
+                        modalInstance.hide();
+                        window.location.reload();
+                    },
+                    error: function (xhr) {
+                        submitBtn.prop('disabled', false).find('.spinner-border').remove();
+                        if (xhr.status === 400) {
+                            // Dispose modal cũ hoàn toàn trước khi render modal mới với lỗi validation
+                            cleanupExistingModal(modalInstance);
+                            $('#modalContainer').html(xhr.responseText);
+                            const newModalEl = document.getElementById('newsModal');
+                            if (newModalEl) {
+                                const updatedModal = new bootstrap.Modal(newModalEl);
+                                bindAjaxForm(formSelector, updatedModal);
+                                if ($.validator && $.validator.unobtrusive) {
+                                    $.validator.unobtrusive.parse($(formSelector));
+                                }
+                                updatedModal.show();
+                            }
+                        } else {
+                            alert('Đã xảy ra lỗi khi lưu bài viết.');
+                        }
+                    }
+                });
+            });
+        }
+
+        // Đính kèm xử lý submit AJAX cho Form Delete Confirm
+        function bindAjaxDeleteForm(formSelector, modalInstance) {
+            $(formSelector).off('submit').on('submit', function (e) {
+                e.preventDefault();
+                const form = $(this);
+                const deleteBtn = form.find('#btnConfirmDelete');
+                deleteBtn.prop('disabled', true).prepend('<span class="spinner-border spinner-border-sm me-1" role="status"></span>');
+
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function () {
+                        modalInstance.hide();
+                        window.location.reload();
+                    },
+                    error: function () {
+                        deleteBtn.prop('disabled', false).find('.spinner-border').remove();
+                        alert('Đã xảy ra lỗi khi xóa bài viết.');
+                    }
+                });
+            });
+        }
+    </script>
+}

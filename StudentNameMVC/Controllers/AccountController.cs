@@ -1,4 +1,5 @@
 using AIVES.BLL.Interfaces;
+using AIVES.BLL.Security;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -8,15 +9,22 @@ using StudentNameMVC.ViewModels;
 
 namespace StudentNameMVC.Controllers;
 
-public sealed class AccountController(IAuthService authService) : Controller
+public class AccountController : Controller
 {
+    private readonly IAuthService _authService;
+
+    public AccountController(IAuthService authService)
+    {
+        _authService = authService ?? throw new ArgumentNullException(nameof(authService));
+    }
+
     [AllowAnonymous]
     [HttpGet]
     public IActionResult Login(string? returnUrl = null)
     {
         if (User.Identity?.IsAuthenticated == true)
         {
-            return RedirectToAction(nameof(Dashboard));
+            return RedirectToDefaultRolePage();
         }
 
         return View(new LoginViewModel
@@ -37,7 +45,7 @@ public sealed class AccountController(IAuthService authService) : Controller
             return View(model);
         }
 
-        var result = await authService.AuthenticateAsync(
+        var result = await _authService.AuthenticateAsync(
             model.Email,
             model.Password,
             cancellationToken);
@@ -65,7 +73,7 @@ public sealed class AccountController(IAuthService authService) : Controller
             return LocalRedirect(model.ReturnUrl);
         }
 
-        return RedirectToAction(nameof(Dashboard));
+        return RedirectToDefaultRolePage();
     }
 
     [Authorize]
@@ -84,4 +92,19 @@ public sealed class AccountController(IAuthService authService) : Controller
     [AllowAnonymous]
     [HttpGet]
     public IActionResult AccessDenied() => View();
+
+    private IActionResult RedirectToDefaultRolePage()
+    {
+        if (User.IsInRole(ApplicationRoles.Admin))
+        {
+            return RedirectToAction(nameof(Dashboard));
+        }
+
+        if (User.IsInRole(ApplicationRoles.Staff))
+        {
+            return RedirectToAction("Index", "NewsArticle");
+        }
+
+        return RedirectToAction(nameof(Dashboard));
+    }
 }

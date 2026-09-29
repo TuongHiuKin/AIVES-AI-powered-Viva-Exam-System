@@ -27,6 +27,7 @@ builder.Services
 
 builder.Services.AddScoped<IPasswordHasher<SystemAccount>, PasswordHasher<SystemAccount>>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<INewsArticleService, NewsArticleService>();
 builder.Services.AddScoped<ActiveAccountCookieEvents>();
 
 builder.Services
