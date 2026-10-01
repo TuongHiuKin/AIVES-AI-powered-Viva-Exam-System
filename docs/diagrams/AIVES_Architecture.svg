@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1060" viewBox="0 0 1600 1060">
+<title>AIVES — Kiến trúc hệ thống</title>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M1 1 L9 5 L1 9 Z" fill="#64748b"/></marker></defs>
+<rect width="1600" height="1060" fill="#f8fafc"/>
+<g font-family="Segoe UI, Arial, sans-serif">
+<text x="55" y="65" font-size="34" fill="#0f172a" font-weight="700" text-anchor="start">AIVES — KIẾN TRÚC HỆ THỐNG</text>
+<text x="55" y="103" font-size="23" fill="#64748b" font-weight="400" text-anchor="start">.NET 8  •  Nhóm 6: Phản hồi &amp; báo cáo</text>
+<rect x="220" y="155" width="990" height="210" rx="12" fill="#eaf3ff" stroke="#4387cf" stroke-width="2"/>
+<text x="715" y="198" font-size="29" fill="#245e9c" font-weight="700" text-anchor="middle">Presentation Layer (StudentNameMVC)</text>
+<rect x="244" y="225" width="300" height="100" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="394.0" y="264" font-size="24" fill="#245e9c" font-weight="700" text-anchor="middle">Controllers</text>
+<text x="394.0" y="300" font-size="20" fill="#64748b" font-weight="400" text-anchor="middle">StudentReports • ClassReports</text>
+<rect x="565" y="225" width="300" height="100" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="715.0" y="264" font-size="24" fill="#245e9c" font-weight="700" text-anchor="middle">Views</text>
+<text x="715.0" y="300" font-size="20" fill="#64748b" font-weight="400" text-anchor="middle">Razor • Bootstrap • Chart.js</text>
+<rect x="886" y="225" width="300" height="100" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="1036.0" y="264" font-size="24" fill="#245e9c" font-weight="700" text-anchor="middle">ViewModels / DTOs</text>
+<text x="1036.0" y="300" font-size="20" fill="#64748b" font-weight="400" text-anchor="middle">Dữ liệu hiển thị</text>
+<text x="105" y="245" font-size="22" fill="#245e9c" font-weight="700" text-anchor="middle">MVC Web App</text>
+<text x="105" y="278" font-size="20" fill="#64748b" font-weight="400" text-anchor="middle">Startup</text>
+<line x1="535" y1="367" x2="535" y2="441" stroke="#64748b" stroke-width="2.4" marker-end="url(#arrow)"/>
+<line x1="900" y1="443" x2="900" y2="369" stroke="#64748b" stroke-width="2.4" stroke-dasharray="8 7" marker-end="url(#arrow)"/>
+<rect x="220" y="445" width="990" height="245" rx="12" fill="#e9f7ef" stroke="#45a478" stroke-width="2"/>
+<text x="715" y="488" font-size="29" fill="#28734f" font-weight="700" text-anchor="middle">Business Layer (AIVES.BLL)</text>
+<rect x="244" y="514" width="300" height="100" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="394.0" y="553" font-size="24" fill="#28734f" font-weight="700" text-anchor="middle">StudentReportService</text>
+<text x="394.0" y="589" font-size="20" fill="#64748b" font-weight="400" text-anchor="middle">Báo cáo cá nhân</text>
+<rect x="565" y="514" width="300" height="100" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="715.0" y="553" font-size="24" fill="#28734f" font-weight="700" text-anchor="middle">ClassReportService</text>
+<text x="715.0" y="589" font-size="20" fill="#64748b" font-weight="400" text-anchor="middle">Thống kê lớp</text>
+<rect x="886" y="514" width="300" height="100" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="1036.0" y="553" font-size="24" fill="#28734f" font-weight="700" text-anchor="middle">Auth / News Services</text>
+<text x="1036.0" y="589" font-size="20" fill="#64748b" font-weight="400" text-anchor="middle">Nghiệp vụ nền</text>
+<text x="1036" y="664" font-size="21" fill="#28734f" font-weight="400" text-anchor="middle">Interfaces • DTOs</text>
+<text x="101" y="666" font-size="32" fill="#334155" font-weight="700" text-anchor="middle">.dll</text>
+<text x="101" y="700" font-size="20" fill="#64748b" font-weight="400" text-anchor="middle">Class Library</text>
+<path d="M195 450 Q175 450 175 480 L175 665 Q175 690 160 703 Q175 716 175 741 L175 939 Q175 960 195 960" fill="none" stroke="#94a3b8" stroke-width="2"/>
+<line x1="535" y1="692" x2="535" y2="776" stroke="#64748b" stroke-width="2.4" marker-end="url(#arrow)"/>
+<line x1="900" y1="778" x2="900" y2="694" stroke="#64748b" stroke-width="2.4" stroke-dasharray="8 7" marker-end="url(#arrow)"/>
+<text x="715" y="742" font-size="20" fill="#64748b" font-weight="400" text-anchor="middle">Auth / News</text>
+<rect x="220" y="780" width="990" height="200" rx="12" fill="#fff0ed" stroke="#d88176" stroke-width="2"/>
+<text x="715" y="822" font-size="29" fill="#aa5146" font-weight="700" text-anchor="middle">Data Access Layer (AIVES.DAL)</text>
+<rect x="244" y="847" width="275" height="100" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="381.5" y="886" font-size="24" fill="#aa5146" font-weight="700" text-anchor="middle">Repositories</text>
+<text x="381.5" y="922" font-size="20" fill="#64748b" font-weight="400" text-anchor="middle">Truy cập dữ liệu</text>
+<rect x="566" y="847" width="275" height="100" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="703.5" y="886" font-size="24" fill="#aa5146" font-weight="700" text-anchor="middle">DAOs</text>
+<text x="703.5" y="922" font-size="20" fill="#64748b" font-weight="400" text-anchor="middle">Singleton</text>
+<rect x="888" y="847" width="298" height="100" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="1037.0" y="886" font-size="24" fill="#aa5146" font-weight="700" text-anchor="middle">AIVESDbContext</text>
+<text x="1037.0" y="922" font-size="20" fill="#64748b" font-weight="400" text-anchor="middle">EF Core • Entities</text>
+<line x1="524" y1="895" x2="559" y2="895" stroke="#64748b" stroke-width="2.4" marker-end="url(#arrow)"/>
+<line x1="846" y1="895" x2="881" y2="895" stroke="#64748b" stroke-width="2.4" marker-end="url(#arrow)"/>
+<rect x="1245" y="155" width="310" height="162" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="1268" y="192" font-size="23" fill="#334155" font-weight="700" text-anchor="start">Chú thích</text>
+<line x1="1268" y1="232" x2="1320" y2="232" stroke="#64748b" stroke-width="2.4" marker-end="url(#arrow)"/>
+<text x="1337" y="239" font-size="22" fill="#334155" font-weight="400" text-anchor="start">Request</text>
+<line x1="1268" y1="278" x2="1320" y2="278" stroke="#64748b" stroke-width="2.4" stroke-dasharray="8 7" marker-end="url(#arrow)"/>
+<text x="1337" y="285" font-size="22" fill="#334155" font-weight="400" text-anchor="start">Response</text>
+<rect x="1245" y="345" width="310" height="154" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="1268" y="383" font-size="23" fill="#334155" font-weight="700" text-anchor="start">References</text>
+<text x="1268" y="423" font-size="22" fill="#334155" font-weight="400" text-anchor="start">MVC → BLL → DAL</text>
+<text x="1268" y="464" font-size="22" fill="#334155" font-weight="400" text-anchor="start">MVC → DAL: DI</text>
+<line x1="1210" y1="875" x2="1266" y2="875" stroke="#64748b" stroke-width="2.4" marker-end="url(#arrow)"/>
+<line x1="1266" y1="916" x2="1210" y2="916" stroke="#64748b" stroke-width="2.4" stroke-dasharray="8 7" marker-end="url(#arrow)"/>
+<path d="M1280 824 L1280 939 C1280 971 1550 971 1550 939 L1550 824 Z" fill="#eef2ff" stroke="#8390b7" stroke-width="2"/>
+<ellipse cx="1415" cy="824" rx="135" ry="25" fill="#f4f6ff" stroke="#8390b7" stroke-width="2"/>
+<text x="1415" y="891" font-size="28" fill="#465786" font-weight="700" text-anchor="middle">SQL Server</text>
+<text x="1415" y="932" font-size="21" fill="#465786" font-weight="400" text-anchor="middle">Tài khoản • News</text>
+<text x="220" y="1025" font-size="19" fill="#64748b" font-weight="400" text-anchor="start">Kiến trúc tổng quan • Nguồn dữ liệu theo source hiện tại</text>
+</g></svg>
