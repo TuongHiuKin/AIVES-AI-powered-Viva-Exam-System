@@ -1,0 +1,136 @@
+<mxfile host="app.diagrams.net" agent="ChatGPT" compressed="false">
+  <diagram id="aives-final-architecture" name="AIVES Architecture">
+    <mxGraphModel dx="2020" dy="1110" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=26;fontStyle=1;fontColor=#0F172A;" value="AIVES System — 3-Layer Architecture" vertex="1">
+          <mxGeometry height="40" width="820" x="360" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#475569;" value="Source-aligned diagram from the uploaded AIVES project • ASP.NET Core MVC / .NET 8 / EF Core 8 / SQL Server" vertex="1">
+          <mxGeometry height="26" width="820" x="360" y="58" as="geometry" />
+        </mxCell>
+        <mxCell id="client" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F1F5F9;strokeColor=#475569;strokeWidth=1.5;fontColor=#0F172A;align=center;verticalAlign=middle;fontSize=13;fontStyle=1;" value="MVC Web App / Browser" vertex="1">
+          <mxGeometry height="70" width="175" x="40" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="legend" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1.5;fontColor=#334155;align=left;verticalAlign=top;spacing=8;fontSize=11;" value="&lt;b&gt;Legend&lt;/b&gt;&lt;br&gt;Solid arrow: request / dependency&lt;br&gt;Dashed arrow: response&lt;br&gt;&lt;span style=&quot;color:#64748B&quot;&gt;Dashed gray box: file exists but is empty&lt;/span&gt;" vertex="1">
+          <mxGeometry height="110" width="300" x="1325" y="105" as="geometry" />
+        </mxCell>
+        <mxCell id="presentation" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#2563EB;strokeWidth=2;fontColor=#1E3A8A;" value="" vertex="1">
+          <mxGeometry height="235" width="1035" x="250" y="105" as="geometry" />
+        </mxCell>
+        <mxCell id="pres_title" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=17;fontStyle=1;fontColor=#1E3A8A;" value="&lt;b&gt;Presentation Layer (StudentNameMVC)&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="530" x="500" y="112" as="geometry" />
+        </mxCell>
+        <mxCell id="controllers" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#94A3B8;strokeWidth=1.5;fontColor=#0F172A;align=left;verticalAlign=top;spacing=8;fontSize=12;" value="&lt;b&gt;Controllers&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;Implemented&lt;/b&gt;&lt;br&gt;• AccountController&lt;br&gt;• ReportController" vertex="1">
+          <mxGeometry height="145" width="230" x="285" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="controllers_empty" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.5;dashed=1;dashPattern=4 4;fontColor=#64748B;align=left;verticalAlign=top;spacing=8;fontSize=11;" value="&lt;b&gt;Controller files currently empty&lt;/b&gt;&lt;br&gt;• HomeController&lt;br&gt;• CategoryController&lt;br&gt;• NewsArticleController&lt;br&gt;• HistoryController&lt;br&gt;• ProfileController" vertex="1">
+          <mxGeometry height="145" width="240" x="530" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="views" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#94A3B8;strokeWidth=1.5;fontColor=#0F172A;align=left;verticalAlign=top;spacing=8;fontSize=12;" value="&lt;b&gt;Razor Views (.cshtml)&lt;/b&gt;&lt;br&gt;&lt;br&gt;Account • Category • NewsArticle&lt;br&gt;Report • History • Profile • Home&lt;br&gt;Shared layout/navigation/validation" vertex="1">
+          <mxGeometry height="145" width="230" x="785" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="viewmodels" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#94A3B8;strokeWidth=1.5;fontColor=#0F172A;align=left;verticalAlign=top;spacing=8;fontSize=12;" value="&lt;b&gt;ViewModels / Model&lt;/b&gt;&lt;br&gt;&lt;br&gt;LoginViewModel&lt;br&gt;SystemAccountViewModel&lt;br&gt;CategoryViewModel&lt;br&gt;NewsArticleViewModel&lt;br&gt;ReportViewModel&lt;br&gt;ProfileViewModel&lt;br&gt;ErrorViewModel" vertex="1">
+          <mxGeometry height="145" width="220" x="1030" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="program" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=1;fontColor=#DBEAFE;" value="&lt;b&gt;Program.cs / Web startup&lt;/b&gt;&lt;br&gt;&lt;br&gt;• MVC registration&lt;br&gt;• Cookie Authentication&lt;br&gt;• AddAivesDataAccess(connection)&lt;br&gt;• Scoped BLL services&lt;br&gt;• Default route: Account/Login" vertex="1">
+          <mxGeometry height="0.01" width="965" x="285" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="business" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DCFCE7;strokeColor=#16A34A;strokeWidth=2;fontColor=#14532D;" value="" vertex="1">
+          <mxGeometry height="210" width="1035" x="250" y="385" as="geometry" />
+        </mxCell>
+        <mxCell id="biz_title" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=17;fontStyle=1;fontColor=#166534;" value="&lt;b&gt;Business Logic Layer (AIVES.BLL)&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="530" x="500" y="392" as="geometry" />
+        </mxCell>
+        <mxCell id="biz_interfaces" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#94A3B8;strokeWidth=1.5;fontColor=#0F172A;align=left;verticalAlign=top;spacing=8;fontSize=12;" value="&lt;b&gt;Implemented Interfaces&lt;/b&gt;&lt;br&gt;&lt;br&gt;• ISystemAccountService&lt;br&gt;• INewsArticleService&lt;br&gt;• IReportService" vertex="1">
+          <mxGeometry height="120" width="245" x="285" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="biz_services" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#94A3B8;strokeWidth=1.5;fontColor=#0F172A;align=left;verticalAlign=top;spacing=8;fontSize=12;" value="&lt;b&gt;Implemented Services&lt;/b&gt;&lt;br&gt;&lt;br&gt;• SystemAccountService&lt;br&gt;• NewsArticleService&lt;br&gt;• ReportService" vertex="1">
+          <mxGeometry height="120" width="245" x="545" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="biz_empty" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.5;dashed=1;dashPattern=4 4;fontColor=#64748B;align=left;verticalAlign=top;spacing=8;fontSize=11;" value="&lt;b&gt;Present but empty&lt;/b&gt;&lt;br&gt;&lt;br&gt;Interfaces:&lt;br&gt;• IAuthService&lt;br&gt;• ICategoryService&lt;br&gt;&lt;br&gt;Services:&lt;br&gt;• AuthService&lt;br&gt;• CategoryService" vertex="1">
+          <mxGeometry height="120" width="210" x="805" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="biz_rules" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#94A3B8;strokeWidth=1.5;fontColor=#0F172A;align=left;verticalAlign=top;spacing=8;fontSize=12;" value="&lt;b&gt;Business responsibilities&lt;/b&gt;&lt;br&gt;&lt;br&gt;Authentication &amp; account rules&lt;br&gt;News validation / tag filtering&lt;br&gt;Report date-range validation&lt;br&gt;UTC / Vietnam date conversion" vertex="1">
+          <mxGeometry height="120" width="220" x="1030" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="dal" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;strokeWidth=2;fontColor=#7F1D1D;" value="" vertex="1">
+          <mxGeometry height="290" width="1035" x="250" y="640" as="geometry" />
+        </mxCell>
+        <mxCell id="dal_title" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=17;fontStyle=1;fontColor=#991B1B;" value="&lt;b&gt;Data Access Layer (AIVES.DAL)&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="530" x="500" y="647" as="geometry" />
+        </mxCell>
+        <mxCell id="repo_if" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#94A3B8;strokeWidth=1.5;fontColor=#0F172A;align=left;verticalAlign=top;spacing=8;fontSize=12;" value="&lt;b&gt;Repository Interfaces&lt;/b&gt;&lt;br&gt;&lt;br&gt;• ISystemAccountRepository&lt;br&gt;• ICategoryRepository&lt;br&gt;• INewsArticleRepository&lt;br&gt;• ITagRepository" vertex="1">
+          <mxGeometry height="145" width="235" x="280" y="700" as="geometry" />
+        </mxCell>
+        <mxCell id="repo_impl" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#94A3B8;strokeWidth=1.5;fontColor=#0F172A;align=left;verticalAlign=top;spacing=8;fontSize=12;" value="&lt;b&gt;Repository Implementations&lt;/b&gt;&lt;br&gt;&lt;br&gt;• SystemAccountRepository&lt;br&gt;• CategoryRepository&lt;br&gt;• NewsArticleRepository&lt;br&gt;• TagRepository" vertex="1">
+          <mxGeometry height="145" width="235" x="530" y="700" as="geometry" />
+        </mxCell>
+        <mxCell id="daos" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#94A3B8;strokeWidth=1.5;fontColor=#0F172A;align=left;verticalAlign=top;spacing=8;fontSize=12;" value="&lt;b&gt;DAOs&lt;/b&gt;&lt;br&gt;&lt;br&gt;• SystemAccountDAO&lt;br&gt;• CategoryDAO&lt;br&gt;• NewsArticleDAO&lt;br&gt;• TagDAO&lt;br&gt;• Persistence" vertex="1">
+          <mxGeometry height="145" width="220" x="780" y="700" as="geometry" />
+        </mxCell>
+        <mxCell id="dbctx" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#94A3B8;strokeWidth=1.5;fontColor=#0F172A;align=left;verticalAlign=top;spacing=8;fontSize=12;" value="&lt;b&gt;AIVESDbContext&lt;/b&gt;&lt;br&gt;&lt;br&gt;EF Core SQL Server&lt;br&gt;DbSet mappings:&lt;br&gt;SystemAccounts&lt;br&gt;Categories&lt;br&gt;NewsArticles&lt;br&gt;Tags&lt;br&gt;NewsTags" vertex="1">
+          <mxGeometry height="145" width="235" x="1015" y="700" as="geometry" />
+        </mxCell>
+        <mxCell id="entities" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#94A3B8;strokeWidth=1.5;fontColor=#0F172A;align=center;verticalAlign=middle;spacing=6;fontSize=12;" value="&lt;b&gt;Entities&lt;/b&gt;&lt;br&gt;SystemAccount • Category • NewsArticle • Tag • NewsTag" vertex="1">
+          <mxGeometry height="45" width="470" x="530" y="860" as="geometry" />
+        </mxCell>
+        <mxCell id="database" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;strokeWidth=2;fontColor=#78350F;align=center;verticalAlign=middle;fontSize=13;" value="&lt;b&gt;SQL Server — Database: AIVES&lt;/b&gt;&lt;br&gt;&lt;br&gt;dbo.SystemAccount &amp;nbsp;&amp;nbsp; dbo.Category &amp;nbsp;&amp;nbsp; dbo.NewsArticle &amp;nbsp;&amp;nbsp; dbo.Tag &amp;nbsp;&amp;nbsp; dbo.NewsTag" vertex="1">
+          <mxGeometry height="100" width="575" x="480" y="980" as="geometry" />
+        </mxCell>
+        <mxCell id="tests" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1.5;fontColor=#334155;align=left;verticalAlign=top;spacing=8;fontSize=11;" value="&lt;b&gt;AIVES.Tests&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;Service tests&lt;/b&gt;&lt;br&gt;AuthServiceTests&lt;br&gt;CategoryServiceTests&lt;br&gt;SystemAccountServiceTests&lt;br&gt;NewsArticleServiceTests&lt;br&gt;ReportServiceTests&lt;br&gt;AdminReportTests&lt;br&gt;&lt;br&gt;&lt;b&gt;Data tests&lt;/b&gt;&lt;br&gt;AIVESDbContextTests&lt;br&gt;RepositorySqlServerTests&lt;br&gt;SqlServerReadOnlyTests&lt;br&gt;TemporarySqlServerDatabase" vertex="1">
+          <mxGeometry height="390" width="300" x="1325" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="refs" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1.5;fontColor=#334155;align=left;verticalAlign=top;spacing=8;fontSize=11;" value="&lt;b&gt;Project references&lt;/b&gt;&lt;br&gt;&lt;br&gt;StudentNameMVC → AIVES.BLL&lt;br&gt;StudentNameMVC → AIVES.DAL&lt;br&gt;AIVES.BLL → AIVES.DAL&lt;br&gt;AIVES.Tests → AIVES.BLL&lt;br&gt;AIVES.Tests → AIVES.DAL&lt;br&gt;&lt;br&gt;&lt;b&gt;Runtime DI&lt;/b&gt;&lt;br&gt;DAL registers DbContext + 4 repositories.&lt;br&gt;Web project registers 3 implemented BLL services." vertex="1">
+          <mxGeometry height="235" width="300" x="1325" y="675" as="geometry" />
+        </mxCell>
+        <mxCell id="note" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1.5;fontColor=#334155;align=left;verticalAlign=top;spacing=8;fontSize=11;" value="&lt;b&gt;Architecture note&lt;/b&gt;&lt;br&gt;&lt;br&gt;The web project references DAL directly because Program.cs calls &lt;i&gt;AddAivesDataAccess&lt;/i&gt;. Request handling should still flow through BLL services rather than controllers calling repositories/DbContext directly." vertex="1">
+          <mxGeometry height="135" width="300" x="1325" y="945" as="geometry" />
+        </mxCell>
+        <mxCell id="e_client_pres" edge="1" parent="1" source="client" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#334155;" target="presentation" value="Request">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_pres_biz" edge="1" parent="1" source="presentation" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#334155;" target="business">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_biz_dal" edge="1" parent="1" source="business" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#334155;" target="dal">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_dal_db" edge="1" parent="1" source="dal" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#334155;" target="database">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_db_dal" edge="1" parent="1" source="database" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#64748B;dashed=1;dashPattern=5 5;" target="dal" value="Response">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_dal_biz" edge="1" parent="1" source="dal" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#64748B;dashed=1;dashPattern=5 5;" target="business">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_biz_pres" edge="1" parent="1" source="business" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#64748B;dashed=1;dashPattern=5 5;" target="presentation">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_pres_client" edge="1" parent="1" source="presentation" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#64748B;dashed=1;dashPattern=5 5;" target="client" value="Response">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_if_service" edge="1" parent="1" source="biz_interfaces" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#16A34A;" target="biz_services">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_service_repo" edge="1" parent="1" source="biz_services" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#16A34A;" target="repo_if">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_repoif_impl" edge="1" parent="1" source="repo_if" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#DC2626;" target="repo_impl">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_impl_daos" edge="1" parent="1" source="repo_impl" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#DC2626;" target="daos">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_daos_ctx" edge="1" parent="1" source="daos" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#DC2626;" target="dbctx">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_ctx_entities" edge="1" parent="1" source="dbctx" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#DC2626;" target="entities">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
