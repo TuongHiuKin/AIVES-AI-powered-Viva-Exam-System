@@ -5,6 +5,7 @@ namespace AIVES.DAL.Repositories.Interfaces;
 
 public interface ISystemAccountRepository
 {
+    Task<bool> ResetPasswordAsync(int id, string email, string expectedHash, string newHash, CancellationToken ct = default);
     Task<List<SystemAccount>> SearchAsync(string? keyword = null, CancellationToken ct = default);
     Task<SystemAccount?> GetByIdAsync(int id, bool includeDeleted = false, CancellationToken ct = default);
     Task<SystemAccount?> GetByEmailAsync(string email, CancellationToken ct = default);

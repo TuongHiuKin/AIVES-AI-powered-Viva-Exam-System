@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using StudentNameMVC.Security;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +29,20 @@ builder.Services
 
 builder.Services.AddScoped<IPasswordHasher<SystemAccount>, PasswordHasher<SystemAccount>>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddDataProtection();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.Configure<PasswordResetEmailOptions>(builder.Configuration.GetSection("PasswordResetEmail"));
+builder.Services.AddScoped<IPasswordResetEmailSender, PasswordResetEmailSender>();
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("password-reset", context => RateLimitPartition.GetFixedWindowLimiter(
+        context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 5, Window = TimeSpan.FromMinutes(1), QueueLimit = 0
+        }));
+});
 builder.Services.AddScoped<ActiveAccountCookieEvents>();
 
 builder.Services
@@ -68,6 +84,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 

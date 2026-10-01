@@ -6,14 +6,54 @@ using AIVES.DAL.Entities;
 using AIVES.DAL.Repositories.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.DataProtection;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
 
 namespace AIVES.BLL.Services;
 
 public sealed class AuthService(
     ISystemAccountRepository accountRepository,
     IPasswordHasher<SystemAccount> passwordHasher,
-    IOptions<DefaultAdminOptions> defaultAdminOptions) : IAuthService
+    IOptions<DefaultAdminOptions> defaultAdminOptions,
+    IDataProtectionProvider dataProtectionProvider,
+    TimeProvider clock) : IAuthService
 {
+    private readonly IDataProtector resetProtector = dataProtectionProvider.CreateProtector("AIVES.PasswordReset.v1");
+    private sealed record ResetPayload(int AccountId, string Email, string PasswordFingerprint, DateTimeOffset Expires);
+    private static string Fingerprint(string hash) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(hash)));
+
+    public async Task<string?> CreatePasswordResetTokenAsync(string email, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(email)) return null;
+        var normalized = NormalizeEmail(email);
+        if (normalized == NormalizeEmail(defaultAdminOptions.Value.Email)) return null;
+        var account = await accountRepository.GetByEmailAsync(normalized, cancellationToken);
+        if (account is null || account.IsDeleted || ApplicationRoles.FromDatabaseRole(account.AccountRole) is null) return null;
+        return resetProtector.Protect(JsonSerializer.Serialize(new ResetPayload(account.AccountId,
+            normalized, Fingerprint(account.AccountPasswordHash), clock.GetUtcNow().AddMinutes(20))));
+    }
+
+    public async Task<bool> ResetPasswordAsync(string email, string token, string newPassword,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(token) || token.Length > 4096 ||
+            string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 8 || newPassword.Length > 128) return false;
+        ResetPayload? payload;
+        try { payload = JsonSerializer.Deserialize<ResetPayload>(resetProtector.Unprotect(token)); }
+        catch (Exception error) when (error is CryptographicException or JsonException or FormatException)
+        { return false; }
+        if (payload is null || payload.Expires <= clock.GetUtcNow() || payload.Email != NormalizeEmail(email)) return false;
+        var account = await accountRepository.GetByIdAsync(payload.AccountId, ct: cancellationToken);
+        if (account is null || account.IsDeleted || NormalizeEmail(account.AccountEmail) != payload.Email ||
+            ApplicationRoles.FromDatabaseRole(account.AccountRole) is null ||
+            Fingerprint(account.AccountPasswordHash) != payload.PasswordFingerprint) return false;
+        var newHash = passwordHasher.HashPassword(account, newPassword);
+        return await accountRepository.ResetPasswordAsync(account.AccountId, account.AccountEmail,
+            account.AccountPasswordHash, newHash, cancellationToken);
+    }
+
     public async Task<AuthenticationResult> AuthenticateAsync(
         string email,
         string password,

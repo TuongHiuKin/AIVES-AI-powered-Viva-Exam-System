@@ -10,6 +10,30 @@ namespace AIVES.Tests.Data;
 public sealed class RepositorySqlServerTests(TemporarySqlServerDatabase database) : IClassFixture<TemporarySqlServerDatabase>
 {
     private static string Key() => Guid.NewGuid().ToString("N");
+
+    [SqlServerWriteFact]
+    public async Task Password_reset_updates_only_active_matching_account_and_consumes_old_hash()
+    {
+        await using var db = database.CreateContext();
+        var email = Key() + "@example.test";
+        var id = await Account(db, email);
+        var repo = new SystemAccountRepository(db);
+        Assert.False(await repo.ResetPasswordAsync(id, "wrong@example.test", "opaque-test-hash", "new-hash"));
+        Assert.False(await repo.ResetPasswordAsync(id, email, "wrong-hash", "new-hash"));
+        Assert.True(await repo.ResetPasswordAsync(id, email, "opaque-test-hash", "new-hash"));
+        Assert.False(await repo.ResetPasswordAsync(id, email, "opaque-test-hash", "replayed-hash"));
+        Assert.Equal("new-hash", (await repo.GetByIdAsync(id))!.AccountPasswordHash);
+        await using var otherDb = database.CreateContext();
+        var competing = new SystemAccountRepository(otherDb);
+        var results = await Task.WhenAll(
+            repo.ResetPasswordAsync(id, email, "new-hash", "winner-one"),
+            competing.ResetPasswordAsync(id, email, "new-hash", "winner-two"));
+        Assert.Single(results, result => result);
+        db.ChangeTracker.Clear();
+        var currentHash = (await repo.GetByIdAsync(id))!.AccountPasswordHash;
+        await repo.SoftDeleteAsync(id);
+        Assert.False(await repo.ResetPasswordAsync(id, email, currentHash, "locked-hash"));
+    }
     private static Task<int> Account(AIVESDbContext db, string? email = null) =>
         new SystemAccountRepository(db).CreateAsync(new AccountCreate("Test " + Key(), email ?? Key() + "@example.test", "opaque-test-hash", 1));
 

@@ -11,11 +11,46 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using StudentNameMVC.Controllers;
 using StudentNameMVC.Security;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using StudentNameMVC.ViewModels;
 
 namespace AIVES.Tests;
 
 public sealed class AuthenticationPresentationTests
 {
+    [Theory]
+    [InlineData(null)]
+    [InlineData("valid-token")]
+    public async Task Recovery_request_keeps_same_response_for_unknown_email_and_delivery_failure(string? token)
+    {
+        var controller = new AccountController(new StubAuthService { ResetToken = token },
+            new FailingEmailSender(), NullLogger<AccountController>.Instance);
+        var response = Assert.IsType<ViewResult>(await controller.ForgotPassword(
+            new ForgotPasswordViewModel { Email = "member@example.test" }, default));
+        var model = Assert.IsType<ForgotPasswordViewModel>(response.Model);
+        Assert.True(model.Submitted);
+        Assert.Empty(model.Email);
+        Assert.True(controller.ModelState.IsValid);
+    }
+
+    [Theory]
+    [InlineData(nameof(AccountController.ForgotPassword))]
+    [InlineData(nameof(AccountController.ResetPassword))]
+    public void Recovery_posts_allow_anonymous_and_require_antiforgery(string action)
+    {
+        var method = Assert.Single(typeof(AccountController).GetMethods(),
+            method => method.Name == action && method.GetCustomAttribute<HttpPostAttribute>() is not null);
+        Assert.NotNull(method.GetCustomAttribute<AllowAnonymousAttribute>());
+        Assert.NotNull(method.GetCustomAttribute<ValidateAntiForgeryTokenAttribute>());
+    }
+
+    private sealed class FailingEmailSender : IPasswordResetEmailSender
+    {
+        public Task SendAsync(string email, string token, CancellationToken ct) =>
+            throw new InvalidOperationException("Test delivery failure");
+    }
+
     [Fact]
     public void Claims_factory_creates_required_identity_claims()
     {
@@ -37,7 +72,7 @@ public sealed class AuthenticationPresentationTests
     {
         var constructor = Assert.Single(typeof(AccountController).GetConstructors());
         Assert.Equal(
-            new[] { typeof(IAuthService) },
+            new[] { typeof(IAuthService), typeof(IPasswordResetEmailSender), typeof(ILogger<AccountController>) },
             constructor.GetParameters().Select(parameter => parameter.ParameterType));
     }
 
@@ -153,6 +188,9 @@ public sealed class AuthenticationPresentationTests
 
     private sealed class StubAuthService : IAuthService
     {
+        public string? ResetToken { get; init; }
+        public Task<string?> CreatePasswordResetTokenAsync(string email, CancellationToken cancellationToken = default) => Task.FromResult(ResetToken);
+        public Task<bool> ResetPasswordAsync(string email, string token, string newPassword, CancellationToken cancellationToken = default) => Task.FromResult(false);
         public bool IsSessionValid { get; init; }
         public int? LastAccountId { get; private set; }
         public string? LastClaimedRole { get; private set; }

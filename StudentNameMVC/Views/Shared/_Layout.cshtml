@@ -43,7 +43,8 @@
                             </form>
                         </div>
                     }
-                    else
+                    else if (!(string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "Account", StringComparison.OrdinalIgnoreCase)
+                        && string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Login", StringComparison.OrdinalIgnoreCase)))
                     {
                         <div class="ms-lg-auto">
                             <a class="btn btn-primary btn-sm" asp-controller="Account" asp-action="Login">Đăng nhập</a>

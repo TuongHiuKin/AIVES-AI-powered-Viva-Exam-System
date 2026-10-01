@@ -8,6 +8,9 @@ namespace AIVES.DAL.Repositories.Implementations;
 
 public sealed class SystemAccountRepository(AIVESDbContext context) : ISystemAccountRepository
 {
+    public Task<bool> ResetPasswordAsync(int id, string email, string expectedHash, string newHash, CancellationToken ct = default) =>
+        SystemAccountDAO.Instance.ResetPasswordAsync(context, id, email, expectedHash, newHash, ct);
+
     public Task<List<SystemAccount>> SearchAsync(string? keyword = null, CancellationToken ct = default) =>
         SystemAccountDAO.Instance.SearchAsync(context, keyword, ct);
 

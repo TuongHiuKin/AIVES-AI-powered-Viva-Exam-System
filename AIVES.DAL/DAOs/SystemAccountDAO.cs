@@ -11,6 +11,15 @@ public sealed class SystemAccountDAO
     public static SystemAccountDAO Instance => Singleton.Value;
     private SystemAccountDAO() { }
 
+    public async Task<bool> ResetPasswordAsync(AIVESDbContext db, int id, string email,
+        string expectedHash, string newHash, CancellationToken ct)
+    {
+        // The old hash acts as a concurrency guard and invalidates every issued reset token.
+        return await db.SystemAccounts.Where(x => x.AccountId == id && !x.IsDeleted &&
+                x.AccountEmail == email && x.AccountPasswordHash == expectedHash)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.AccountPasswordHash, newHash), ct) == 1;
+    }
+
     private static string NormalizeEmail(string email)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(email);
