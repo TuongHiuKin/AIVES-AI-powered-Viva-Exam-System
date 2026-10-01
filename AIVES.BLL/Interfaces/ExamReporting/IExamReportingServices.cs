@@ -34,4 +34,14 @@ public interface IClassReportService
         string classId,
         string examId,
         CancellationToken ct = default);
+
+    /// <summary>
+    /// Giảng viên xem chi tiết bài thi và transcript của từng sinh viên thuộc lớp được phân công (FIX-05, DEC-11)
+    /// </summary>
+    Task<StudentReportDto?> GetStudentExamDetailForTeacherAsync(
+        string teacherId,
+        string classId,
+        string examId,
+        string studentId,
+        CancellationToken ct = default);
 }

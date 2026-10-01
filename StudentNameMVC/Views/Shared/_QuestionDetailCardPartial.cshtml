@@ -1,0 +1,148 @@
+@model AIVES.BLL.Models.ExamReporting.QuestionResultDto
+
+<div class="card shadow-sm border-0 rounded-4 mb-4 question-detail-card overflow-hidden">
+    <!-- Header: Mã câu & Thang nhận thức Bloom -->
+    <div class="card-header bg-light d-flex flex-wrap justify-content-between align-items-center py-2 px-3 border-bottom gap-2">
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-primary px-3 py-1 rounded-pill">
+                <i class="bi bi-patch-question-fill me-1"></i>Câu hỏi: @Model.QuestionId
+            </span>
+            <span class="badge bg-secondary-subtle text-secondary-emphasis border px-2 py-1 rounded-pill">
+                <i class="bi bi-layers-fill me-1"></i>Thang Bloom: @Model.CognitiveLevel
+            </span>
+        </div>
+        <div>
+            @if (Model.IsPassed)
+            {
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill">
+                    <i class="bi bi-check-circle-fill me-1"></i>ĐẠT CHUẨN
+                </span>
+            }
+            else
+            {
+                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1 rounded-pill">
+                    <i class="bi bi-x-circle-fill me-1"></i>CHƯA ĐẠT
+                </span>
+            }
+        </div>
+    </div>
+
+    <div class="card-body p-4">
+        <!-- KHỐI 1: Nội dung câu hỏi chính -->
+        <div class="mb-4">
+            <span class="small fw-bold text-uppercase text-secondary d-block mb-1">
+                <i class="bi bi-question-circle-fill text-primary me-1"></i>1. Nội dung câu hỏi chính:
+            </span>
+            <h5 class="card-title fw-bold text-dark ps-3 border-start border-4 border-primary mb-0 py-1">
+                @Model.QuestionTitle
+            </h5>
+        </div>
+
+        <!-- KHỐI 2: Câu trả lời của thí sinh & Transcript hội thoại AI (Lõi Nhóm 3) -->
+        <div class="bg-light p-3 rounded-3 mb-4 border">
+            <span class="small fw-bold text-uppercase text-secondary d-block mb-2">
+                <i class="bi bi-mic-fill text-danger me-1"></i>2. Nhật ký vấn đáp giọng nói (Speech-to-Text Transcript):
+            </span>
+
+            <!-- Câu trả lời ban đầu -->
+            <div class="mb-3 ps-3 border-start border-3 border-info">
+                <div class="small fw-bold text-info-emphasis mb-1">
+                    <i class="bi bi-person-fill"></i> Thí sinh trả lời ban đầu:
+                </div>
+                <p class="mb-0 text-dark fst-italic">"@Model.StudentInitialAnswerTranscript"</p>
+            </div>
+
+            <!-- Câu hỏi đào sâu của AI (Adaptive Follow-up) -->
+            @if (!string.IsNullOrEmpty(Model.AiFollowUpQuestion))
+            {
+                <div class="mb-3 ps-3 border-start border-3 border-warning bg-white p-2 rounded shadow-sm">
+                    <div class="small fw-bold text-warning-emphasis mb-1">
+                        <i class="bi bi-robot"></i> AI Giám khảo hỏi xoáy / làm rõ (Adaptive Follow-up):
+                    </div>
+                    <p class="mb-0 text-dark fw-semibold">@Model.AiFollowUpQuestion</p>
+                </div>
+
+                <!-- Thí sinh phản hồi câu hỏi đào sâu -->
+                <div class="ps-3 border-start border-3 border-success">
+                    <div class="small fw-bold text-success-emphasis mb-1">
+                        <i class="bi bi-person-fill"></i> Thí sinh phản hồi câu hỏi đào sâu:
+                    </div>
+                    <p class="mb-0 text-dark fst-italic">"@Model.StudentFollowUpAnswerTranscript"</p>
+                </div>
+            }
+        </div>
+
+        <!-- KHỐI 3: Ghi chú của Giảng viên khảo thí (Human-in-the-loop) -->
+        @if (!string.IsNullOrEmpty(Model.TeacherNotes))
+        {
+            <div class="alert alert-light border border-success-subtle py-2 px-3 mb-4 rounded-3">
+                <span class="small fw-bold text-uppercase text-success d-block mb-1">
+                    <i class="bi bi-pencil-square me-1"></i>3. Ghi chú của Giảng viên chấm thi:
+                </span>
+                <p class="mb-0 text-dark small">@Model.TeacherNotes</p>
+            </div>
+        }
+
+        <!-- KHỐI 4: Đánh giá chi tiết của AI & Điểm số (Nhóm 4 & Nhóm 6) -->
+        <div class="p-3 rounded-3 bg-white border mb-4">
+            <span class="small fw-bold text-uppercase text-secondary d-block mb-3">
+                <i class="bi bi-clipboard-data-fill text-primary me-1"></i>4. Đánh giá chi tiết & Điểm số:
+            </span>
+
+            <!-- Điểm AI gợi ý vs Điểm Giảng viên chốt -->
+            <div class="row g-2 mb-3">
+                <div class="col-sm-6">
+                    <div class="p-2 px-3 rounded bg-light border d-flex justify-content-between align-items-center">
+                        <span class="small text-muted">Điểm AI đề xuất:</span>
+                        <span class="fw-bold text-primary fs-6">@Model.AiSuggestedScore / @Model.MaxScore</span>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="p-2 px-3 rounded bg-primary-subtle border border-primary-subtle d-flex justify-content-between align-items-center">
+                        <span class="small fw-bold text-primary">Điểm Giảng viên chốt:</span>
+                        <span class="fw-bold text-success fs-5">@Model.TeacherFinalScore / @Model.MaxScore</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Điểm mạnh & Điểm yếu / ý còn thiếu -->
+            <div class="row g-2 mb-2">
+                @if (!string.IsNullOrEmpty(Model.Strengths))
+                {
+                    <div class="col-md-6">
+                        <div class="p-2 px-3 rounded bg-success-subtle text-success-emphasis border border-success-subtle h-100">
+                            <span class="small fw-bold d-block"><i class="bi bi-check-circle-fill me-1"></i> Điểm mạnh:</span>
+                            <span class="small">@Model.Strengths</span>
+                        </div>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(Model.Weaknesses))
+                {
+                    <div class="col-md-6">
+                        <div class="p-2 px-3 rounded bg-danger-subtle text-danger-emphasis border border-danger-subtle h-100">
+                            <span class="small fw-bold d-block"><i class="bi bi-exclamation-triangle-fill me-1"></i> Điểm cần cải thiện:</span>
+                            <span class="small">@Model.Weaknesses</span>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.AiFeedback))
+            {
+                <div class="mt-3 pt-2 border-top">
+                    <small class="text-dark d-block">
+                        <strong><i class="bi bi-chat-quote-fill text-primary me-1"></i> Nhận xét tổng kết của AI:</strong> @Model.AiFeedback
+                    </small>
+                </div>
+            }
+        </div>
+
+        <!-- KHỐI 5: Tiêu chí Rubric chi tiết -->
+        <div class="p-3 rounded-3 bg-light border">
+            <span class="small fw-bold text-uppercase text-secondary d-block mb-1">
+                <i class="bi bi-card-checklist text-secondary me-1"></i>5. Tiêu chí Rubric đánh giá:
+            </span>
+            <small class="text-dark d-block">@Model.RubricCriteria</small>
+        </div>
+    </div>
+</div>
