@@ -18,9 +18,15 @@ public class AccountController : Controller
     #region Admin Account Management (M01 - ACC-01, ACC-02, ACC-03, ACC-04, ACC-05)
 
     [HttpGet]
-    public async Task<IActionResult> Index(string? keyword, CancellationToken ct)
+    public async Task<IActionResult> Index(string? keyword, byte? roleFilter, CancellationToken ct)
     {
-        var accounts = await _accountService.SearchAccountsAsync(keyword, ct);
+        if (roleFilter.HasValue && roleFilter.Value is not (1 or 2))
+        {
+            ModelState.AddModelError(nameof(roleFilter), "Vai trò lọc không hợp lệ. Chỉ chấp nhận Sinh viên (1) hoặc Giảng viên (2).");
+            roleFilter = null;
+        }
+
+        var accounts = await _accountService.SearchAccountsAsync(keyword, roleFilter, includeDeleted: true, ct);
 
         var items = new List<AccountItemViewModel>();
         foreach (var a in accounts)
@@ -33,13 +39,16 @@ public class AccountController : Controller
                 AccountEmail = a.AccountEmail,
                 AccountRole = a.AccountRole,
                 IsDeleted = a.IsDeleted,
-                IsReferenced = isReferenced
+                IsReferenced = isReferenced,
+                StudentCode = null,
+                ClassName = null
             });
         }
 
         var viewModel = new AccountIndexViewModel
         {
             Keyword = keyword,
+            RoleFilter = roleFilter,
             Accounts = items
         };
 

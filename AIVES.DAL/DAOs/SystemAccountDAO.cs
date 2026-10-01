@@ -17,13 +17,31 @@ public sealed class SystemAccountDAO
         return email.Trim().ToLowerInvariant();
     }
 
-    public Task<List<SystemAccount>> SearchAsync(AIVESDbContext db, string? keyword, CancellationToken ct)
+    public Task<List<SystemAccount>> SearchAsync(
+        AIVESDbContext db,
+        string? keyword = null,
+        byte? role = null,
+        bool includeDeleted = false,
+        CancellationToken ct = default)
     {
-        var query = db.SystemAccounts.AsNoTracking().Where(x => !x.IsDeleted);
+        var query = db.SystemAccounts.AsNoTracking();
+        if (!includeDeleted)
+        {
+            query = query.Where(x => !x.IsDeleted);
+        }
+
         var term = keyword?.Trim();
         if (!string.IsNullOrEmpty(term))
+        {
             query = query.Where(x => x.AccountName.Contains(term) || x.AccountEmail.Contains(term));
-        return query.OrderBy(x => x.AccountName).ThenBy(x => x.AccountId).ToListAsync(ct);
+        }
+
+        if (role.HasValue)
+        {
+            query = query.Where(x => x.AccountRole == role.Value);
+        }
+
+        return query.OrderBy(x => x.AccountId).ToListAsync(ct);
     }
 
     public Task<SystemAccount?> GetByIdAsync(AIVESDbContext db, int id, bool includeDeleted, CancellationToken ct) =>

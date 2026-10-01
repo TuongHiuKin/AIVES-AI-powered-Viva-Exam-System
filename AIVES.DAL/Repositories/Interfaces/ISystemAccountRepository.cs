@@ -5,7 +5,11 @@ namespace AIVES.DAL.Repositories.Interfaces;
 
 public interface ISystemAccountRepository
 {
-    Task<List<SystemAccount>> SearchAsync(string? keyword = null, CancellationToken ct = default);
+    Task<List<SystemAccount>> SearchAsync(
+        string? keyword = null,
+        byte? role = null,
+        bool includeDeleted = false,
+        CancellationToken ct = default);
     Task<SystemAccount?> GetByIdAsync(int id, bool includeDeleted = false, CancellationToken ct = default);
     Task<SystemAccount?> GetByEmailAsync(string email, CancellationToken ct = default);
     // Includes deleted accounts: soft delete does not release an email address.

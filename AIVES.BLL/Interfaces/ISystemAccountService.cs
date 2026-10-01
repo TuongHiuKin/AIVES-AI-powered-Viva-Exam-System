@@ -6,7 +6,11 @@ namespace AIVES.BLL.Interfaces;
 public interface ISystemAccountService
 {
     // --- 1. Admin Account Management (TV5 - ACC-01, ACC-02) ---
-    Task<List<SystemAccount>> SearchAccountsAsync(string? keyword = null, CancellationToken ct = default);
+    Task<List<SystemAccount>> SearchAccountsAsync(
+        string? keyword = null,
+        byte? role = null,
+        bool includeDeleted = true,
+        CancellationToken ct = default);
     Task<SystemAccount?> GetAccountByIdAsync(int id, bool includeDeleted = false, CancellationToken ct = default);
 
     // --- 2. Admin Account Create & Update (TV5 - ACC-03, ACC-04) ---

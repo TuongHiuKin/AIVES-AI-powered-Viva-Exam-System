@@ -8,8 +8,12 @@ namespace AIVES.DAL.Repositories.Implementations;
 
 public sealed class SystemAccountRepository(AIVESDbContext context) : ISystemAccountRepository
 {
-    public Task<List<SystemAccount>> SearchAsync(string? keyword = null, CancellationToken ct = default) =>
-        SystemAccountDAO.Instance.SearchAsync(context, keyword, ct);
+    public Task<List<SystemAccount>> SearchAsync(
+        string? keyword = null,
+        byte? role = null,
+        bool includeDeleted = false,
+        CancellationToken ct = default) =>
+        SystemAccountDAO.Instance.SearchAsync(context, keyword, role, includeDeleted, ct);
 
     public Task<SystemAccount?> GetByIdAsync(int id, bool includeDeleted = false, CancellationToken ct = default) =>
         SystemAccountDAO.Instance.GetByIdAsync(context, id, includeDeleted, ct);
