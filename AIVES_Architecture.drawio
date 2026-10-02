@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-10-01T04:00:00.000Z" agent="Mozilla/5.0" version="24.7.17">
+  <diagram id="diag_project_actual" name="1. Kiến Trúc Project AIVES (Rút Gọn Chuẩn)">
+    <mxGraphModel dx="1350" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1250" pageHeight="720" math="0" shadow="0">
+      <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+    <mxCell id="lbl_mvc" value="&lt;div style=&quot;text-align: right; font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;b style=&quot;font-size: 15px; color: #1e3a8a;&quot;&gt;MVC Web App&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size: 12px; color: #64748b;&quot;&gt;startup project&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=right;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+      <mxGeometry x="30" y="102" width="120" height="46" as="geometry" />
+    </mxCell>
+    <mxCell id="bracket_mvc" value="" style="shape=curlyBracket;whiteSpace=wrap;html=1;rounded=1;flipH=1;strokeColor=#94a3b8;strokeWidth=2;fillColor=none;" parent="1" vertex="1">
+      <mxGeometry x="165" y="60" width="18" height="130" as="geometry" />
+    </mxCell>
+    <mxCell id="lbl_dll" value="&lt;div style=&quot;text-align: right; font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;b style=&quot;font-size: 20px; color: #0f172a;&quot;&gt;.dll&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size: 12px; color: #64748b; line-height: 1.35;&quot;&gt;Class library&lt;br/&gt;projects&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=right;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+      <mxGeometry x="30" y="388" width="120" height="58" as="geometry" />
+    </mxCell>
+    <mxCell id="bracket_dll" value="" style="shape=curlyBracket;whiteSpace=wrap;html=1;rounded=1;flipH=1;strokeColor=#94a3b8;strokeWidth=2;fillColor=none;" parent="1" vertex="1">
+      <mxGeometry x="165" y="245" width="18" height="345" as="geometry" />
+    </mxCell>
+    <mxCell id="layer_pres" value="Presentation Layer (StudentNameMVC)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#3b82f6;strokeWidth=2;arcSize=6;verticalAlign=top;spacingTop=12;fontStyle=1;fontSize=15;fontColor=#1d4ed8;fontFamily=-apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;" parent="1" vertex="1">
+      <mxGeometry x="200" y="50" width="670" height="150" as="geometry" />
+    </mxCell>
+    <mxCell id="card_controllers" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 13.5px; font-weight: bold; color: #0f172a; margin-bottom: 6px;&quot;&gt;Controllers&lt;/div&gt;&lt;div style=&quot;font-size: 11.5px; color: #475569; line-height: 1.5;&quot;&gt;StudentReports, ClassReports&lt;br/&gt;Account, Home, NewsArticle&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#93c5fd;strokeWidth=1.5;arcSize=8;shadow=0;verticalAlign=middle;align=center;" parent="1" vertex="1">
+      <mxGeometry x="220" y="92" width="195" height="88" as="geometry" />
+    </mxCell>
+    <mxCell id="card_views" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 13.5px; font-weight: bold; color: #0f172a; margin-bottom: 6px;&quot;&gt;Views&lt;/div&gt;&lt;div style=&quot;font-size: 11.5px; color: #475569; line-height: 1.5;&quot;&gt;Razor (.cshtml)&lt;br/&gt;Bootstrap 5, Chart.js&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#93c5fd;strokeWidth=1.5;arcSize=8;shadow=0;verticalAlign=middle;align=center;" parent="1" vertex="1">
+      <mxGeometry x="435" y="92" width="195" height="88" as="geometry" />
+    </mxCell>
+    <mxCell id="card_viewmodels" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 13.5px; font-weight: bold; color: #0f172a; margin-bottom: 6px;&quot;&gt;ViewModels&lt;/div&gt;&lt;div style=&quot;font-size: 11.5px; color: #475569; line-height: 1.5;&quot;&gt;StudentReport, ClassReport&lt;br/&gt;Login, SystemAccount&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#93c5fd;strokeWidth=1.5;arcSize=8;shadow=0;verticalAlign=middle;align=center;" parent="1" vertex="1">
+      <mxGeometry x="650" y="92" width="195" height="88" as="geometry" />
+    </mxCell>
+    <mxCell id="arrow_p_to_b" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0f172a;strokeWidth=2;endArrow=classic;endFill=1;" parent="1" edge="1">
+      <mxGeometry relative="1" as="geometry"><mxPoint x="475" y="200" as="sourcePoint" /><mxPoint x="475" y="245" as="targetPoint" /></mxGeometry>
+    </mxCell>
+    <mxCell id="arrow_b_to_p" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0f172a;strokeWidth=2;dashed=1;dashPattern=6 6;endArrow=classic;endFill=1;" parent="1" edge="1">
+      <mxGeometry relative="1" as="geometry"><mxPoint x="595" y="245" as="sourcePoint" /><mxPoint x="595" y="200" as="targetPoint" /></mxGeometry>
+    </mxCell>
+    <mxCell id="layer_bll" value="Business Layer (AIVES.BLL)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#22c55e;strokeWidth=2;arcSize=6;verticalAlign=top;spacingTop=12;fontStyle=1;fontSize=15;fontColor=#15803d;fontFamily=-apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;" parent="1" vertex="1">
+      <mxGeometry x="200" y="245" width="670" height="150" as="geometry" />
+    </mxCell>
+    <mxCell id="card_account_svc" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 13px; font-weight: bold; color: #0f172a; margin-bottom: 6px;&quot;&gt;AccountService&lt;/div&gt;&lt;div style=&quot;font-size: 11px; color: #475569; line-height: 1.45;&quot;&gt;AuthService&lt;br/&gt;PBKDF2 hasher&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#86efac;strokeWidth=1.5;arcSize=8;shadow=0;verticalAlign=middle;align=center;" parent="1" vertex="1">
+      <mxGeometry x="215" y="287" width="150" height="88" as="geometry" />
+    </mxCell>
+    <mxCell id="card_report_svc" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 13px; font-weight: bold; color: #0f172a; margin-bottom: 6px;&quot;&gt;ExamReporting&lt;/div&gt;&lt;div style=&quot;font-size: 11px; color: #475569; line-height: 1.45;&quot;&gt;StudentReportService&lt;br/&gt;ClassReportService&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#86efac;strokeWidth=1.5;arcSize=8;shadow=0;verticalAlign=middle;align=center;" parent="1" vertex="1">
+      <mxGeometry x="377" y="287" width="150" height="88" as="geometry" />
+    </mxCell>
+    <mxCell id="card_core_svc" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 13px; font-weight: bold; color: #0f172a; margin-bottom: 6px;&quot;&gt;CoreServices&lt;/div&gt;&lt;div style=&quot;font-size: 11px; color: #475569; line-height: 1.45;&quot;&gt;NewsArticleService&lt;br/&gt;CategoryService&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#86efac;strokeWidth=1.5;arcSize=8;shadow=0;verticalAlign=middle;align=center;" parent="1" vertex="1">
+      <mxGeometry x="539" y="287" width="150" height="88" as="geometry" />
+    </mxCell>
+    <mxCell id="card_interfaces" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 13px; font-weight: bold; color: #0f172a; margin-bottom: 6px;&quot;&gt;Interfaces&lt;/div&gt;&lt;div style=&quot;font-size: 11px; color: #475569; line-height: 1.45;&quot;&gt;DTOs, Models&lt;br/&gt;ServiceResult&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#86efac;strokeWidth=1.5;arcSize=8;shadow=0;verticalAlign=middle;align=center;" parent="1" vertex="1">
+      <mxGeometry x="701" y="287" width="150" height="88" as="geometry" />
+    </mxCell>
+    <mxCell id="arrow_b_to_d" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0f172a;strokeWidth=2;endArrow=classic;endFill=1;" parent="1" edge="1">
+      <mxGeometry relative="1" as="geometry"><mxPoint x="475" y="395" as="sourcePoint" /><mxPoint x="475" y="440" as="targetPoint" /></mxGeometry>
+    </mxCell>
+    <mxCell id="arrow_d_to_b" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0f172a;strokeWidth=2;dashed=1;dashPattern=6 6;endArrow=classic;endFill=1;" parent="1" edge="1">
+      <mxGeometry relative="1" as="geometry"><mxPoint x="595" y="440" as="sourcePoint" /><mxPoint x="595" y="395" as="targetPoint" /></mxGeometry>
+    </mxCell>
+    <mxCell id="layer_dal" value="Data Access Layer (AIVES.DAL)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef2f2;strokeColor=#ef4444;strokeWidth=2;arcSize=6;verticalAlign=top;spacingTop=12;fontStyle=1;fontSize=15;fontColor=#b91c1c;fontFamily=-apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;" parent="1" vertex="1">
+      <mxGeometry x="200" y="440" width="575" height="150" as="geometry" />
+    </mxCell>
+    <mxCell id="card_repos" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 13px; font-weight: bold; color: #0f172a; margin-bottom: 6px;&quot;&gt;Repositories&lt;/div&gt;&lt;div style=&quot;font-size: 11px; color: #475569; line-height: 1.45;&quot;&gt;Account, NewsArticle&lt;br/&gt;Category, Tag&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#fca5a5;strokeWidth=1.5;arcSize=8;shadow=0;verticalAlign=middle;align=center;" parent="1" vertex="1">
+      <mxGeometry x="215" y="482" width="170" height="88" as="geometry" />
+    </mxCell>
+    <mxCell id="card_daos" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 13px; font-weight: bold; color: #0f172a; margin-bottom: 6px;&quot;&gt;DAOs&lt;/div&gt;&lt;div style=&quot;font-size: 11px; color: #475569; line-height: 1.45;&quot;&gt;Singleton pattern&lt;br/&gt;Thread-safe&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#fca5a5;strokeWidth=1.5;arcSize=8;shadow=0;verticalAlign=middle;align=center;" parent="1" vertex="1">
+      <mxGeometry x="398" y="482" width="175" height="88" as="geometry" />
+    </mxCell>
+    <mxCell id="card_dbcontext" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 13px; font-weight: bold; color: #0f172a; margin-bottom: 6px;&quot;&gt;AIVESDbContext&lt;/div&gt;&lt;div style=&quot;font-size: 11px; color: #475569; line-height: 1.45;&quot;&gt;Scaffold-DbContext&lt;br/&gt;(Database First)&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#fca5a5;strokeWidth=1.5;arcSize=8;shadow=0;verticalAlign=middle;align=center;" parent="1" vertex="1">
+      <mxGeometry x="586" y="482" width="174" height="88" as="geometry" />
+    </mxCell>
+    <mxCell id="db_sql" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 14px; font-weight: bold; color: #0f172a; margin-top: 15px;&quot;&gt;SQL Server&lt;/div&gt;&lt;div style=&quot;font-size: 12px; font-weight: bold; color: #2563eb; margin-top: 2px;&quot;&gt;AIVESDb&lt;/div&gt;&lt;div style=&quot;font-size: 10px; color: #64748b; margin-top: 4px; line-height: 1.35;&quot;&gt;Accounts, Reports&lt;br/&gt;News, Categories&lt;/div&gt;&lt;/div&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f8fafc;strokeColor=#475569;strokeWidth=2;shadow=0;align=center;" parent="1" vertex="1">
+      <mxGeometry x="805" y="445" width="140" height="140" as="geometry" />
+    </mxCell>
+    <mxCell id="arrow_dal_sql" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;endArrow=classic;startArrow=classic;endFill=1;startFill=1;" parent="1" edge="1">
+      <mxGeometry relative="1" as="geometry"><mxPoint x="775" y="525" as="sourcePoint" /><mxPoint x="805" y="525" as="targetPoint" /></mxGeometry>
+    </mxCell>
+    <mxCell id="box_legends" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 13.5px; font-weight: bold; color: #0f172a;&quot;&gt;Legends&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#cbd5e1;strokeWidth=1.5;arcSize=8;verticalAlign=top;spacingTop=12;align=left;spacingLeft=15;" parent="1" vertex="1">
+      <mxGeometry x="895" y="50" width="235" height="120" as="geometry" />
+    </mxCell>
+    <mxCell id="leg_line_req" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0f172a;strokeWidth=2;endArrow=classic;endFill=1;" parent="1" edge="1">
+      <mxGeometry relative="1" as="geometry"><mxPoint x="915" y="96" as="sourcePoint" /><mxPoint x="975" y="96" as="targetPoint" /></mxGeometry>
+    </mxCell>
+    <mxCell id="leg_lbl_req" value="&lt;span style=&quot;font-size: 12px; color: #334155; font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;: Request&lt;/span&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+      <mxGeometry x="980" y="85" width="80" height="25" as="geometry" />
+    </mxCell>
+    <mxCell id="leg_line_res" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0f172a;strokeWidth=2;dashed=1;dashPattern=6 6;endArrow=classic;endFill=1;" parent="1" edge="1">
+      <mxGeometry relative="1" as="geometry"><mxPoint x="915" y="132" as="sourcePoint" /><mxPoint x="975" y="132" as="targetPoint" /></mxGeometry>
+    </mxCell>
+    <mxCell id="leg_lbl_res" value="&lt;span style=&quot;font-size: 12px; color: #334155; font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;: Response&lt;/span&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+      <mxGeometry x="980" y="121" width="80" height="25" as="geometry" />
+    </mxCell>
+    <mxCell id="box_proj_ref" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 13.5px; font-weight: bold; color: #0f172a; margin-bottom: 8px;&quot;&gt;Project references&lt;/div&gt;&lt;div style=&quot;font-size: 11.5px; color: #334155; line-height: 1.6;&quot;&gt;WebMVC &amp;rarr; Business&lt;br/&gt;Business &amp;rarr; DataAccess&lt;/div&gt;&lt;div style=&quot;font-size: 10px; color: #64748b; margin-top: 10px; line-height: 1.45;&quot;&gt;WebMVC never references&lt;br/&gt;DataAccess / DbContext&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#cbd5e1;strokeWidth=1.5;arcSize=8;verticalAlign=top;spacingTop=12;align=left;spacingLeft=15;" parent="1" vertex="1">
+      <mxGeometry x="895" y="185" width="235" height="165" as="geometry" />
+    </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="diag_template_slide" name="2. Slide Mẫu Giảng Viên (Đối Chiếu)">
+    <mxGraphModel dx="1350" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1250" pageHeight="720" math="0" shadow="0">
+      <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+    <mxCell id="ref_lbl_mvc" value="&lt;div style=&quot;text-align: right; font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;b style=&quot;font-size: 15px; color: #1e3a8a;&quot;&gt;MVC Web App&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size: 12px; color: #64748b;&quot;&gt;startup project&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=right;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+      <mxGeometry x="30" y="102" width="120" height="46" as="geometry" />
+    </mxCell>
+    <mxCell id="ref_bracket_mvc" value="" style="shape=curlyBracket;whiteSpace=wrap;html=1;rounded=1;flipH=1;strokeColor=#94a3b8;strokeWidth=2;fillColor=none;" parent="1" vertex="1">
+      <mxGeometry x="165" y="60" width="18" height="130" as="geometry" />
+    </mxCell>
+    <mxCell id="ref_lbl_dll" value="&lt;div style=&quot;text-align: right; font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;b style=&quot;font-size: 20px; color: #0f172a;&quot;&gt;.dll&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size: 12px; color: #64748b; line-height: 1.35;&quot;&gt;Class library&lt;br/&gt;projects&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=right;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+      <mxGeometry x="30" y="388" width="120" height="58" as="geometry" />
+    </mxCell>
+    <mxCell id="ref_bracket_dll" value="" style="shape=curlyBracket;whiteSpace=wrap;html=1;rounded=1;flipH=1;strokeColor=#94a3b8;strokeWidth=2;fillColor=none;" parent="1" vertex="1">
+      <mxGeometry x="165" y="245" width="18" height="345" as="geometry" />
+    </mxCell>
+    <mxCell id="ref_layer_pres" value="Presentation Layer (AIVES.WebMVC)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#3b82f6;strokeWidth=2;arcSize=6;verticalAlign=top;spacingTop=12;fontStyle=1;fontSize=15;fontColor=#1d4ed8;fontFamily=-apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;" parent="1" vertex="1">
+      <mxGeometry x="200" y="50" width="670" height="150" as="geometry" />
+    </mxCell>
+    <mxCell id="ref_card_controllers" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 13.5px; font-weight: bold; color: #0f172a; margin-bottom: 5px;&quot;&gt;Controllers&lt;/div&gt;&lt;div style=&quot;font-size: 11px; color: #475569; line-height: 1.45;&quot;&gt;Auth, Accounts, Subjects,&lt;br/&gt;MySubjects, Language&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#93c5fd;strokeWidth=1.5;arcSize=8;shadow=0;verticalAlign=middle;align=center;" parent="1" vertex="1">
+      <mxGeometry x="220" y="92" width="195" height="88" as="geometry" />
+    </mxCell>
+    <mxCell id="ref_card_views" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 13.5px; font-weight: bold; color: #0f172a; margin-bottom: 5px;&quot;&gt;Views&lt;/div&gt;&lt;div style=&quot;font-size: 11px; color: #475569; line-height: 1.45;&quot;&gt;Razor (.cshtml)&lt;br/&gt;Bootstrap 5&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#93c5fd;strokeWidth=1.5;arcSize=8;shadow=0;verticalAlign=middle;align=center;" parent="1" vertex="1">
+      <mxGeometry x="435" y="92" width="195" height="88" as="geometry" />
+    </mxCell>
+    <mxCell id="ref_card_viewmodels" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 13.5px; font-weight: bold; color: #0f172a; margin-bottom: 5px;&quot;&gt;ViewModels&lt;/div&gt;&lt;div style=&quot;font-size: 11px; color: #475569; line-height: 1.45;&quot;&gt;Login, Account, Subject,&lt;br/&gt;LanguageConfig&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#93c5fd;strokeWidth=1.5;arcSize=8;shadow=0;verticalAlign=middle;align=center;" parent="1" vertex="1">
+      <mxGeometry x="650" y="92" width="195" height="88" as="geometry" />
+    </mxCell>
+    <mxCell id="ref_arrow_p_to_b" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0f172a;strokeWidth=2;endArrow=classic;endFill=1;" parent="1" edge="1">
+      <mxGeometry relative="1" as="geometry"><mxPoint x="475" y="200" as="sourcePoint" /><mxPoint x="475" y="245" as="targetPoint" /></mxGeometry>
+    </mxCell>
+    <mxCell id="ref_arrow_b_to_p" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0f172a;strokeWidth=2;dashed=1;dashPattern=6 6;endArrow=classic;endFill=1;" parent="1" edge="1">
+      <mxGeometry relative="1" as="geometry"><mxPoint x="595" y="245" as="sourcePoint" /><mxPoint x="595" y="200" as="targetPoint" /></mxGeometry>
+    </mxCell>
+    <mxCell id="ref_layer_bll" value="Business Layer (AIVES.Business)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#22c55e;strokeWidth=2;arcSize=6;verticalAlign=top;spacingTop=12;fontStyle=1;fontSize=15;fontColor=#15803d;fontFamily=-apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;" parent="1" vertex="1">
+      <mxGeometry x="200" y="245" width="670" height="150" as="geometry" />
+    </mxCell>
+    <mxCell id="ref_card_account_svc" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 12.5px; font-weight: bold; color: #0f172a; margin-bottom: 5px;&quot;&gt;AccountService&lt;/div&gt;&lt;div style=&quot;font-size: 11px; color: #475569; line-height: 1.45;&quot;&gt;AuthService&lt;br/&gt;PBKDF2 hasher&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#86efac;strokeWidth=1.5;arcSize=8;shadow=0;verticalAlign=middle;align=center;" parent="1" vertex="1">
+      <mxGeometry x="215" y="287" width="150" height="88" as="geometry" />
+    </mxCell>
+    <mxCell id="ref_card_assign_svc" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 12.5px; font-weight: bold; color: #0f172a; margin-bottom: 5px;&quot;&gt;AssignmentService&lt;/div&gt;&lt;div style=&quot;font-size: 11px; color: #475569; line-height: 1.45;&quot;&gt;SubjectService&lt;br/&gt;CanAccessSubject()&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#86efac;strokeWidth=1.5;arcSize=8;shadow=0;verticalAlign=middle;align=center;" parent="1" vertex="1">
+      <mxGeometry x="377" y="287" width="150" height="88" as="geometry" />
+    </mxCell>
+    <mxCell id="ref_card_lang_svc" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 12px; font-weight: bold; color: #0f172a; margin-bottom: 4px;&quot;&gt;LanguageConfig&lt;br/&gt;Service&lt;/div&gt;&lt;div style=&quot;font-size: 10.5px; color: #475569; line-height: 1.4;&quot;&gt;STT / TTS: vi-VN, en-US&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#86efac;strokeWidth=1.5;arcSize=8;shadow=0;verticalAlign=middle;align=center;" parent="1" vertex="1">
+      <mxGeometry x="539" y="287" width="150" height="88" as="geometry" />
+    </mxCell>
+    <mxCell id="ref_card_interfaces" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 12.5px; font-weight: bold; color: #0f172a; margin-bottom: 5px;&quot;&gt;Interfaces&lt;/div&gt;&lt;div style=&quot;font-size: 11px; color: #475569; line-height: 1.45;&quot;&gt;DTOs, Models&lt;br/&gt;ServiceResult&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#86efac;strokeWidth=1.5;arcSize=8;shadow=0;verticalAlign=middle;align=center;" parent="1" vertex="1">
+      <mxGeometry x="701" y="287" width="150" height="88" as="geometry" />
+    </mxCell>
+    <mxCell id="ref_arrow_b_to_d" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0f172a;strokeWidth=2;endArrow=classic;endFill=1;" parent="1" edge="1">
+      <mxGeometry relative="1" as="geometry"><mxPoint x="475" y="395" as="sourcePoint" /><mxPoint x="475" y="440" as="targetPoint" /></mxGeometry>
+    </mxCell>
+    <mxCell id="ref_arrow_d_to_b" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0f172a;strokeWidth=2;dashed=1;dashPattern=6 6;endArrow=classic;endFill=1;" parent="1" edge="1">
+      <mxGeometry relative="1" as="geometry"><mxPoint x="595" y="440" as="sourcePoint" /><mxPoint x="595" y="395" as="targetPoint" /></mxGeometry>
+    </mxCell>
+    <mxCell id="ref_layer_dal" value="Data Access Layer (AIVES.DataAccess)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef2f2;strokeColor=#ef4444;strokeWidth=2;arcSize=6;verticalAlign=top;spacingTop=12;fontStyle=1;fontSize=15;fontColor=#b91c1c;fontFamily=-apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;" parent="1" vertex="1">
+      <mxGeometry x="200" y="440" width="575" height="150" as="geometry" />
+    </mxCell>
+    <mxCell id="ref_card_repos" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 12.5px; font-weight: bold; color: #0f172a; margin-bottom: 5px;&quot;&gt;Repositories&lt;/div&gt;&lt;div style=&quot;font-size: 11px; color: #475569; line-height: 1.45;&quot;&gt;Account, Subject,&lt;br/&gt;LecturerSubject&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#fca5a5;strokeWidth=1.5;arcSize=8;shadow=0;verticalAlign=middle;align=center;" parent="1" vertex="1">
+      <mxGeometry x="215" y="482" width="170" height="88" as="geometry" />
+    </mxCell>
+    <mxCell id="ref_card_dbcontext" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 12.5px; font-weight: bold; color: #0f172a; margin-bottom: 5px;&quot;&gt;AppDbContext&lt;/div&gt;&lt;div style=&quot;font-size: 11px; color: #475569; line-height: 1.45;&quot;&gt;Scaffold-DbContext&lt;br/&gt;(Database First)&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#fca5a5;strokeWidth=1.5;arcSize=8;shadow=0;verticalAlign=middle;align=center;" parent="1" vertex="1">
+      <mxGeometry x="398" y="482" width="175" height="88" as="geometry" />
+    </mxCell>
+    <mxCell id="ref_card_entities" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 12.5px; font-weight: bold; color: #0f172a; margin-bottom: 5px;&quot;&gt;Entity Models&lt;/div&gt;&lt;div style=&quot;font-size: 11px; color: #475569; line-height: 1.45;&quot;&gt;Account, Subject,&lt;br/&gt;LecturerSubject&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#fca5a5;strokeWidth=1.5;arcSize=8;shadow=0;verticalAlign=middle;align=center;" parent="1" vertex="1">
+      <mxGeometry x="586" y="482" width="174" height="88" as="geometry" />
+    </mxCell>
+    <mxCell id="ref_db_sql" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 13.5px; font-weight: bold; color: #0f172a; margin-top: 15px;&quot;&gt;SQL Server&lt;/div&gt;&lt;div style=&quot;font-size: 11.5px; font-weight: bold; color: #2563eb; margin-top: 2px;&quot;&gt;AIVESDb&lt;/div&gt;&lt;div style=&quot;font-size: 10px; color: #64748b; margin-top: 4px; line-height: 1.35;&quot;&gt;Accounts, Subjects,&lt;br/&gt;LecturerSubjects&lt;/div&gt;&lt;/div&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f8fafc;strokeColor=#475569;strokeWidth=2;shadow=0;align=center;" parent="1" vertex="1">
+      <mxGeometry x="805" y="445" width="140" height="140" as="geometry" />
+    </mxCell>
+    <mxCell id="ref_arrow_dal_sql" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;endArrow=classic;startArrow=classic;endFill=1;startFill=1;" parent="1" edge="1">
+      <mxGeometry relative="1" as="geometry"><mxPoint x="775" y="525" as="sourcePoint" /><mxPoint x="805" y="525" as="targetPoint" /></mxGeometry>
+    </mxCell>
+    <mxCell id="ref_box_legends" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 13.5px; font-weight: bold; color: #0f172a;&quot;&gt;Legends&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#cbd5e1;strokeWidth=1.5;arcSize=8;verticalAlign=top;spacingTop=12;align=left;spacingLeft=15;" parent="1" vertex="1">
+      <mxGeometry x="895" y="50" width="235" height="120" as="geometry" />
+    </mxCell>
+    <mxCell id="ref_leg_line_req" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0f172a;strokeWidth=2;endArrow=classic;endFill=1;" parent="1" edge="1">
+      <mxGeometry relative="1" as="geometry"><mxPoint x="915" y="96" as="sourcePoint" /><mxPoint x="975" y="96" as="targetPoint" /></mxGeometry>
+    </mxCell>
+    <mxCell id="ref_leg_lbl_req" value="&lt;span style=&quot;font-size: 12px; color: #334155; font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;: Request&lt;/span&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+      <mxGeometry x="980" y="85" width="80" height="25" as="geometry" />
+    </mxCell>
+    <mxCell id="ref_leg_line_res" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0f172a;strokeWidth=2;dashed=1;dashPattern=6 6;endArrow=classic;endFill=1;" parent="1" edge="1">
+      <mxGeometry relative="1" as="geometry"><mxPoint x="915" y="132" as="sourcePoint" /><mxPoint x="975" y="132" as="targetPoint" /></mxGeometry>
+    </mxCell>
+    <mxCell id="ref_leg_lbl_res" value="&lt;span style=&quot;font-size: 12px; color: #334155; font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;: Response&lt;/span&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+      <mxGeometry x="980" y="121" width="80" height="25" as="geometry" />
+    </mxCell>
+    <mxCell id="ref_box_proj_ref" value="&lt;div style=&quot;font-family: -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif;&quot;&gt;&lt;div style=&quot;font-size: 13.5px; font-weight: bold; color: #0f172a; margin-bottom: 8px;&quot;&gt;Project references&lt;/div&gt;&lt;div style=&quot;font-size: 11.5px; color: #334155; line-height: 1.6;&quot;&gt;WebMVC &amp;rarr; Business&lt;br/&gt;Business &amp;rarr; DataAccess&lt;/div&gt;&lt;div style=&quot;font-size: 10.5px; color: #64748b; margin-top: 10px; line-height: 1.45;&quot;&gt;WebMVC never references&lt;br/&gt;DataAccess / DbContext&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#cbd5e1;strokeWidth=1.5;arcSize=8;verticalAlign=top;spacingTop=12;align=left;spacingLeft=15;" parent="1" vertex="1">
+      <mxGeometry x="895" y="185" width="235" height="165" as="geometry" />
+    </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
