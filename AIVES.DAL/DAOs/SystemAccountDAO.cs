@@ -23,7 +23,7 @@ public sealed class SystemAccountDAO
         var term = keyword?.Trim();
         if (!string.IsNullOrEmpty(term))
             query = query.Where(x => x.AccountName.Contains(term) || x.AccountEmail.Contains(term));
-        return query.OrderBy(x => x.AccountName).ThenBy(x => x.AccountId).ToListAsync(ct);
+        return query.OrderBy(x => x.AccountId).ToListAsync(ct);
     }
 
     public Task<SystemAccount?> GetByIdAsync(AIVESDbContext db, int id, bool includeDeleted, CancellationToken ct) =>

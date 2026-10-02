@@ -20,7 +20,7 @@ public class SystemAccountServices : ISystemAccountServices
     {
         var exist = _systemAccountRepository.GetByIdAsync(accountId);
         if (exist == null)
-            throw new ArgumentException("Cannot find this user");
+            throw new ArgumentException("Cannot find this user", nameof(exist));
         return await _articlesRepository.GetByCreatorAsync(accountId, null, ct);
     }
 
@@ -28,10 +28,10 @@ public class SystemAccountServices : ISystemAccountServices
     {
         var exist = _systemAccountRepository.GetByIdAsync(accountId);
         if (exist == null)
-            throw new ArgumentException("Cannot find this user");
+            throw new ArgumentException("Cannot find this user", nameof(accountId));
         if (exist.Result.AccountRole != 2)
         {
-            throw new ArgumentException("Only Lecturers are allowed to view this");
+            throw new ArgumentException("Only Lecturers are allowed to view this", nameof(exist));
         }
         return await _articlesRepository.GetByCreatorAsync(accountId, null, ct);
     }
