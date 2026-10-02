@@ -39,6 +39,12 @@ public class StudentReportService : IStudentReportService
         // Đánh giá từng lượt thi theo cấu hình của Giảng viên (DEC-02, DEC-04, DEC-12)
         foreach (var attempt in attempts)
         {
+            attempt.EvaluationMode = settings.EvaluationMode;
+            foreach (var q in attempt.QuestionResults)
+            {
+                q.EvaluationMode = settings.EvaluationMode;
+            }
+
             if (settings.EvaluationMode == ExamEvaluationMode.PassFail)
             {
                 var totalQuestions = attempt.QuestionResults.Count;
@@ -82,6 +88,7 @@ public class StudentReportService : IStudentReportService
             StudentName = studentName,
             ExamId = examId,
             ExamTitle = settings.ExamTitle,
+            EvaluationMode = settings.EvaluationMode,
             CompletedAttemptsCount = completedAttempts.Count,
             MaxAllowedAttemptsCount = settings.MaxAllowedAttempts,
             GradedAttemptsCount = fullyGradedAttempts.Count,
