@@ -1,0 +1,190 @@
+@model AIVES.BLL.Models.ExamReporting.StudentReportDto
+@{
+    ViewData["Title"] = $"Chi tiết bài thi - {Model.StudentName} ({Model.StudentId})";
+    string selectedClassId = ViewBag.SelectedClassId as string ?? "SE1701";
+    string selectedExamId = ViewBag.SelectedExamId as string ?? "EXAM01";
+    int? selectedAttemptOrdinal = ViewBag.SelectedAttemptOrdinal as int?;
+}
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumbs & Navigation Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom gap-3">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small">
+                    <li class="breadcrumb-item">
+                        <a asp-action="Index" 
+                           asp-route-classId="@selectedClassId" 
+                           asp-route-examId="@selectedExamId" 
+                           asp-route-attemptOrdinal="@selectedAttemptOrdinal" 
+                           class="text-decoration-none">
+                            <i class="bi bi-bar-chart-steps me-1"></i>Thống kê Lớp @selectedClassId
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Hồ sơ bài thi cá nhân</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold mb-1 text-primary">
+                <i class="bi bi-file-earmark-person-fill me-2"></i>Chi Tiết Bài Thi Vấn Đáp Sinh Viên
+            </h2>
+            <p class="text-muted mb-0">Hệ thống khảo thí thông minh AIVES · Giám sát và đánh giá câu trả lời theo chuẩn rubric (Human-in-the-loop).</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <!-- Nút quay lại giữ nguyên bộ lọc lớp học phần -->
+            <a asp-action="Index" 
+               asp-route-classId="@selectedClassId" 
+               asp-route-examId="@selectedExamId" 
+               asp-route-attemptOrdinal="@selectedAttemptOrdinal" 
+               class="btn btn-outline-secondary fw-semibold shadow-sm">
+                <i class="bi bi-arrow-left me-1"></i> Quay lại Bảng Điểm Lớp
+            </a>
+            <span class="badge bg-secondary p-2"><i class="bi bi-building me-1"></i>Lớp: @selectedClassId</span>
+        </div>
+    </div>
+
+    <!-- Student & Exam Profile Card -->
+    <div class="card shadow-sm border-0 rounded-4 mb-4 bg-light">
+        <div class="card-body p-4">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-3 border-end">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-primary-subtle text-primary p-3 rounded-circle">
+                            <i class="bi bi-person-bounding-box fs-2"></i>
+                        </div>
+                        <div>
+                            <span class="text-muted small text-uppercase fw-semibold d-block">Sinh viên khảo thí</span>
+                            <h4 class="fw-bold mb-0 text-dark">@Model.StudentName</h4>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle mt-1">MSSV: @Model.StudentId</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 border-end">
+                    <span class="text-muted small text-uppercase fw-semibold d-block mb-1">Kỳ thi vấn đáp</span>
+                    <h6 class="fw-bold text-dark mb-1">@Model.ExamTitle</h6>
+                    <span class="badge bg-secondary">Mã đề: @Model.ExamId</span>
+                </div>
+
+                <div class="col-md-3 border-end text-center">
+                    <span class="text-muted small text-uppercase fw-semibold d-block mb-1">Tiến độ thi (DEC-01)</span>
+                    <h3 class="fw-bold text-dark mb-0">@Model.CompletedAttemptsCount / @Model.MaxAllowedAttemptsCount</h3>
+                    <small class="text-muted">lượt đã hoàn thành</small>
+                </div>
+
+                <div class="col-md-3 text-center">
+                    <span class="text-muted small text-uppercase fw-semibold d-block mb-1">Điểm trung bình (DEC-05, 12)</span>
+                    @if (Model.AverageScore.HasValue)
+                    {
+                        <h3 class="fw-bold text-success mb-0">@Model.AverageScore.Value <span class="fs-6 text-muted">/ 10</span></h3>
+                        <span class="badge @(Model.AverageScore.Value >= 6.0m ? "bg-success" : "bg-danger")">
+                            @(Model.AverageScore.Value >= 6.0m ? "ĐẠT YÊU CẦU" : "CHƯA ĐẠT")
+                        </span>
+                    }
+                    else
+                    {
+                        <h4 class="text-secondary mb-0">Chưa có điểm</h4>
+                        <small class="text-muted">Đang chờ chấm thi</small>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attempts Section -->
+    @if (Model.Attempts == null || !Model.Attempts.Any())
+    {
+        <div class="card border-0 shadow-sm rounded-4 p-5 text-center">
+            <div class="py-4">
+                <i class="bi bi-journal-x text-muted display-4 mb-3 d-block"></i>
+                <h5 class="fw-bold text-secondary">Sinh viên chưa tham gia lượt thi nào trong lớp này.</h5>
+                <p class="text-muted small">Dữ liệu lượt thi sẽ hiển thị sau khi sinh viên hoàn thành buổi vấn đáp.</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Nav Tabs for Attempts -->
+        <ul class="nav nav-pills mb-4 gap-2" id="attemptTabs" role="tablist">
+            @for (int i = 0; i < Model.Attempts.Count; i++)
+            {
+                var att = Model.Attempts[i];
+                bool isActive = (selectedAttemptOrdinal.HasValue && att.AttemptOrdinal == selectedAttemptOrdinal.Value) || (!selectedAttemptOrdinal.HasValue && i == 0);
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-4 fw-semibold @(isActive ? "active" : "bg-white border")" 
+                            id="tab-att-@att.AttemptOrdinal" 
+                            data-bs-toggle="pill" 
+                            data-bs-target="#pane-att-@att.AttemptOrdinal" 
+                            type="button" 
+                            role="tab">
+                        <i class="bi bi-clock-history me-1"></i> Lượt thi số @att.AttemptOrdinal
+                        @if (att.GradingState == AIVES.BLL.Models.ExamReporting.GradingState.Graded)
+                        {
+                            <span class="badge bg-light text-dark ms-2 border">@att.NormalizedScore / 10</span>
+                        }
+                    </button>
+                </li>
+            }
+        </ul>
+
+        <!-- Tab Contents -->
+        <div class="tab-content" id="attemptTabsContent">
+            @for (int i = 0; i < Model.Attempts.Count; i++)
+            {
+                var att = Model.Attempts[i];
+                bool isActive = (selectedAttemptOrdinal.HasValue && att.AttemptOrdinal == selectedAttemptOrdinal.Value) || (!selectedAttemptOrdinal.HasValue && i == 0);
+                <div class="tab-pane fade @(isActive ? "show active" : "")" id="pane-att-@att.AttemptOrdinal" role="tabpanel">
+                    
+                    <!-- Attempt Overview Header Card -->
+                    <div class="card border-0 shadow-sm rounded-4 mb-4 p-3 bg-white">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="bg-primary text-white p-3 rounded-3">
+                                    <i class="bi bi-award-fill fs-3"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-1">Chi tiết kết quả: Lượt thi số @att.AttemptOrdinal</h5>
+                                    <div class="d-flex align-items-center gap-2 small text-muted">
+                                        <span><i class="bi bi-calendar-event me-1"></i>Hoàn thành lúc: @(att.CompletedAt?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")</span>
+                                        <span>•</span>
+                                        <span>Mã lượt thi: <code>@att.AttemptId</code></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="text-end">
+                                    <span class="small text-muted d-block">Điểm tổng kết lượt thi (Thang 10)</span>
+                                    <span class="fw-bold fs-4 text-success">@att.NormalizedScore / 10</span>
+                                </div>
+                                <div>
+                                    @if (att.IsPassed)
+                                    {
+                                        <span class="badge bg-success fs-6 px-3 py-2 rounded-pill"><i class="bi bi-check-circle me-1"></i>ĐẠT CHUẨN</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger fs-6 px-3 py-2 rounded-pill"><i class="bi bi-x-circle me-1"></i>CHƯA ĐẠT</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Questions List (5 blocks rendered via partial) -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold text-dark mb-0">
+                                <i class="bi bi-journal-text text-primary me-2"></i>Danh Sách Câu Hỏi & Nhật Ký Vấn Đáp
+                            </h5>
+                            <span class="badge bg-secondary-subtle text-secondary-emphasis border">Tổng số câu: @att.QuestionResults.Count</span>
+                        </div>
+
+                        @foreach (var q in att.QuestionResults)
+                        {
+                            <partial name="_QuestionDetailCardPartial" model="q" />
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

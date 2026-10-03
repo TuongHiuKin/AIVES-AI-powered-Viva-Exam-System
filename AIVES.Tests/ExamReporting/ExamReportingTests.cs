@@ -168,6 +168,57 @@ public class ExamReportingTests
         Assert.Contains("Nguyễn Văn A", csvContent);
     }
 
+    [Fact]
+    public async Task GetStudentExamDetail_AuthorizedTeacher_ReturnsReportWithAttempts()
+    {
+        // GV01 is assigned to SE1701, SV01 is enrolled in SE1701
+        var report = await _classService.GetStudentExamDetailForTeacherAsync("GV01", "SE1701", "EXAM01", "SV01");
+
+        Assert.NotNull(report);
+        Assert.Equal("SV01", report.StudentId);
+        Assert.Equal("Nguyễn Văn A", report.StudentName);
+        Assert.Equal(2, report.CompletedAttemptsCount);
+        Assert.Equal(2, report.Attempts.Count);
+        Assert.NotNull(report.AverageScore);
+        Assert.Equal(6.84m, report.AverageScore.Value);
+
+        // Check attempt details
+        var attempt1 = report.Attempts.FirstOrDefault(a => a.AttemptOrdinal == 1);
+        Assert.NotNull(attempt1);
+        Assert.Equal(3, attempt1.QuestionResults.Count);
+        Assert.Equal("Q1", attempt1.QuestionResults[0].QuestionId);
+        Assert.Equal(8.0m, attempt1.QuestionResults[0].TeacherFinalScore);
+        Assert.Equal(7.5m, attempt1.QuestionResults[0].AiSuggestedScore);
+    }
+
+    [Fact]
+    public async Task GetStudentExamDetail_UnauthorizedTeacher_ThrowsUnauthorizedAccessException_DEC11()
+    {
+        // GV02 is assigned to SE1702, NOT SE1701
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
+            _classService.GetStudentExamDetailForTeacherAsync("GV02", "SE1701", "EXAM01", "SV01"));
+    }
+
+    [Fact]
+    public async Task GetStudentExamDetail_StudentNotInClass_ThrowsInvalidOperationException()
+    {
+        // GV01 is authorized for SE1701, but SV999 is not in SE1701
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _classService.GetStudentExamDetailForTeacherAsync("GV01", "SE1701", "EXAM01", "SV999"));
+    }
+
+    [Theory]
+    [InlineData("", "SE1701", "EXAM01", "SV01")]
+    [InlineData("GV01", "", "EXAM01", "SV01")]
+    [InlineData("GV01", "SE1701", "", "SV01")]
+    [InlineData("GV01", "SE1701", "EXAM01", "")]
+    public async Task GetStudentExamDetail_EmptyArguments_ThrowsArgumentException(
+        string teacherId, string classId, string examId, string studentId)
+    {
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            _classService.GetStudentExamDetailForTeacherAsync(teacherId, classId, examId, studentId));
+    }
+
     private class FakeExamReportRepository : IExamReportRepository
     {
         public List<ExamSettingsSnapshot> Exams { get; } = new();
