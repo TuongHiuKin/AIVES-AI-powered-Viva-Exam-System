@@ -31,10 +31,19 @@ public class SystemAccountService : ISystemAccountService, ISystemAccountService
         return email.Trim().ToLowerInvariant();
     }
 
-    public async Task<List<SystemAccount>> SearchAccountsAsync(string? keyword = null, CancellationToken ct = default)
+    public async Task<List<SystemAccount>> SearchAccountsAsync(
+        string? keyword = null,
+        byte? role = null,
+        bool includeDeleted = true,
+        CancellationToken ct = default)
     {
         var trimmed = string.IsNullOrWhiteSpace(keyword) ? null : keyword.Trim();
-        return await _accountRepo.SearchAsync(trimmed, ct);
+        if (role.HasValue && role.Value is not (1 or 2))
+        {
+            throw new ArgumentException("Vai trò lọc không hợp lệ. Chỉ chấp nhận Sinh viên (1) hoặc Giảng viên (2).", nameof(role));
+        }
+
+        return await _accountRepo.SearchAsync(trimmed, role, includeDeleted, ct);
     }
 
     public async Task<SystemAccount?> GetAccountByIdAsync(int id, bool includeDeleted = false, CancellationToken ct = default)

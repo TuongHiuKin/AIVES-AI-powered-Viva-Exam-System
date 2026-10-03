@@ -259,4 +259,97 @@ public class ClassReportService : IClassReportService
         }
         return $"\"{text}\"";
     }
+
+    public async Task<StudentReportDto?> GetStudentExamDetailForTeacherAsync(
+        string teacherId,
+        string classId,
+        string examId,
+        string studentId,
+        CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(teacherId))
+            throw new ArgumentException("Teacher ID cannot be empty.", nameof(teacherId));
+        if (string.IsNullOrWhiteSpace(classId))
+            throw new ArgumentException("Class ID cannot be empty.", nameof(classId));
+        if (string.IsNullOrWhiteSpace(examId))
+            throw new ArgumentException("Exam ID cannot be empty.", nameof(examId));
+        if (string.IsNullOrWhiteSpace(studentId))
+            throw new ArgumentException("Student ID cannot be empty.", nameof(studentId));
+
+        // DEC-11: Giảng viên chỉ được xem dữ liệu của lớp được phân công
+        var isAssigned = await _repository.IsTeacherAssignedToClassAsync(teacherId, classId, ct);
+        if (!isAssigned)
+        {
+            throw new UnauthorizedAccessException($"Giảng viên {teacherId} không có quyền truy cập lớp {classId}.");
+        }
+
+        var settings = await _repository.GetExamSettingsAsync(examId, ct);
+        if (settings == null)
+            return null;
+
+        // Lấy tất cả lượt thi của sinh viên cho kỳ thi này
+        var studentAttempts = await _repository.GetStudentAttemptsAsync(studentId, examId, ct);
+
+        // Lọc các lượt thi thuộc đúng lớp học phần được phân công
+        var classAttempts = studentAttempts
+            .Where(a => string.Equals(a.ClassId, classId, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        if (!classAttempts.Any())
+        {
+            // Kiểm tra xem sinh viên có trong danh sách lớp này không
+            var classAllAttempts = await _repository.GetClassAttemptsAsync(classId, examId, ct);
+            var studentInClass = classAllAttempts.Any(a => string.Equals(a.StudentId, studentId, StringComparison.OrdinalIgnoreCase));
+            if (!studentInClass)
+            {
+                throw new InvalidOperationException($"Sinh viên {studentId} không thuộc lớp {classId}.");
+            }
+        }
+
+        // Lọc các lượt thi completed & graded để tính trung bình
+        var completedAttempts = classAttempts.Where(a => a.ExamState == ExamState.Completed).ToList();
+        var gradedAttempts = completedAttempts.Where(a => a.GradingState == GradingState.Graded).ToList();
+        var pendingAttempts = completedAttempts.Where(a => a.GradingState == GradingState.Pending).ToList();
+
+        decimal? averageScore = null;
+        if (gradedAttempts.Any())
+        {
+            var sumNormalized = gradedAttempts.Sum(a => a.NormalizedScore);
+            averageScore = Math.Round(sumNormalized / gradedAttempts.Count, 2);
+        }
+
+        decimal? passRate = null;
+        if (gradedAttempts.Any())
+        {
+            var passedCount = gradedAttempts.Count(a => a.IsPassed);
+            passRate = Math.Round(((decimal)passedCount / gradedAttempts.Count) * 100.0m, 1);
+        }
+
+        var studentName = classAttempts.FirstOrDefault()?.StudentName ?? studentId;
+
+        return new StudentReportDto
+        {
+            StudentId = studentId,
+            StudentName = studentName,
+            ExamId = examId,
+            ExamTitle = settings.ExamTitle,
+            CompletedAttemptsCount = completedAttempts.Count,
+            MaxAllowedAttemptsCount = settings.MaxAllowedAttempts,
+            GradedAttemptsCount = gradedAttempts.Count,
+            PendingAttemptsCount = pendingAttempts.Count,
+            AverageScore = averageScore,
+            PassRatePercentage = passRate,
+            Attempts = classAttempts.OrderBy(a => a.AttemptOrdinal).ToList()
+        };
+    }
+
+    public Task<List<ExamSettingsSnapshot>> GetAvailableExamsAsync(CancellationToken ct = default)
+    {
+        return _repository.GetAvailableExamsAsync(ct);
+    }
+
+    public Task<List<string>> GetAvailableClassesForTeacherAsync(string teacherId, CancellationToken ct = default)
+    {
+        return _repository.GetAvailableClassesForTeacherAsync(teacherId, ct);
+    }
 }

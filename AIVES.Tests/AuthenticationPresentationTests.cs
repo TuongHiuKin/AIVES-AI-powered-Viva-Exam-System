@@ -130,6 +130,12 @@ public sealed class AuthenticationPresentationTests
             CancellationToken cancellationToken = default) =>
             Task.FromResult(AuthenticationResult.Failure);
 
+        public Task<string?> CreatePasswordResetTokenAsync(string email, CancellationToken cancellationToken = default) =>
+            Task.FromResult<string?>(null);
+
+        public Task<bool> ResetPasswordAsync(string email, string token, string newPassword, CancellationToken cancellationToken = default) =>
+            Task.FromResult(false);
+
         public Task<bool> IsAccountActiveAsync(
             int accountId,
             CancellationToken cancellationToken = default)

@@ -49,6 +49,7 @@ public class QuestionResultDto
 
     public bool IsPassed { get; set; }
     public GradingState GradingState { get; set; } = GradingState.Graded;
+    public ExamEvaluationMode EvaluationMode { get; set; } = ExamEvaluationMode.Score;
 
     // Lõi phỏng vấn AI & Transcript hội thoại (Nhóm 3)
     public string StudentInitialAnswerTranscript { get; set; } = string.Empty; // STT câu trả lời ban đầu
@@ -73,6 +74,7 @@ public class AttemptSnapshotDto
     public int AttemptOrdinal { get; set; } = 1;
     public ExamState ExamState { get; set; } = ExamState.Completed;
     public GradingState GradingState { get; set; } = GradingState.Graded;
+    public ExamEvaluationMode EvaluationMode { get; set; } = ExamEvaluationMode.Score;
     public DateTime? CompletedAt { get; set; }
     public string SettingsVersion { get; set; } = "1.0";
     public List<QuestionResultDto> QuestionResults { get; set; } = new();
@@ -94,6 +96,7 @@ public class StudentReportDto
     public string StudentName { get; set; } = string.Empty;
     public string ExamId { get; set; } = string.Empty;
     public string ExamTitle { get; set; } = string.Empty;
+    public ExamEvaluationMode EvaluationMode { get; set; } = ExamEvaluationMode.Score;
     public int CompletedAttemptsCount { get; set; }
     public int MaxAllowedAttemptsCount { get; set; }
     public int GradedAttemptsCount { get; set; }

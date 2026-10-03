@@ -6,6 +6,7 @@ using AIVES.DAL.Repositories.Interfaces;
 using AIVES.DAL.Repositories.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace AIVES.Tests;
 
@@ -105,17 +106,72 @@ public sealed class AuthServiceTests
 
     private static AuthService CreateService(
         StubAccountRepository repository,
-        IPasswordHasher<SystemAccount>? hasher = null) => new(
+        IPasswordHasher<SystemAccount>? hasher = null,
+        TimeProvider? clock = null) => new(
             repository,
             hasher ?? new PasswordHasher<SystemAccount>(),
             Options.Create(new DefaultAdminOptions
             {
                 Email = AdminEmail,
                 Password = AdminPassword
-            }));
+            }),
+            new EphemeralDataProtectionProvider(),
+            clock ?? TimeProvider.System);
+
+    [Fact]
+    public async Task Reset_token_is_single_use_and_new_password_authenticates()
+    {
+        var account = new SystemAccount { AccountId = 1, AccountEmail = "member@example.test", AccountRole = 1 };
+        var hasher = new PasswordHasher<SystemAccount>();
+        account.AccountPasswordHash = hasher.HashPassword(account, "Old-password-123");
+        var service = CreateService(new StubAccountRepository { EmailAccount = account, IdAccount = account }, hasher);
+        var token = await service.CreatePasswordResetTokenAsync(" MEMBER@EXAMPLE.TEST ");
+        Assert.NotNull(token);
+        Assert.DoesNotContain(account.AccountEmail, token);
+        Assert.True(await service.ResetPasswordAsync(account.AccountEmail, token, "New-password-123"));
+        Assert.False(await service.ResetPasswordAsync(account.AccountEmail, token, "Other-password-123"));
+        Assert.False((await service.AuthenticateAsync(account.AccountEmail, "Old-password-123")).Succeeded);
+        Assert.True((await service.AuthenticateAsync(account.AccountEmail, "New-password-123")).Succeeded);
+    }
+
+    [Fact]
+    public async Task Reset_rejects_wrong_email_tampering_expiry_and_locked_account()
+    {
+        var account = new SystemAccount { AccountId = 1, AccountEmail = "member@example.test", AccountRole = 1, AccountPasswordHash = "old-hash" };
+        var clock = new TestClock();
+        var service = CreateService(new StubAccountRepository { EmailAccount = account, IdAccount = account }, clock: clock);
+        var token = (await service.CreatePasswordResetTokenAsync(account.AccountEmail))!;
+        Assert.False(await service.ResetPasswordAsync("other@example.test", token, "New-password-123"));
+        Assert.False(await service.ResetPasswordAsync(account.AccountEmail, "invalid-token", "New-password-123"));
+        Assert.False(await service.ResetPasswordAsync(account.AccountEmail, token, "short"));
+        account.IsDeleted = true;
+        Assert.Null(await service.CreatePasswordResetTokenAsync(account.AccountEmail));
+        Assert.False(await service.ResetPasswordAsync(account.AccountEmail, token, "New-password-123"));
+        account.IsDeleted = false;
+        clock.Now = clock.Now.AddMinutes(20);
+        Assert.False(await service.ResetPasswordAsync(account.AccountEmail, token, "New-password-123"));
+        Assert.Equal("old-hash", account.AccountPasswordHash);
+        Assert.Null(await service.CreatePasswordResetTokenAsync(AdminEmail));
+        Assert.Null(await CreateService(new StubAccountRepository()).CreatePasswordResetTokenAsync("missing@example.test"));
+    }
+
+    private sealed class TestClock : TimeProvider
+    {
+        public DateTimeOffset Now { get; set; } = DateTimeOffset.UtcNow;
+        public override DateTimeOffset GetUtcNow() => Now;
+    }
 
     private sealed class StubAccountRepository : ISystemAccountRepository
     {
+        public Task<bool> ResetPasswordAsync(int id, string email, string expectedHash, string newHash, CancellationToken ct = default)
+        {
+            var account = IdAccount;
+            if (account is null || account.IsDeleted || account.AccountId != id ||
+                account.AccountEmail != email || account.AccountPasswordHash != expectedHash) return Task.FromResult(false);
+            account.AccountPasswordHash = newHash;
+            return Task.FromResult(true);
+        }
+
         public SystemAccount? EmailAccount { get; set; }
         public SystemAccount? IdAccount { get; set; }
         public int EmailLookupCount { get; private set; }
@@ -138,7 +194,11 @@ public sealed class AuthServiceTests
             return Task.FromResult(IdAccount?.AccountId == id ? IdAccount : null);
         }
 
-        public Task<List<SystemAccount>> SearchAsync(string? keyword = null, CancellationToken ct = default) =>
+        public Task<List<SystemAccount>> SearchAsync(
+            string? keyword = null,
+            byte? role = null,
+            bool includeDeleted = false,
+            CancellationToken ct = default) =>
             throw new NotSupportedException();
         public Task<bool> EmailExistsAsync(string email, int? exceptId = null, CancellationToken ct = default) =>
             throw new NotSupportedException();

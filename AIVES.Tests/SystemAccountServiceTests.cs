@@ -13,15 +13,36 @@ public class SystemAccountServiceTests
         public List<SystemAccount> Accounts { get; } = new();
         public HashSet<int> ReferencedIds { get; } = new();
 
-        public Task<List<SystemAccount>> SearchAsync(string? keyword = null, CancellationToken ct = default)
+        public Task<bool> ResetPasswordAsync(int id, string email, string expectedHash, string newHash, CancellationToken ct = default)
         {
-            var query = Accounts.Where(x => !x.IsDeleted);
+            var account = Accounts.FirstOrDefault(x => x.AccountId == id && !x.IsDeleted &&
+                x.AccountEmail == email && x.AccountPasswordHash == expectedHash);
+            if (account is null) return Task.FromResult(false);
+            account.AccountPasswordHash = newHash;
+            return Task.FromResult(true);
+        }
+
+        public Task<List<SystemAccount>> SearchAsync(
+            string? keyword = null,
+            byte? role = null,
+            bool includeDeleted = false,
+            CancellationToken ct = default)
+        {
+            var query = Accounts.AsEnumerable();
+            if (!includeDeleted)
+            {
+                query = query.Where(x => !x.IsDeleted);
+            }
             if (!string.IsNullOrEmpty(keyword))
             {
                 var term = keyword.Trim().ToLowerInvariant();
                 query = query.Where(x => x.AccountName.ToLowerInvariant().Contains(term) || x.AccountEmail.Contains(term));
             }
-            return Task.FromResult(query.ToList());
+            if (role.HasValue)
+            {
+                query = query.Where(x => x.AccountRole == role.Value);
+            }
+            return Task.FromResult(query.OrderBy(x => x.AccountId).ToList());
         }
 
         public Task<SystemAccount?> GetByIdAsync(int id, bool includeDeleted = false, CancellationToken ct = default)
@@ -248,5 +269,87 @@ public class SystemAccountServiceTests
 
         Assert.Equal(DeleteResult.Deleted, result);
         Assert.Empty(repo.Accounts);
+    }
+
+    [Fact]
+    public async Task SearchAccountsAsync_SortsAscendingByAccountIdNumerically()
+    {
+        var repo = new FakeSystemAccountRepository();
+        // Insert accounts out of numerical order and with different alphabetic names
+        repo.Accounts.Add(new SystemAccount { AccountId = 21, AccountName = "Alice", AccountEmail = "alice@aives.test", AccountRole = 1 });
+        repo.Accounts.Add(new SystemAccount { AccountId = 2, AccountName = "Zach", AccountEmail = "zach@aives.test", AccountRole = 1 });
+        repo.Accounts.Add(new SystemAccount { AccountId = 10, AccountName = "Bob", AccountEmail = "bob@aives.test", AccountRole = 2 });
+
+        var service = new SystemAccountService(repo);
+        var result = await service.SearchAccountsAsync();
+
+        Assert.Equal(3, result.Count);
+        // Acceptance criterion: 2 -> 10 -> 21 regardless of name alphabet
+        Assert.Equal(2, result[0].AccountId);
+        Assert.Equal(10, result[1].AccountId);
+        Assert.Equal(21, result[2].AccountId);
+    }
+
+    [Fact]
+    public async Task SearchAccountsAsync_WithRoleFilter_ReturnsOnlyMatchingRole()
+    {
+        var repo = new FakeSystemAccountRepository();
+        repo.Accounts.Add(new SystemAccount { AccountId = 1, AccountName = "Student 1", AccountEmail = "s1@aives.test", AccountRole = 1 });
+        repo.Accounts.Add(new SystemAccount { AccountId = 2, AccountName = "Lecturer 1", AccountEmail = "l1@aives.test", AccountRole = 2 });
+        repo.Accounts.Add(new SystemAccount { AccountId = 3, AccountName = "Student 2", AccountEmail = "s2@aives.test", AccountRole = 1 });
+
+        var service = new SystemAccountService(repo);
+        var students = await service.SearchAccountsAsync(role: 1);
+        var lecturers = await service.SearchAccountsAsync(role: 2);
+
+        Assert.Equal(2, students.Count);
+        Assert.All(students, a => Assert.Equal(1, a.AccountRole));
+
+        Assert.Single(lecturers);
+        Assert.Equal(2, lecturers[0].AccountRole);
+    }
+
+    [Fact]
+    public async Task SearchAccountsAsync_WithKeywordAndRole_AppliesAndCondition()
+    {
+        var repo = new FakeSystemAccountRepository();
+        repo.Accounts.Add(new SystemAccount { AccountId = 1, AccountName = "Nguyen Van A", AccountEmail = "a@aives.test", AccountRole = 1 });
+        repo.Accounts.Add(new SystemAccount { AccountId = 2, AccountName = "Nguyen Van B", AccountEmail = "b@aives.test", AccountRole = 2 });
+        repo.Accounts.Add(new SystemAccount { AccountId = 3, AccountName = "Tran Thi C", AccountEmail = "c@aives.test", AccountRole = 1 });
+
+        var service = new SystemAccountService(repo);
+        // Search "Nguyen" AND Role 1 (Student)
+        var result = await service.SearchAccountsAsync(keyword: "Nguyen", role: 1);
+
+        Assert.Single(result);
+        Assert.Equal(1, result[0].AccountId);
+        Assert.Equal("Nguyen Van A", result[0].AccountName);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(3)]
+    [InlineData(99)]
+    public async Task SearchAccountsAsync_WithInvalidRole_ThrowsArgumentException(byte invalidRole)
+    {
+        var repo = new FakeSystemAccountRepository();
+        var service = new SystemAccountService(repo);
+
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            service.SearchAccountsAsync(role: invalidRole));
+    }
+
+    [Fact]
+    public async Task SearchAccountsAsync_WhenIncludeDeletedIsTrue_ReturnsLockedAccounts()
+    {
+        var repo = new FakeSystemAccountRepository();
+        repo.Accounts.Add(new SystemAccount { AccountId = 1, AccountName = "Active", AccountEmail = "active@aives.test", AccountRole = 1, IsDeleted = false });
+        repo.Accounts.Add(new SystemAccount { AccountId = 2, AccountName = "Locked", AccountEmail = "locked@aives.test", AccountRole = 1, IsDeleted = true });
+
+        var service = new SystemAccountService(repo);
+        var result = await service.SearchAccountsAsync(includeDeleted: true);
+
+        Assert.Equal(2, result.Count);
+        Assert.Contains(result, a => a.IsDeleted);
     }
 }

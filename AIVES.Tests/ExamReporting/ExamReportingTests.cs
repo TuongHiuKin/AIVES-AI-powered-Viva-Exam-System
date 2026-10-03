@@ -1,7 +1,12 @@
+using System.Security.Claims;
 using AIVES.BLL.Interfaces.ExamReporting;
 using AIVES.BLL.Models.ExamReporting;
-using AIVES.BLL.Services.ExamReporting;
 using AIVES.BLL.Repositories.ExamReporting;
+using AIVES.BLL.Security;
+using AIVES.BLL.Services.ExamReporting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using StudentNameMVC.Controllers;
 using Xunit;
 
 namespace AIVES.Tests.ExamReporting;
@@ -166,6 +171,185 @@ public class ExamReportingTests
         Assert.Contains("SV02", csvContent);
         Assert.Contains("SV03", csvContent);
         Assert.Contains("Nguyễn Văn A", csvContent);
+    }
+
+    [Fact]
+    public async Task GetStudentExamDetail_AuthorizedTeacher_ReturnsReportWithAttempts()
+    {
+        // GV01 is assigned to SE1701, SV01 is enrolled in SE1701
+        var report = await _classService.GetStudentExamDetailForTeacherAsync("GV01", "SE1701", "EXAM01", "SV01");
+
+        Assert.NotNull(report);
+        Assert.Equal("SV01", report.StudentId);
+        Assert.Equal("Nguyễn Văn A", report.StudentName);
+        Assert.Equal(2, report.CompletedAttemptsCount);
+        Assert.Equal(2, report.Attempts.Count);
+        Assert.NotNull(report.AverageScore);
+        Assert.Equal(6.84m, report.AverageScore.Value);
+
+        // Check attempt details
+        var attempt1 = report.Attempts.FirstOrDefault(a => a.AttemptOrdinal == 1);
+        Assert.NotNull(attempt1);
+        Assert.Equal(3, attempt1.QuestionResults.Count);
+        Assert.Equal("Q1", attempt1.QuestionResults[0].QuestionId);
+        Assert.Equal(8.0m, attempt1.QuestionResults[0].TeacherFinalScore);
+        Assert.Equal(7.5m, attempt1.QuestionResults[0].AiSuggestedScore);
+    }
+
+    [Fact]
+    public async Task GetStudentExamDetail_UnauthorizedTeacher_ThrowsUnauthorizedAccessException_DEC11()
+    {
+        // GV02 is assigned to SE1702, NOT SE1701
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
+            _classService.GetStudentExamDetailForTeacherAsync("GV02", "SE1701", "EXAM01", "SV01"));
+    }
+
+    [Fact]
+    public async Task GetStudentExamDetail_StudentNotInClass_ThrowsInvalidOperationException()
+    {
+        // GV01 is authorized for SE1701, but SV999 is not in SE1701
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _classService.GetStudentExamDetailForTeacherAsync("GV01", "SE1701", "EXAM01", "SV999"));
+    }
+
+    [Theory]
+    [InlineData("", "SE1701", "EXAM01", "SV01")]
+    [InlineData("GV01", "", "EXAM01", "SV01")]
+    [InlineData("GV01", "SE1701", "", "SV01")]
+    [InlineData("GV01", "SE1701", "EXAM01", "")]
+    public async Task GetStudentExamDetail_EmptyArguments_ThrowsArgumentException(
+        string teacherId, string classId, string examId, string studentId)
+    {
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            _classService.GetStudentExamDetailForTeacherAsync(teacherId, classId, examId, studentId));
+    }
+
+    [Fact]
+    public async Task StudentReport_Propagates_EvaluationMode_Correctly_To_Attempts_And_Questions()
+    {
+        // 1. Score Mode Test (EXAM01)
+        var scoreReport = await _studentService.GetStudentReportAsync("SV01", "EXAM01");
+        Assert.NotNull(scoreReport);
+        Assert.Equal(ExamEvaluationMode.Score, scoreReport.EvaluationMode);
+        Assert.All(scoreReport.Attempts, a =>
+        {
+            Assert.Equal(ExamEvaluationMode.Score, a.EvaluationMode);
+            Assert.All(a.QuestionResults, q => Assert.Equal(ExamEvaluationMode.Score, q.EvaluationMode));
+        });
+
+        // 2. Pass/Fail Mode Test (EXAM02)
+        var passFailReport = await _studentService.GetStudentReportAsync("SV01", "EXAM02");
+        Assert.NotNull(passFailReport);
+        Assert.Equal(ExamEvaluationMode.PassFail, passFailReport.EvaluationMode);
+        Assert.Null(passFailReport.AverageScore); // Pass/Fail mode does not compute numerical average score
+        Assert.All(passFailReport.Attempts, a =>
+        {
+            Assert.Equal(ExamEvaluationMode.PassFail, a.EvaluationMode);
+            Assert.All(a.QuestionResults, q => Assert.Equal(ExamEvaluationMode.PassFail, q.EvaluationMode));
+        });
+    }
+
+    [Fact]
+    public async Task StudentReportService_GetAvailableExamsAsync_DelegatesToRepository()
+    {
+        var exams = await _studentService.GetAvailableExamsAsync();
+        Assert.NotNull(exams);
+        Assert.NotEmpty(exams);
+    }
+
+    [Fact]
+    public async Task ClassReportService_GetAvailableExamsAndClasses_DelegatesToRepository()
+    {
+        var exams = await _classService.GetAvailableExamsAsync();
+        var classes = await _classService.GetAvailableClassesForTeacherAsync("GV01");
+
+        Assert.NotNull(exams);
+        Assert.NotEmpty(exams);
+        Assert.NotNull(classes);
+        Assert.NotEmpty(classes);
+    }
+
+    [Fact]
+    public async Task StudentReportsController_StudentCannotViewOtherStudentReport_ReturnsForbid()
+    {
+        var controller = new StudentReportsController(_studentService);
+        var principal = new ClaimsPrincipal(new ClaimsIdentity(new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, "SV01"),
+            new Claim(ClaimTypes.Email, "student1@aives.test"),
+            new Claim(ClaimTypes.Role, ApplicationRoles.Staff)
+        }, "TestAuth"));
+
+        controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = principal }
+        };
+
+        // Sinh viên SV01 cố tình truyền studentId="SV02" để xem bài của bạn
+        var result = await controller.Index(studentId: "SV02", examId: "EXAM01");
+
+        Assert.IsType<ForbidResult>(result);
+    }
+
+    [Fact]
+    public async Task StudentReportsController_StudentCanViewOwnReport_ReturnsViewResult()
+    {
+        var controller = new StudentReportsController(_studentService);
+        var principal = new ClaimsPrincipal(new ClaimsIdentity(new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, "SV01"),
+            new Claim(ClaimTypes.Email, "student1@aives.test"),
+            new Claim(ClaimTypes.Role, ApplicationRoles.Staff)
+        }, "TestAuth"));
+
+        controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = principal }
+        };
+
+        // Sinh viên xem bài thi của chính mình (hoặc truyền null)
+        var result = await controller.Index(studentId: null, examId: "EXAM01");
+
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var model = Assert.IsType<StudentReportDto>(viewResult.Model);
+        Assert.Equal("SV01", model.StudentId);
+    }
+
+    [Fact]
+    public async Task StudentReportsController_AdminCanViewAnyStudentReport_ReturnsViewResult()
+    {
+        var controller = new StudentReportsController(_studentService);
+        var principal = new ClaimsPrincipal(new ClaimsIdentity(new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, "admin"),
+            new Claim(ClaimTypes.Email, "admin@aives.test"),
+            new Claim(ClaimTypes.Role, ApplicationRoles.Admin)
+        }, "TestAuth"));
+
+        controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = principal }
+        };
+
+        // Admin có thể xem bài của bất kỳ sinh viên nào (SV02)
+        var result = await controller.Index(studentId: "SV02", examId: "EXAM01");
+
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var model = Assert.IsType<StudentReportDto>(viewResult.Model);
+        Assert.Equal("SV02", model.StudentId);
+    }
+
+    [Fact]
+    public void ReportingControllers_DoNotDependOnExamReportRepository()
+    {
+        // Kiểm tra kiến trúc: Controller không được nhận IExamReportRepository trong constructor
+        var studentCtors = typeof(StudentReportsController).GetConstructors();
+        Assert.All(studentCtors, c =>
+            Assert.DoesNotContain(c.GetParameters(), p => p.ParameterType == typeof(IExamReportRepository)));
+
+        var classCtors = typeof(ClassReportsController).GetConstructors();
+        Assert.All(classCtors, c =>
+            Assert.DoesNotContain(c.GetParameters(), p => p.ParameterType == typeof(IExamReportRepository)));
     }
 
     private class FakeExamReportRepository : IExamReportRepository

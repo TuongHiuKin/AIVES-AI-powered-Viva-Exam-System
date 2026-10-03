@@ -11,19 +11,46 @@ public sealed class SystemAccountDAO
     public static SystemAccountDAO Instance => Singleton.Value;
     private SystemAccountDAO() { }
 
+    public async Task<bool> ResetPasswordAsync(AIVESDbContext db, int id, string email,
+        string expectedHash, string newHash, CancellationToken ct)
+    {
+        // The old hash acts as a concurrency guard and invalidates every issued reset token.
+        return await db.SystemAccounts.Where(x => x.AccountId == id && !x.IsDeleted &&
+                x.AccountEmail == email && x.AccountPasswordHash == expectedHash)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.AccountPasswordHash, newHash), ct) == 1;
+    }
+
     private static string NormalizeEmail(string email)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(email);
         return email.Trim().ToLowerInvariant();
     }
 
-    public Task<List<SystemAccount>> SearchAsync(AIVESDbContext db, string? keyword, CancellationToken ct)
+    public Task<List<SystemAccount>> SearchAsync(
+        AIVESDbContext db,
+        string? keyword = null,
+        byte? role = null,
+        bool includeDeleted = false,
+        CancellationToken ct = default)
     {
-        var query = db.SystemAccounts.AsNoTracking().Where(x => !x.IsDeleted);
+        var query = db.SystemAccounts.AsNoTracking();
+        if (!includeDeleted)
+        {
+            query = query.Where(x => !x.IsDeleted);
+        }
+
         var term = keyword?.Trim();
         if (!string.IsNullOrEmpty(term))
+        {
             query = query.Where(x => x.AccountName.Contains(term) || x.AccountEmail.Contains(term));
-        return query.OrderBy(x => x.AccountName).ThenBy(x => x.AccountId).ToListAsync(ct);
+        }
+
+        if (role.HasValue)
+        {
+            query = query.Where(x => x.AccountRole == role.Value);
+        }
+
+        return query.OrderBy(x => x.AccountId).ToListAsync(ct);
     }
 
     public Task<SystemAccount?> GetByIdAsync(AIVESDbContext db, int id, bool includeDeleted, CancellationToken ct) =>

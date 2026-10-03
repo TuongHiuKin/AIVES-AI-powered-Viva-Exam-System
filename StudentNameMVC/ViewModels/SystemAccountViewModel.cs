@@ -11,11 +11,14 @@ public class AccountItemViewModel
     public string RoleName => AccountRole == 1 ? "Sinh viên" : "Giảng viên";
     public bool IsDeleted { get; set; }
     public bool IsReferenced { get; set; }
+    public string? StudentCode { get; set; }
+    public string? ClassName { get; set; }
 }
 
 public class AccountIndexViewModel
 {
     public string? Keyword { get; set; }
+    public byte? RoleFilter { get; set; }
     public List<AccountItemViewModel> Accounts { get; set; } = new();
     public int TotalAccounts => Accounts.Count;
     public int TotalStudents => Accounts.Count(a => a.AccountRole == 1);

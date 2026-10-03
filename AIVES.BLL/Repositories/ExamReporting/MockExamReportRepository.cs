@@ -388,6 +388,92 @@ public class MockExamReportRepository : IExamReportRepository
             GradingState = GradingState.Failed,
             CompletedAt = null
         });
+
+        // ==========================================
+        // Dữ liệu Kỳ thi EXAM02: Chế độ Pass/Fail Mode (DEC-02, DEC-04)
+        // ==========================================
+        // SV01: Nguyễn Văn A - Lượt 1
+        _attempts.Add(new AttemptSnapshotDto
+        {
+            AttemptId = "ATT-007",
+            StudentId = "SV01",
+            StudentName = "Nguyễn Văn A",
+            ClassId = "SE1701",
+            ExamId = "EXAM02",
+            AttemptOrdinal = 1,
+            ExamState = ExamState.Completed,
+            GradingState = GradingState.Graded,
+            EvaluationMode = ExamEvaluationMode.PassFail,
+            CompletedAt = DateTime.UtcNow.AddDays(-1),
+            QuestionResults = new List<QuestionResultDto>
+            {
+                new()
+                {
+                    QuestionId = "Q1",
+                    QuestionTitle = "Phân tích ranh giới giữa Service Layer và Data Access Layer trong Clean Architecture.",
+                    CognitiveLevel = "Phân tích",
+                    EvaluationMode = ExamEvaluationMode.PassFail,
+                    IsPassed = true,
+                    GradingState = GradingState.Graded,
+                    CriteriaOutcomes = new Dictionary<string, bool>
+                    {
+                        { "ArchitectureBoundary", true },
+                        { "SingleResponsibility", true }
+                    },
+                    StudentInitialAnswerTranscript = "Service layer chứa toàn bộ quy tắc nghiệp vụ (Business Rules), hoàn toàn độc lập với công nghệ DB. Data Access Layer chỉ thực thi DAO và ánh xạ truy vấn.",
+                    AiFollowUpQuestion = "AI Giám khảo hỏi xoáy: Nếu Controller gọi trực tiếp DAO mà không qua Service thì vi phạm những ranh giới thiết kế nào?",
+                    StudentFollowUpAnswerTranscript = "Sẽ vi phạm nguyên tắc Đơn trách nhiệm (SRP) và làm thất thoát logic kiểm soát nghiệp vụ, dẫn đến Coupling cao giữa giao diện và lưu trữ.",
+                    TeacherNotes = "Sinh viên nắm rất chắc ranh giới các tầng kiến trúc. Phản biện tốt câu hỏi hóc búa của AI.",
+                    AiFeedback = "Lập luận sắc bén, hiểu rõ ranh giới Clean Architecture và lợi ích bảo trì mã nguồn khi mở rộng.",
+                    Strengths = "Nắm vững nguyên tắc Inversion of Control và ranh giới kiến trúc độc lập.",
+                    Weaknesses = "Cần chú ý thêm về Data Transfer Object (DTO) khi truyền dữ liệu ra tầng Presentation.",
+                    RubricCriteria = "Tiêu chí bắt buộc: ArchitectureBoundary (ĐẠT). Tách biệt logic và truy xuất (ĐẠT)."
+                },
+                new()
+                {
+                    QuestionId = "Q2",
+                    QuestionTitle = "Nguyên lý Single Responsibility (SRP) và Dependency Inversion (DIP) trong SOLID.",
+                    CognitiveLevel = "Vận dụng",
+                    EvaluationMode = ExamEvaluationMode.PassFail,
+                    IsPassed = true,
+                    GradingState = GradingState.Graded,
+                    CriteriaOutcomes = new Dictionary<string, bool>
+                    {
+                        { "ArchitectureBoundary", true },
+                        { "SOLIDCompliance", true }
+                    },
+                    StudentInitialAnswerTranscript = "Mỗi module chỉ nên có một lý do duy nhất để thay đổi. Module cấp cao không phụ thuộc module cấp thấp, cả hai cùng phụ thuộc abstraction.",
+                    AiFollowUpQuestion = "AI Giám khảo hỏi xoáy: Làm thế nào để áp dụng DIP giải quyết sự phụ thuộc giữa Service và DbContext trong ứng dụng Web?",
+                    StudentFollowUpAnswerTranscript = "Thông qua interface IRepository và Dependency Injection container, Service chỉ phụ thuộc interface mà không biết về DbContext thật.",
+                    TeacherNotes = "Thí sinh trả lời lưu loát, liên hệ thực tế tốt với đồ án thực hành.",
+                    AiFeedback = "Áp dụng chính xác SOLID vào thiết kế hệ thống, đạt chuẩn năng lực học phần SWE302.",
+                    Strengths = "Hiểu sâu bản chất Loose Coupling và DI Container.",
+                    Weaknesses = "Nên đưa ví dụ cụ thể về unit test không cần DB.",
+                    RubricCriteria = "Tiêu chí: Áp dụng SOLID trong kiến trúc phân tầng (ĐẠT)."
+                },
+                new()
+                {
+                    QuestionId = "Q3",
+                    QuestionTitle = "So sánh kiến trúc Microservices và Monolithic khi mở rộng quy mô hệ thống.",
+                    CognitiveLevel = "Đánh giá",
+                    EvaluationMode = ExamEvaluationMode.PassFail,
+                    IsPassed = false,
+                    GradingState = GradingState.Graded,
+                    CriteriaOutcomes = new Dictionary<string, bool>
+                    {
+                        { "ScalabilityAnalysis", false }
+                    },
+                    StudentInitialAnswerTranscript = "Microservices chia nhỏ hệ thống thành nhiều service độc lập nên lúc nào cũng tốt hơn Monolithic.",
+                    AiFollowUpQuestion = "AI Giám khảo hỏi xoáy: Chi phí vận hành, Distributed Transaction và Network Latency của Microservices có nhược điểm gì so với Monolith?",
+                    StudentFollowUpAnswerTranscript = "Dạ em chưa tìm hiểu sâu về xử lý transaction phân tán và độ trễ mạng ạ.",
+                    TeacherNotes = "Cần đọc thêm chương Thiết kế Hệ thống Phân tán và bài toán CAP Theorem.",
+                    AiFeedback = "Nhận thức một chiều về Microservices, chưa đánh giá được chi phí phân tán và phức tạp vận hành.",
+                    Strengths = "Biết khái niệm chia nhỏ dịch vụ cơ bản.",
+                    Weaknesses = "Thiếu kiến thức về Data Consistency, 2PC, Saga Pattern trong hệ thống phân tán.",
+                    RubricCriteria = "Tiêu chí: Phân tích được trade-off giữa Monolith và Microservices (CHƯA ĐẠT)."
+                }
+            }
+        });
     }
 
     public Task<List<AttemptSnapshotDto>> GetStudentAttemptsAsync(string studentId, string examId, CancellationToken ct = default)
