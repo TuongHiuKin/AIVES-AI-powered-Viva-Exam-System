@@ -10,14 +10,10 @@ namespace StudentNameMVC.Controllers;
 public class ClassReportsController : Controller
 {
     private readonly IClassReportService _classReportService;
-    private readonly IExamReportRepository _examReportRepository;
 
-    public ClassReportsController(
-        IClassReportService classReportService,
-        IExamReportRepository examReportRepository)
+    public ClassReportsController(IClassReportService classReportService)
     {
         _classReportService = classReportService ?? throw new ArgumentNullException(nameof(classReportService));
-        _examReportRepository = examReportRepository ?? throw new ArgumentNullException(nameof(examReportRepository));
     }
 
     [HttpGet]
@@ -32,8 +28,8 @@ public class ClassReportsController : Controller
         classId = string.IsNullOrWhiteSpace(classId) ? "SE1701" : classId;
         examId = string.IsNullOrWhiteSpace(examId) ? "EXAM01" : examId;
 
-        var exams = await _examReportRepository.GetAvailableExamsAsync(ct);
-        var availableClasses = await _examReportRepository.GetAvailableClassesForTeacherAsync(resolvedTeacherId, ct);
+        var exams = await _classReportService.GetAvailableExamsAsync(ct);
+        var availableClasses = await _classReportService.GetAvailableClassesForTeacherAsync(resolvedTeacherId, ct);
 
         ViewBag.AvailableExams = exams;
         ViewBag.AvailableClasses = availableClasses;

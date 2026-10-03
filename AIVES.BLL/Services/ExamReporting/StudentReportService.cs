@@ -98,4 +98,9 @@ public class StudentReportService : IStudentReportService
             Attempts = attempts.OrderBy(a => a.AttemptOrdinal).ToList()
         };
     }
+
+    public Task<List<ExamSettingsSnapshot>> GetAvailableExamsAsync(CancellationToken ct = default)
+    {
+        return _repository.GetAvailableExamsAsync(ct);
+    }
 }

@@ -342,4 +342,14 @@ public class ClassReportService : IClassReportService
             Attempts = classAttempts.OrderBy(a => a.AttemptOrdinal).ToList()
         };
     }
+
+    public Task<List<ExamSettingsSnapshot>> GetAvailableExamsAsync(CancellationToken ct = default)
+    {
+        return _repository.GetAvailableExamsAsync(ct);
+    }
+
+    public Task<List<string>> GetAvailableClassesForTeacherAsync(string teacherId, CancellationToken ct = default)
+    {
+        return _repository.GetAvailableClassesForTeacherAsync(teacherId, ct);
+    }
 }

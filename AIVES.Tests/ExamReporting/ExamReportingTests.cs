@@ -1,7 +1,12 @@
+using System.Security.Claims;
 using AIVES.BLL.Interfaces.ExamReporting;
 using AIVES.BLL.Models.ExamReporting;
-using AIVES.BLL.Services.ExamReporting;
 using AIVES.BLL.Repositories.ExamReporting;
+using AIVES.BLL.Security;
+using AIVES.BLL.Services.ExamReporting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using StudentNameMVC.Controllers;
 using Xunit;
 
 namespace AIVES.Tests.ExamReporting;
@@ -242,6 +247,109 @@ public class ExamReportingTests
             Assert.Equal(ExamEvaluationMode.PassFail, a.EvaluationMode);
             Assert.All(a.QuestionResults, q => Assert.Equal(ExamEvaluationMode.PassFail, q.EvaluationMode));
         });
+    }
+
+    [Fact]
+    public async Task StudentReportService_GetAvailableExamsAsync_DelegatesToRepository()
+    {
+        var exams = await _studentService.GetAvailableExamsAsync();
+        Assert.NotNull(exams);
+        Assert.NotEmpty(exams);
+    }
+
+    [Fact]
+    public async Task ClassReportService_GetAvailableExamsAndClasses_DelegatesToRepository()
+    {
+        var exams = await _classService.GetAvailableExamsAsync();
+        var classes = await _classService.GetAvailableClassesForTeacherAsync("GV01");
+
+        Assert.NotNull(exams);
+        Assert.NotEmpty(exams);
+        Assert.NotNull(classes);
+        Assert.NotEmpty(classes);
+    }
+
+    [Fact]
+    public async Task StudentReportsController_StudentCannotViewOtherStudentReport_ReturnsForbid()
+    {
+        var controller = new StudentReportsController(_studentService);
+        var principal = new ClaimsPrincipal(new ClaimsIdentity(new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, "SV01"),
+            new Claim(ClaimTypes.Email, "student1@aives.test"),
+            new Claim(ClaimTypes.Role, ApplicationRoles.Staff)
+        }, "TestAuth"));
+
+        controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = principal }
+        };
+
+        // Sinh viên SV01 cố tình truyền studentId="SV02" để xem bài của bạn
+        var result = await controller.Index(studentId: "SV02", examId: "EXAM01");
+
+        Assert.IsType<ForbidResult>(result);
+    }
+
+    [Fact]
+    public async Task StudentReportsController_StudentCanViewOwnReport_ReturnsViewResult()
+    {
+        var controller = new StudentReportsController(_studentService);
+        var principal = new ClaimsPrincipal(new ClaimsIdentity(new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, "SV01"),
+            new Claim(ClaimTypes.Email, "student1@aives.test"),
+            new Claim(ClaimTypes.Role, ApplicationRoles.Staff)
+        }, "TestAuth"));
+
+        controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = principal }
+        };
+
+        // Sinh viên xem bài thi của chính mình (hoặc truyền null)
+        var result = await controller.Index(studentId: null, examId: "EXAM01");
+
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var model = Assert.IsType<StudentReportDto>(viewResult.Model);
+        Assert.Equal("SV01", model.StudentId);
+    }
+
+    [Fact]
+    public async Task StudentReportsController_AdminCanViewAnyStudentReport_ReturnsViewResult()
+    {
+        var controller = new StudentReportsController(_studentService);
+        var principal = new ClaimsPrincipal(new ClaimsIdentity(new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, "admin"),
+            new Claim(ClaimTypes.Email, "admin@aives.test"),
+            new Claim(ClaimTypes.Role, ApplicationRoles.Admin)
+        }, "TestAuth"));
+
+        controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = principal }
+        };
+
+        // Admin có thể xem bài của bất kỳ sinh viên nào (SV02)
+        var result = await controller.Index(studentId: "SV02", examId: "EXAM01");
+
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var model = Assert.IsType<StudentReportDto>(viewResult.Model);
+        Assert.Equal("SV02", model.StudentId);
+    }
+
+    [Fact]
+    public void ReportingControllers_DoNotDependOnExamReportRepository()
+    {
+        // Kiểm tra kiến trúc: Controller không được nhận IExamReportRepository trong constructor
+        var studentCtors = typeof(StudentReportsController).GetConstructors();
+        Assert.All(studentCtors, c =>
+            Assert.DoesNotContain(c.GetParameters(), p => p.ParameterType == typeof(IExamReportRepository)));
+
+        var classCtors = typeof(ClassReportsController).GetConstructors();
+        Assert.All(classCtors, c =>
+            Assert.DoesNotContain(c.GetParameters(), p => p.ParameterType == typeof(IExamReportRepository)));
     }
 
     private class FakeExamReportRepository : IExamReportRepository

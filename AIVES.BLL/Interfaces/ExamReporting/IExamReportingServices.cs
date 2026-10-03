@@ -15,6 +15,7 @@ public interface IExamReportRepository
 public interface IStudentReportService
 {
     Task<StudentReportDto?> GetStudentReportAsync(string studentId, string examId, CancellationToken ct = default);
+    Task<List<ExamSettingsSnapshot>> GetAvailableExamsAsync(CancellationToken ct = default);
 }
 
 public interface IClassReportService
@@ -44,4 +45,7 @@ public interface IClassReportService
         string examId,
         string studentId,
         CancellationToken ct = default);
+
+    Task<List<ExamSettingsSnapshot>> GetAvailableExamsAsync(CancellationToken ct = default);
+    Task<List<string>> GetAvailableClassesForTeacherAsync(string teacherId, CancellationToken ct = default);
 }

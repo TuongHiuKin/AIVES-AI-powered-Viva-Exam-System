@@ -189,14 +189,14 @@
                                         </button>
                                         @if (!account.IsDeleted)
                                         {
-                                            <button type="button" class="btn btn-outline-danger" title="Khóa / Xóa mềm"
+                                            <button type="button" class="btn btn-outline-danger" title="Khóa tài khoản"
                                                     onclick="openDeleteModal(@account.AccountId)">
                                                 <i class="bi bi-lock me-1"></i> Khóa
                                             </button>
                                         }
-                                        <button type="button" class="btn btn-outline-dark" title="Xóa vĩnh viễn"
+                                        <button type="button" class="btn btn-outline-dark" title="Xóa tài khoản vĩnh viễn"
                                                 onclick="openHardDeleteModal(@account.AccountId)">
-                                            <i class="bi bi-trash3 me-1"></i> Xóa cứng
+                                            <i class="bi bi-trash3 me-1"></i> Xóa vĩnh viễn
                                         </button>
                                     </div>
                                 </td>
@@ -282,7 +282,7 @@
             });
         }
 
-        // Mở Modal Xác nhận xóa mềm (ACC-05)
+        // Mở Modal Xác nhận khóa tài khoản (ACC-05)
         function openDeleteModal(id) {
             cleanupExistingModal();
             $.get('@Url.Action("DeleteModal", "Account")', { id: id }, function (data) {
