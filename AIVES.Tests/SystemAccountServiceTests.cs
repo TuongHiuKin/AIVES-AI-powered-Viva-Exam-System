@@ -13,6 +13,15 @@ public class SystemAccountServiceTests
         public List<SystemAccount> Accounts { get; } = new();
         public HashSet<int> ReferencedIds { get; } = new();
 
+        public Task<bool> ResetPasswordAsync(int id, string email, string expectedHash, string newHash, CancellationToken ct = default)
+        {
+            var account = Accounts.FirstOrDefault(x => x.AccountId == id && !x.IsDeleted &&
+                x.AccountEmail == email && x.AccountPasswordHash == expectedHash);
+            if (account is null) return Task.FromResult(false);
+            account.AccountPasswordHash = newHash;
+            return Task.FromResult(true);
+        }
+
         public Task<List<SystemAccount>> SearchAsync(string? keyword = null, CancellationToken ct = default)
         {
             var query = Accounts.Where(x => !x.IsDeleted);

@@ -62,7 +62,8 @@
                             </li>
                         </ul>
                     }
-                    else
+                    else if (!(string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "Account", StringComparison.OrdinalIgnoreCase)
+                        && string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Login", StringComparison.OrdinalIgnoreCase)))
                     {
                         <ul class="navbar-nav ms-auto">
                             <li class="nav-item">

@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using StudentNameMVC.Security;
 using StudentNameMVC.ViewModels;
 
+using Microsoft.AspNetCore.RateLimiting;
+
 namespace StudentNameMVC.Controllers;
 
 public class AccountController : Controller
@@ -18,7 +20,62 @@ public class AccountController : Controller
         _authService = authService ?? throw new ArgumentNullException(nameof(authService));
     }
 
-    #region Authentication (TV2 - AUTH-01, AUTH-02)
+    #region Authentication (TV2 - AUTH-01, AUTH-02, FIX-03)
+
+    [AllowAnonymous]
+    [HttpGet]
+    public IActionResult ForgotPassword() => View(new ForgotPasswordViewModel());
+
+    [AllowAnonymous]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [EnableRateLimiting("password-reset")]
+    public async Task<IActionResult> ForgotPassword(
+        ForgotPasswordViewModel model,
+        [FromServices] IPasswordResetEmailSender resetEmailSender,
+        [FromServices] ILogger<AccountController> logger,
+        CancellationToken ct)
+    {
+        if (!ModelState.IsValid) return View(model);
+        try
+        {
+            var token = await _authService.CreatePasswordResetTokenAsync(model.Email, ct);
+            if (token is not null) await resetEmailSender.SendAsync(model.Email.Trim().ToLowerInvariant(), token, ct);
+        }
+        catch (Exception error) when (error is not OperationCanceledException)
+        {
+            logger.LogError("Password reset request could not be processed ({ErrorType}).", error.GetType().Name);
+        }
+        ModelState.Clear();
+        return View(new ForgotPasswordViewModel { Submitted = true });
+    }
+
+    [AllowAnonymous]
+    [HttpGet]
+    public IActionResult ResetPassword(string? email, string? token)
+    {
+        Response.Headers["Referrer-Policy"] = "no-referrer";
+        Response.Headers["Cache-Control"] = "no-store";
+        return View(new ResetPasswordViewModel { Email = email ?? string.Empty, Token = token ?? string.Empty });
+    }
+
+    [AllowAnonymous]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [EnableRateLimiting("password-reset")]
+    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model, CancellationToken ct)
+    {
+        Response.Headers["Referrer-Policy"] = "no-referrer";
+        Response.Headers["Cache-Control"] = "no-store";
+        if (!ModelState.IsValid) return View(model);
+        if (!await _authService.ResetPasswordAsync(model.Email, model.Token, model.NewPassword, ct))
+        {
+            ModelState.AddModelError(string.Empty, "Liên kết khôi phục không hợp lệ, đã hết hạn hoặc đã được sử dụng.");
+            return View(model);
+        }
+        TempData["SuccessMessage"] = "Đã đặt lại mật khẩu. Vui lòng đăng nhập bằng mật khẩu mới.";
+        return RedirectToAction(nameof(Login));
+    }
 
     [AllowAnonymous]
     [HttpGet]
