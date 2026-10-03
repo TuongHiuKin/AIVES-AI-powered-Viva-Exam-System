@@ -54,10 +54,10 @@ public class CategoryService : ICategoryService
 
         // 2. Xác định các input
         if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Category title cannot be empty.", nameof(name));
+            throw new ArgumentException("Category title cannot be empty", nameof(name));
         if (description != null)
             if (description.Trim().Length > 500)
-                throw new ArgumentException("Category description cannot exceed 500 characters.", nameof(name));
+                throw new ArgumentException("Category description cannot exceed 500 characters", nameof(name));
 
         // 3. Chuyển qua cho Repo thực thi
         return await _categoryRepo.UpdateAsync(id, name, description, ct);
