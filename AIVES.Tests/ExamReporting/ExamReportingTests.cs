@@ -219,6 +219,31 @@ public class ExamReportingTests
             _classService.GetStudentExamDetailForTeacherAsync(teacherId, classId, examId, studentId));
     }
 
+    [Fact]
+    public async Task StudentReport_Propagates_EvaluationMode_Correctly_To_Attempts_And_Questions()
+    {
+        // 1. Score Mode Test (EXAM01)
+        var scoreReport = await _studentService.GetStudentReportAsync("SV01", "EXAM01");
+        Assert.NotNull(scoreReport);
+        Assert.Equal(ExamEvaluationMode.Score, scoreReport.EvaluationMode);
+        Assert.All(scoreReport.Attempts, a =>
+        {
+            Assert.Equal(ExamEvaluationMode.Score, a.EvaluationMode);
+            Assert.All(a.QuestionResults, q => Assert.Equal(ExamEvaluationMode.Score, q.EvaluationMode));
+        });
+
+        // 2. Pass/Fail Mode Test (EXAM02)
+        var passFailReport = await _studentService.GetStudentReportAsync("SV01", "EXAM02");
+        Assert.NotNull(passFailReport);
+        Assert.Equal(ExamEvaluationMode.PassFail, passFailReport.EvaluationMode);
+        Assert.Null(passFailReport.AverageScore); // Pass/Fail mode does not compute numerical average score
+        Assert.All(passFailReport.Attempts, a =>
+        {
+            Assert.Equal(ExamEvaluationMode.PassFail, a.EvaluationMode);
+            Assert.All(a.QuestionResults, q => Assert.Equal(ExamEvaluationMode.PassFail, q.EvaluationMode));
+        });
+    }
+
     private class FakeExamReportRepository : IExamReportRepository
     {
         public List<ExamSettingsSnapshot> Exams { get; } = new();

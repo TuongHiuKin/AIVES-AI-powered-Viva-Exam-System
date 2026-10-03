@@ -1,0 +1,184 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 670" width="100%" height="100%" style="background-color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.06"/>
+    </filter>
+    <filter id="card-shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="2" flood-color="#000000" flood-opacity="0.05"/>
+    </filter>
+
+    <marker id="arrow-solid" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#0f172a"/>
+    </marker>
+    <marker id="arrow-db" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#475569"/>
+    </marker>
+  </defs>
+
+  <!-- Left Annotations: MVC Web App & .dll -->
+  <g transform="translate(25, 70)">
+    <text x="115" y="45" text-anchor="end" font-size="15" font-weight="700" fill="#1e3a8a">MVC Web App</text>
+    <text x="115" y="65" text-anchor="end" font-size="12" fill="#64748b">startup project</text>
+
+    <path d="M 130 5 C 140 5 140 55 145 55 C 140 55 140 105 130 105" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"/>
+    <line x1="145" y1="55" x2="165" y2="55" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow-solid)"/>
+  </g>
+
+  <g transform="translate(25, 260)">
+    <text x="115" y="165" text-anchor="end" font-size="22" font-weight="800" fill="#0f172a">.dll</text>
+    <text x="115" y="190" text-anchor="end" font-size="12" fill="#64748b">Class library</text>
+    <text x="115" y="206" text-anchor="end" font-size="12" fill="#64748b">projects</text>
+
+    <path d="M 130 10 C 145 10 145 175 152 175 C 145 175 145 340 130 340" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- 1. PRESENTATION LAYER -->
+  <g transform="translate(190, 50)">
+    <rect x="0" y="0" width="670" height="150" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+    <text x="335" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#1d4ed8">Presentation Layer (StudentNameMVC)</text>
+
+    <!-- Card 1: Controllers -->
+    <g transform="translate(20, 42)">
+      <rect x="0" y="0" width="195" height="92" rx="8" fill="#ffffff" stroke="#93c5fd" stroke-width="1.5" filter="url(#card-shadow)"/>
+      <text x="97" y="28" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">Controllers</text>
+      <text x="97" y="52" text-anchor="middle" font-size="11.5" fill="#475569">StudentReports, ClassReports</text>
+      <text x="97" y="70" text-anchor="middle" font-size="11.5" fill="#475569">Account, Home, NewsArticle</text>
+    </g>
+
+    <!-- Card 2: Views -->
+    <g transform="translate(235, 42)">
+      <rect x="0" y="0" width="195" height="92" rx="8" fill="#ffffff" stroke="#93c5fd" stroke-width="1.5" filter="url(#card-shadow)"/>
+      <text x="97" y="28" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">Views</text>
+      <text x="97" y="52" text-anchor="middle" font-size="11.5" fill="#475569">Razor (.cshtml)</text>
+      <text x="97" y="70" text-anchor="middle" font-size="11.5" fill="#475569">Bootstrap 5, Chart.js</text>
+    </g>
+
+    <!-- Card 3: ViewModels -->
+    <g transform="translate(450, 42)">
+      <rect x="0" y="0" width="195" height="92" rx="8" fill="#ffffff" stroke="#93c5fd" stroke-width="1.5" filter="url(#card-shadow)"/>
+      <text x="97" y="28" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">ViewModels</text>
+      <text x="97" y="52" text-anchor="middle" font-size="11.5" fill="#475569">StudentReport, ClassReport</text>
+      <text x="97" y="70" text-anchor="middle" font-size="11.5" fill="#475569">Login, SystemAccount</text>
+    </g>
+  </g>
+
+  <!-- Arrows Presentation <-> Business -->
+  <g transform="translate(190, 200)">
+    <line x1="270" y1="2" x2="270" y2="44" stroke="#0f172a" stroke-width="2" marker-end="url(#arrow-solid)"/>
+    <line x1="390" y1="44" x2="390" y2="2" stroke="#0f172a" stroke-width="2" stroke-dasharray="6,6" marker-end="url(#arrow-solid)"/>
+  </g>
+
+  <!-- 2. BUSINESS LAYER -->
+  <g transform="translate(190, 248)">
+    <rect x="0" y="0" width="670" height="150" rx="8" fill="#f0fdf4" stroke="#22c55e" stroke-width="2" filter="url(#shadow)"/>
+    <text x="335" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#15803d">Business Layer (AIVES.BLL)</text>
+
+    <!-- Card 1: AccountService -->
+    <g transform="translate(15, 42)">
+      <rect x="0" y="0" width="150" height="92" rx="8" fill="#ffffff" stroke="#86efac" stroke-width="1.5" filter="url(#card-shadow)"/>
+      <text x="75" y="27" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">AccountService</text>
+      <text x="75" y="50" text-anchor="middle" font-size="11" fill="#475569">AuthService</text>
+      <text x="75" y="68" text-anchor="middle" font-size="11" fill="#475569">PBKDF2 hasher</text>
+    </g>
+
+    <!-- Card 2: ExamReporting -->
+    <g transform="translate(177, 42)">
+      <rect x="0" y="0" width="150" height="92" rx="8" fill="#ffffff" stroke="#86efac" stroke-width="1.5" filter="url(#card-shadow)"/>
+      <text x="75" y="27" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">ExamReporting</text>
+      <text x="75" y="50" text-anchor="middle" font-size="11" fill="#475569">StudentReportService</text>
+      <text x="75" y="68" text-anchor="middle" font-size="11" fill="#475569">ClassReportService</text>
+    </g>
+
+    <!-- Card 3: CoreServices -->
+    <g transform="translate(339, 42)">
+      <rect x="0" y="0" width="150" height="92" rx="8" fill="#ffffff" stroke="#86efac" stroke-width="1.5" filter="url(#card-shadow)"/>
+      <text x="75" y="27" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">CoreServices</text>
+      <text x="75" y="50" text-anchor="middle" font-size="11" fill="#475569">NewsArticleService</text>
+      <text x="75" y="68" text-anchor="middle" font-size="11" fill="#475569">CategoryService</text>
+    </g>
+
+    <!-- Card 4: Interfaces -->
+    <g transform="translate(501, 42)">
+      <rect x="0" y="0" width="154" height="92" rx="8" fill="#ffffff" stroke="#86efac" stroke-width="1.5" filter="url(#card-shadow)"/>
+      <text x="77" y="27" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">Interfaces</text>
+      <text x="77" y="50" text-anchor="middle" font-size="11" fill="#475569">DTOs, Models</text>
+      <text x="77" y="68" text-anchor="middle" font-size="11" fill="#475569">ServiceResult</text>
+    </g>
+  </g>
+
+  <!-- Arrows Business <-> Data Access -->
+  <g transform="translate(190, 398)">
+    <line x1="270" y1="2" x2="270" y2="44" stroke="#0f172a" stroke-width="2" marker-end="url(#arrow-solid)"/>
+    <line x1="390" y1="44" x2="390" y2="2" stroke="#0f172a" stroke-width="2" stroke-dasharray="6,6" marker-end="url(#arrow-solid)"/>
+  </g>
+
+  <!-- 3. DATA ACCESS LAYER -->
+  <g transform="translate(190, 446)">
+    <rect x="0" y="0" width="570" height="150" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="2" filter="url(#shadow)"/>
+    <text x="285" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#b91c1c">Data Access Layer (AIVES.DAL)</text>
+
+    <!-- Card 1: Repositories -->
+    <g transform="translate(15, 42)">
+      <rect x="0" y="0" width="170" height="92" rx="8" fill="#ffffff" stroke="#fca5a5" stroke-width="1.5" filter="url(#card-shadow)"/>
+      <text x="85" y="27" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">Repositories</text>
+      <text x="85" y="50" text-anchor="middle" font-size="11" fill="#475569">Account, NewsArticle</text>
+      <text x="85" y="68" text-anchor="middle" font-size="11" fill="#475569">Category, Tag</text>
+    </g>
+
+    <!-- Card 2: DAOs -->
+    <g transform="translate(198, 42)">
+      <rect x="0" y="0" width="175" height="92" rx="8" fill="#ffffff" stroke="#fca5a5" stroke-width="1.5" filter="url(#card-shadow)"/>
+      <text x="87" y="27" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">DAOs</text>
+      <text x="87" y="50" text-anchor="middle" font-size="11" fill="#475569">Singleton pattern</text>
+      <text x="87" y="68" text-anchor="middle" font-size="11" fill="#475569">Thread-safe</text>
+    </g>
+
+    <!-- Card 3: AIVESDbContext -->
+    <g transform="translate(385, 42)">
+      <rect x="0" y="0" width="170" height="92" rx="8" fill="#ffffff" stroke="#fca5a5" stroke-width="1.5" filter="url(#card-shadow)"/>
+      <text x="85" y="27" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">AIVESDbContext</text>
+      <text x="85" y="50" text-anchor="middle" font-size="11" fill="#475569">Scaffold-DbContext</text>
+      <text x="85" y="68" text-anchor="middle" font-size="11" fill="#475569">(Database First)</text>
+    </g>
+  </g>
+
+  <!-- Arrow DAL <-> SQL Server -->
+  <line x1="760" y1="521" x2="795" y2="521" stroke="#475569" stroke-width="2" marker-start="url(#arrow-db)" marker-end="url(#arrow-db)"/>
+
+  <!-- SQL Server Database Cylinder -->
+  <g transform="translate(800, 448)">
+    <path d="M 0 20 C 0 8 135 8 135 20 L 135 125 C 135 137 0 137 0 125 Z" fill="#f8fafc" stroke="#475569" stroke-width="2" filter="url(#shadow)"/>
+    <ellipse cx="67.5" cy="20" rx="67.5" ry="12" fill="#e2e8f0" stroke="#475569" stroke-width="2"/>
+    <text x="67.5" y="55" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">SQL Server</text>
+    <text x="67.5" y="74" text-anchor="middle" font-size="12" font-weight="700" fill="#2563eb">AIVESDb</text>
+    <text x="67.5" y="96" text-anchor="middle" font-size="10.5" fill="#64748b">Accounts, Reports</text>
+    <text x="67.5" y="112" text-anchor="middle" font-size="10.5" fill="#64748b">News, Categories</text>
+  </g>
+
+  <!-- RIGHT COLUMN: Legends & Project References -->
+  <!-- Legends Card -->
+  <g transform="translate(890, 50)">
+    <rect x="0" y="0" width="240" height="120" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" filter="url(#card-shadow)"/>
+    <text x="20" y="30" font-size="14" font-weight="700" fill="#0f172a">Legends</text>
+
+    <!-- Item 1: Request -->
+    <line x1="20" y1="58" x2="80" y2="58" stroke="#0f172a" stroke-width="2" marker-end="url(#arrow-solid)"/>
+    <text x="95" y="63" font-size="12.5" fill="#334155">: Request</text>
+
+    <!-- Item 2: Response -->
+    <line x1="20" y1="92" x2="80" y2="92" stroke="#0f172a" stroke-width="2" stroke-dasharray="6,6" marker-end="url(#arrow-solid)"/>
+    <text x="95" y="97" font-size="12.5" fill="#334155">: Response</text>
+  </g>
+
+  <!-- Project References Card -->
+  <g transform="translate(890, 185)">
+    <rect x="0" y="0" width="240" height="165" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" filter="url(#card-shadow)"/>
+    <text x="20" y="30" font-size="14" font-weight="700" fill="#0f172a">Project references</text>
+    
+    <text x="20" y="60" font-size="12.5" fill="#334155">WebMVC → Business</text>
+    <text x="20" y="82" font-size="12.5" fill="#334155">Business → DataAccess</text>
+    
+    <text x="20" y="118" font-size="11" fill="#64748b">WebMVC never references</text>
+    <text x="20" y="136" font-size="11" fill="#64748b">DataAccess / DbContext</text>
+  </g>
+</svg>
