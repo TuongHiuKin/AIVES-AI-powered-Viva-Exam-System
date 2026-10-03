@@ -11,8 +11,12 @@ public sealed class SystemAccountRepository(AIVESDbContext context) : ISystemAcc
     public Task<bool> ResetPasswordAsync(int id, string email, string expectedHash, string newHash, CancellationToken ct = default) =>
         SystemAccountDAO.Instance.ResetPasswordAsync(context, id, email, expectedHash, newHash, ct);
 
-    public Task<List<SystemAccount>> SearchAsync(string? keyword = null, CancellationToken ct = default) =>
-        SystemAccountDAO.Instance.SearchAsync(context, keyword, ct);
+    public Task<List<SystemAccount>> SearchAsync(
+        string? keyword = null,
+        byte? role = null,
+        bool includeDeleted = false,
+        CancellationToken ct = default) =>
+        SystemAccountDAO.Instance.SearchAsync(context, keyword, role, includeDeleted, ct);
 
     public Task<SystemAccount?> GetByIdAsync(int id, bool includeDeleted = false, CancellationToken ct = default) =>
         SystemAccountDAO.Instance.GetByIdAsync(context, id, includeDeleted, ct);

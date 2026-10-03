@@ -193,10 +193,17 @@ public class AccountController : Controller
     [HttpGet]
     public async Task<IActionResult> Index(
         string? keyword,
+        byte? roleFilter,
         [FromServices] ISystemAccountService accountService,
-        CancellationToken ct)
+        CancellationToken ct = default)
     {
-        var accounts = await accountService.SearchAccountsAsync(keyword, ct);
+        if (roleFilter.HasValue && roleFilter.Value is not (1 or 2))
+        {
+            ModelState.AddModelError(nameof(roleFilter), "Vai trò lọc không hợp lệ. Chỉ chấp nhận Sinh viên (1) hoặc Giảng viên (2).");
+            roleFilter = null;
+        }
+
+        var accounts = await accountService.SearchAccountsAsync(keyword, roleFilter, includeDeleted: true, ct);
 
         var items = new List<AccountItemViewModel>();
         foreach (var a in accounts)
@@ -209,13 +216,16 @@ public class AccountController : Controller
                 AccountEmail = a.AccountEmail,
                 AccountRole = a.AccountRole,
                 IsDeleted = a.IsDeleted,
-                IsReferenced = isReferenced
+                IsReferenced = isReferenced,
+                StudentCode = null,
+                ClassName = null
             });
         }
 
         var viewModel = new AccountIndexViewModel
         {
             Keyword = keyword,
+            RoleFilter = roleFilter,
             Accounts = items
         };
 

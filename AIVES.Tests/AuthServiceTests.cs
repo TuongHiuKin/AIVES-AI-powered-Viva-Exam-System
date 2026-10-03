@@ -194,7 +194,11 @@ public sealed class AuthServiceTests
             return Task.FromResult(IdAccount?.AccountId == id ? IdAccount : null);
         }
 
-        public Task<List<SystemAccount>> SearchAsync(string? keyword = null, CancellationToken ct = default) =>
+        public Task<List<SystemAccount>> SearchAsync(
+            string? keyword = null,
+            byte? role = null,
+            bool includeDeleted = false,
+            CancellationToken ct = default) =>
             throw new NotSupportedException();
         public Task<bool> EmailExistsAsync(string email, int? exceptId = null, CancellationToken ct = default) =>
             throw new NotSupportedException();
